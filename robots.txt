@@ -1,1 +1,1 @@
-User-agent: * Disallow: Sitemap: https://jindongwang.github.io/sitemap.xml
+User-agent: * Disallow: Sitemap: https://github.com/AliceAii/sitemap.xml
