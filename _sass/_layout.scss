@@ -2,7 +2,7 @@
  * Content
  ******************************************************************************/
 
-body {
+ body {
   padding-bottom: 70px;
   color: var(--global-text-color);
   background-color: var(--global-bg-color);
@@ -39,15 +39,66 @@ body.sticky-bottom-footer {
 }
 
 // TODO: redefine content layout.
+.educational-experiences {
+  font-size: 0.9rem; 
+  line-height: 1.6; 
+  margin-top: 1rem;
+}
 
-/******************************************************************************
- * Publications
- ******************************************************************************/
+.degree {
+  display: flex;
+  justify-content: space-between; 
+  align-items: flex-start;
+  margin-bottom: 1rem;
 
-// TODO: redefine publications layout.
+  strong {
+    font-size: 1rem; 
+    display: block;
+    margin-bottom: 0.3rem; 
+  }
 
-/*****************************************************************************
-* Projects
-*****************************************************************************/
+  span {
+    display: block; 
+    font-size: 0.95em; 
+    color: #444; 
+  }
+}
 
-// TODO: redefine projects layout.
+.year-right {
+  text-align: right; 
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.degree-layout {
+  display: flex;
+  justify-content: space-between; /* 将两边的内容分散排列 */
+  align-items: baseline;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.degree-layout .school {
+  font-style: italic;
+  font-size: 0.95rem;
+  margin-right: 2rem; /* 增加右侧的间距 */
+}
+
+.degree-layout .year {
+  font-size: 0.95rem;
+  font-weight: normal;
+  color: #555;
+  text-align: right;
+}
+
+.conference-paper {
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.conference-paper strong {
+  font-weight: bold;
+}
+
+
