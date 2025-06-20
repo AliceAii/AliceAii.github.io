@@ -1,6 +1,6 @@
 ---
-title: "Post With Code"
-author: "Harlow Malloc"
+title: "Post With Code in R"
+author: "Shuhan (Alice) Ai"
 date: "2025-06-20"
 categories: [news, code, analysis]
 image: "image.jpg"

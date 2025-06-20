@@ -4,7 +4,7 @@
     "href": "blog_posts.html",
     "title": "Blog Post",
     "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\ntheory\n\n\nanalysis\n\n\nreading list\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
+    "text": "Post With Code in R\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\ntheory\n\n\nanalysis\n\n\nreading list\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/welcome/index.html",
@@ -16,7 +16,7 @@
   {
     "objectID": "posts/post-with-code/index.html",
     "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
+    "title": "Post With Code in R",
     "section": "",
     "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
   },
