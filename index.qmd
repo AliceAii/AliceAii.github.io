@@ -15,5 +15,4 @@ about:
       href: https://github.com/AliceAii
 ---
 
-hello hello, write something about myself....
 I am a second year phd student
