@@ -1,0 +1,18 @@
+---
+title: "About"
+image: 233.jpeg
+about:
+  template: jolla
+  links:
+    - icon: google
+      text: Google
+      href: https://scholar.google.com/citations?user=jUyocCQAAAAJ&hl=en&oi=ao
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/shuhan-alice-ai-90146720b/
+    - icon: github
+      text: Github
+      href: https://github.com/AliceAii
+---
+
+hello hello, write something about myself....

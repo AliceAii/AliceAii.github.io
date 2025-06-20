@@ -1,0 +1,14 @@
+---
+title: "Welcome To My Blog"
+author: "Shuhan (Alice) Ai"
+date: "2025-06-17"
+categories: [theory, analysis, reading list]
+---
+
+This is the first post in a Quarto blog. Welcome!
+
+![](thumbnail.jpg)
+
+Since this post doesn't specify an explicit `image`, the first image in the post will be used in the listing page of posts.
+
+This was a project use xxx data. You can find the project [here](website)
