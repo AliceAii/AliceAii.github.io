@@ -1,0 +1,15 @@
+---
+title: "Causal Inference in Network Data: A Tutorial"
+author:
+  - Yingshi Huang
+  - Shuhan (Alice) Ai
+  - Kayla Teng
+  - Detao Ma
+date: "2025-06-20"
+categories: [SNA, Causal Inference, STATS]
+image: "snaimage.jpg"
+---
+
+This is a tutorial for the causal inference with network data.
+
+![](ciwithnetworkdata.pdf){width="100%" height="1000px"}

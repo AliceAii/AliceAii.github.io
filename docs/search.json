@@ -4,7 +4,7 @@
     "href": "blog_posts.html",
     "title": "Blog Post",
     "section": "",
-    "text": "Post With Code in R\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\ntheory\n\n\nanalysis\n\n\nreading list\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
+    "text": "Causal Inference in Network Data: A Tutorial\n\n\n\n\n\n\nSNA\n\n\nCausal Inference\n\n\nSTATS\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\ntheory\n\n\nanalysis\n\n\nreading list\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/welcome/index.html",
@@ -23,9 +23,9 @@
   {
     "objectID": "posts/post-with-code/index.html",
     "href": "posts/post-with-code/index.html",
-    "title": "Post With Code in R",
+    "title": "Causal Inference in Network Data: A Tutorial",
     "section": "",
-    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
+    "text": "This is a tutorial for the causal inference with network data.\n\n1 + 1\n\n[1] 2"
   },
   {
     "objectID": "index.html",
@@ -40,5 +40,12 @@
     "title": "Presentation",
     "section": "",
     "text": "Ai, S., & Eagan, K. (2025). What Factors Promote High School Students’ Development of Science Identity and STEM Major Aspiration? An Analysis of HSLS:09 Data. Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO.\nAi, S. (2025). A Critical Race Analysis of Black and Hispanic Female Graduate Students’ Enrollment Trends from 2012 to 2021. Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO.\n\n\n\n\nAi, S., Rios, M., Olivares, J., & Jiang, T. (2024). Can Community Cultural Wealth Guide Undergraduate Women of Color Toward STEM Careers? Examining HERI Data. Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN.\nRamos, H., Eagan, K., & Ai, S. (2024). BUILDing Science Identity: Exploring the Efficacy and Moderation Effects of a Nationally Funded Intervention. Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN.\nJiang, T., Ai, S., & Li, K. (2024). Revealing Contributions on Research Data: The Potential of Data Paper. Paper presentation at the MET/STI 2024 Workshop, Association for Information Science and Technology (ASIS&T), Virtual.\nAi, S. (2024). STEM Curriculum as a Catalyst: Narrowing Racial and Structural Inequalities. Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division L: Educational Policies and Politics, Philadelphia, PA."
+  },
+  {
+    "objectID": "posts/ci-with-networkdata/index.html",
+    "href": "posts/ci-with-networkdata/index.html",
+    "title": "Causal Inference in Network Data: A Tutorial",
+    "section": "",
+    "text": "This is a tutorial for the causal inference with network data."
   }
 ]
