@@ -4,14 +4,14 @@
     "href": "blog_posts.html",
     "title": "Blog Post",
     "section": "",
-    "text": "Causal Inference in Network Data: A Tutorial\n\n\n\n\n\n\nSNA\n\n\nCausal Inference\n\n\nSTATS\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\ntheory\n\n\nanalysis\n\n\nreading list\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
+    "text": "Causal Inference in Network Data: A Tutorial\n\n\n\n\n\n\nSNA\n\n\nCausal Inference\n\n\nSTATS\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\n\n\n\ntheory\n\n\nanalysis\n\n\nreading list\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/welcome/index.html",
     "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
+    "title": "Welcome to My Blog",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts.\nThis was a project use xxx data. You can find the project here"
+    "text": "Welcome to my blog!\nThis platform serves as a space for me to share reflections on my research journey, including theoretical insights, methodological explorations, and analytical code. I plan to update it periodically with content related to the topics I’m currently working on, the questions I’m grappling with, and the approaches I’m experimenting with in the field of educational and social science research. In addition to research-related content, I will also occasionally share curated reading lists and research reflections on selected academic articles.\nYou’ll find posts introducing conceptual frameworks, walkthroughs of data analysis in R, and brief commentaries on emerging methods in quantitative social science research. Some posts may be informal or exploratory which intended to spark dialogue rather than offer definitive answers.\nAll content on this blog is shared in the spirit of open academic exchange. If you notice any inaccuracies in methods, theoretical interpretations, or data approaches, I warmly welcome your comments and corrections. If you’d like to connect or discuss further, feel free to reach out via email [aishuhan@ucla.edu].\nThank you for visiting, and I hope you find something here that resonates with your own work or sparks new ideas.\nWarmly,\nAlice"
   },
   {
     "objectID": "presentation.html",
