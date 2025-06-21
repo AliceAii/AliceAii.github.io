@@ -17,7 +17,6 @@ website:
       - text: "CV"
         file: CV.qmd
     right:
-      - about.qmd
       - icon: github
         href: https://github.com/AliceAii
       - icon: google
