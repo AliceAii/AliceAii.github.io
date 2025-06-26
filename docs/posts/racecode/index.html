@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-06-25">
+
+<title>How to code Race? – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6bd9cfa162949bde0a231f530c97869d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">How to code Race?</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Critical Quant</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 25, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#the-traditional-way-categorical-coding" id="toc-the-traditional-way-categorical-coding" class="nav-link" data-scroll-target="#the-traditional-way-categorical-coding">The Traditional Way: Categorical Coding</a>
+  <ul class="collapse">
+  <li><a href="#potential-analysis-with-traditional-race-coding" id="toc-potential-analysis-with-traditional-race-coding" class="nav-link" data-scroll-target="#potential-analysis-with-traditional-race-coding">Potential Analysis with Traditional Race Coding</a></li>
+  <li><a href="#advantages" id="toc-advantages" class="nav-link" data-scroll-target="#advantages">Advantages</a></li>
+  <li><a href="#disadvantages" id="toc-disadvantages" class="nav-link" data-scroll-target="#disadvantages">Disadvantages</a></li>
+  </ul></li>
+  <li><a href="#alternative-way-1-binary-coding" id="toc-alternative-way-1-binary-coding" class="nav-link" data-scroll-target="#alternative-way-1-binary-coding">Alternative Way 1: Binary Coding</a>
+  <ul class="collapse">
+  <li><a href="#potential-analysis-with-binary-race-coding" id="toc-potential-analysis-with-binary-race-coding" class="nav-link" data-scroll-target="#potential-analysis-with-binary-race-coding">Potential Analysis with Binary Race Coding</a></li>
+  <li><a href="#advantages-1" id="toc-advantages-1" class="nav-link" data-scroll-target="#advantages-1">Advantages</a></li>
+  <li><a href="#disadvantages-1" id="toc-disadvantages-1" class="nav-link" data-scroll-target="#disadvantages-1">Disadvantages</a></li>
+  </ul></li>
+  <li><a href="#alternative-way-2-effect-coding" id="toc-alternative-way-2-effect-coding" class="nav-link" data-scroll-target="#alternative-way-2-effect-coding">Alternative Way 2: Effect Coding</a>
+  <ul class="collapse">
+  <li><a href="#statistical-idea" id="toc-statistical-idea" class="nav-link" data-scroll-target="#statistical-idea">Statistical Idea</a></li>
+  <li><a href="#apply-effect-coding-and-run-the-regression" id="toc-apply-effect-coding-and-run-the-regression" class="nav-link" data-scroll-target="#apply-effect-coding-and-run-the-regression">Apply Effect Coding and Run the Regression</a></li>
+  <li><a href="#advantages-2" id="toc-advantages-2" class="nav-link" data-scroll-target="#advantages-2">Advantages</a></li>
+  <li><a href="#disadvantages-2" id="toc-disadvantages-2" class="nav-link" data-scroll-target="#disadvantages-2">Disadvantages</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a>
+  <ul class="collapse">
+  <li><a href="#which-method-should-i-use" id="toc-which-method-should-i-use" class="nav-link" data-scroll-target="#which-method-should-i-use">Which Method Should I Use?</a></li>
+  <li><a href="#final-considerations" id="toc-final-considerations" class="nav-link" data-scroll-target="#final-considerations">Final Considerations</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>This post will show several ways of race coding in quantitative social science research.</p>
+<p><img src="racecode.jpg" class="img-fluid"></p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>When conducting social science research, especially in critical quantitative studies, race is a sensitive variable that requires careful consideration. Traditional approaches to coding race often fall short when attempting to capture the complex realities of students who identify with multiple racial categories. This tutorial will explore three different methods for handling race variables in your analyses, each method has advantages and limitations.</p>
+</section>
+<section id="the-traditional-way-categorical-coding" class="level2">
+<h2 class="anchored" data-anchor-id="the-traditional-way-categorical-coding">The Traditional Way: Categorical Coding</h2>
+<p>The traditional approach treats race as a single categorical variable with mutually exclusive categories such as White, Black, Asian, Hispanic, Multiracial, and Other. This method forces each participant into one category, even if they identify with multiple racial groups.</p>
+<p>Following is a simulated dataset to demonstrate this approach:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Simulate traditional categorical race data</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>traditional_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">student_id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">race_traditional =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"White"</span>, <span class="st">"Black"</span>, <span class="st">"Asian"</span>, <span class="st">"Hispanic"</span>, <span class="st">"Multiracial"</span>, <span class="st">"Other"</span>), </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                           n, <span class="at">replace =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.45</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.12</span>, <span class="fl">0.06</span>, <span class="fl">0.02</span>)),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">college_gpa =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">3.2</span>, <span class="at">sd =</span> <span class="fl">0.5</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">science_identity =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">4.0</span>, <span class="at">sd =</span> <span class="fl">1.2</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>traditional_data<span class="sc">$</span>science_identity[traditional_data<span class="sc">$</span>race_traditional <span class="sc">==</span> <span class="st">"Asian"</span>] <span class="ot">&lt;-</span> </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  traditional_data<span class="sc">$</span>science_identity[traditional_data<span class="sc">$</span>race_traditional <span class="sc">==</span> <span class="st">"Asian"</span>] <span class="sc">+</span> <span class="fl">0.3</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(traditional_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  student_id race_traditional college_gpa science_identity
+1          1            White    3.012199         5.846116
+2          2            Black    2.919062         3.868348
+3          3            White    3.028041         4.613765
+4          4         Hispanic    3.245248         4.256750
+5          5      Multiracial    3.999254         3.776655
+6          6            White    3.155717         3.855527</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(traditional_data<span class="sc">$</span>race_traditional)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+      Asian       Black    Hispanic Multiracial       Other       White 
+         92          77          55          27          12         237 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Check the factor levels - this determines the reference group</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(<span class="fu">factor</span>(traditional_data<span class="sc">$</span>race_traditional))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Asian"       "Black"       "Hispanic"    "Multiracial" "Other"      
+[6] "White"      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By default, R uses alphabetical order, so "Asian" would be the reference group</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Explicitly set White as reference group for clearer interpretation</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>traditional_data<span class="sc">$</span>race_traditional <span class="ot">&lt;-</span> <span class="fu">factor</span>(traditional_data<span class="sc">$</span>race_traditional, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"White"</span>, <span class="st">"Asian"</span>, <span class="st">"Black"</span>, <span class="st">"Hispanic"</span>, <span class="st">"Multiracial"</span>, <span class="st">"Other"</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Confirm White is now the reference group (first level)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(traditional_data<span class="sc">$</span>race_traditional)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "White"       "Asian"       "Black"       "Hispanic"    "Multiracial"
+[6] "Other"      </code></pre>
+</div>
+</div>
+<section id="potential-analysis-with-traditional-race-coding" class="level3">
+<h3 class="anchored" data-anchor-id="potential-analysis-with-traditional-race-coding">Potential Analysis with Traditional Race Coding</h3>
+<ul>
+<li>Regression analysis</li>
+<li>ANOVA</li>
+<li>Post-hoc tests</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Linear regression with traditional categorical race variable</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>traditional_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(science_identity <span class="sc">~</span> race_traditional <span class="sc">+</span> college_gpa, <span class="at">data =</span> traditional_data)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(traditional_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = science_identity ~ race_traditional + college_gpa, 
+    data = traditional_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1993 -0.8330  0.0016  0.7314  3.7727 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                  4.13485    0.35884  11.523  &lt; 2e-16 ***
+race_traditionalAsian        0.40274    0.15044   2.677  0.00767 ** 
+race_traditionalBlack        0.01130    0.16081   0.070  0.94399    
+race_traditionalHispanic     0.04394    0.18348   0.240  0.81082    
+race_traditionalMultiracial  0.05976    0.24887   0.240  0.81032    
+race_traditionalOther       -0.35093    0.36377  -0.965  0.33516    
+college_gpa                 -0.03989    0.10991  -0.363  0.71683    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.224 on 493 degrees of freedom
+Multiple R-squared:  0.01832,   Adjusted R-squared:  0.006373 
+F-statistic: 1.533 on 6 and 493 DF,  p-value: 0.1652</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Additional analyses</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOVA for science identity by race</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>anova_result <span class="ot">&lt;-</span> <span class="fu">aov</span>(science_identity <span class="sc">~</span> race_traditional, <span class="at">data =</span> traditional_data)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(anova_result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                  Df Sum Sq Mean Sq F value Pr(&gt;F)
+race_traditional   5   13.6   2.718   1.817  0.108
+Residuals        494  739.0   1.496               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Post-hoc tests</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">TukeyHSD</span>(anova_result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = science_identity ~ race_traditional, data = traditional_data)
+
+$race_traditional
+                             diff         lwr       upr     p adj
+Asian-White           0.401102578 -0.02873138 0.8309365 0.0832504
+Black-White           0.008146734 -0.45085693 0.4671504 1.0000000
+Hispanic-White        0.040401167 -0.48332801 0.5641303 0.9999281
+Multiracial-White     0.056002743 -0.65474710 0.7667526 0.9999202
+Other-White          -0.338777734 -1.37417196 0.6966165 0.9370082
+Black-Asian          -0.392955844 -0.93343001 0.1475183 0.2994279
+Hispanic-Asian       -0.360701411 -0.95712426 0.2357214 0.5123743
+Multiracial-Asian    -0.345099835 -1.11099362 0.4207940 0.7910142
+Other-Asian          -0.739880312 -1.81387713 0.3341165 0.3606136
+Hispanic-Black        0.032254433 -0.58552169 0.6500306 0.9999896
+Multiracial-Black     0.047856009 -0.73478083 0.8304928 0.9999773
+Other-Black          -0.346924468 -1.43292460 0.7390757 0.9428997
+Multiracial-Hispanic  0.015601576 -0.80666864 0.8378718 0.9999999
+Other-Hispanic       -0.379178901 -1.49407987 0.7357221 0.9263404
+Other-Multiracial    -0.394780477 -1.60881395 0.8192530 0.9385782</code></pre>
+</div>
+</div>
+</section>
+<section id="advantages" class="level3">
+<h3 class="anchored" data-anchor-id="advantages">Advantages</h3>
+<ul>
+<li><strong>Simplicity:</strong> Easy to understand and implement.</li>
+<li><strong>Support Standard analyses:</strong> Compatible with ANOVA, chi-square tests, and most statistical procedures.</li>
+<li><strong>Clear group comparisons:</strong> Straightforward interpretation of group differences.</li>
+</ul>
+</section>
+<section id="disadvantages" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages">Disadvantages</h3>
+<ul>
+<li><strong>Reference group dependency:</strong> Results are interpreted relative to a chosen reference category (typically White), which can reinforce hierarchical thinking about race.</li>
+<li><strong>Lmited representation:</strong> Students identifying as both White and Hispanic, or Black and Asian, are lumped into a generic “Multiracial” category. This “Multiracial” category obscures the specific combination of racial identities.</li>
+</ul>
+</section>
+</section>
+<section id="alternative-way-1-binary-coding" class="level2">
+<h2 class="anchored" data-anchor-id="alternative-way-1-binary-coding">Alternative Way 1: Binary Coding</h2>
+<p>Dummy coding creates separate binary variables for each racial category, allowing students to be coded as belonging to multiple groups simultaneously.</p>
+<p>Let’s see a simulated case.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create dummy-coded race variables</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dummy_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">student_id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">college_gpa =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">3.2</span>, <span class="at">sd =</span> <span class="fl">0.5</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">science_identity =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">4.0</span>, <span class="at">sd =</span> <span class="fl">1.2</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Create binary race variables (allowing multiple identities)</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>white <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">0.4</span>))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>black <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>))</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>asian <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.75</span>, <span class="fl">0.25</span>))</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>hispanic <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>))</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Add a multiracial category for students identifying with multiple groups</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>multiracial <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Ensure some students have multiple identities</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>multiracial_ids <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="at">size =</span> <span class="dv">30</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>asian[multiracial_ids[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>white[multiracial_ids[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>multiracial[multiracial_ids[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span>  <span class="co">#mark as multiracial</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>black[multiracial_ids[<span class="dv">16</span><span class="sc">:</span><span class="dv">30</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>hispanic[multiracial_ids[<span class="dv">16</span><span class="sc">:</span><span class="dv">30</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>multiracial[multiracial_ids[<span class="dv">16</span><span class="sc">:</span><span class="dv">30</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span>  <span class="co">#mark as multiracial</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>science_identity[dummy_data<span class="sc">$</span>asian <span class="sc">==</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> </span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  dummy_data<span class="sc">$</span>science_identity[dummy_data<span class="sc">$</span>asian <span class="sc">==</span> <span class="dv">1</span>] <span class="sc">+</span> <span class="fl">0.3</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>dummy_data<span class="sc">$</span>total_races <span class="ot">&lt;-</span> dummy_data<span class="sc">$</span>white <span class="sc">+</span> dummy_data<span class="sc">$</span>black <span class="sc">+</span> </span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>                         dummy_data<span class="sc">$</span>asian <span class="sc">+</span> dummy_data<span class="sc">$</span>hispanic <span class="sc">+</span> dummy_data<span class="sc">$</span>multiracial</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="potential-analysis-with-binary-race-coding" class="level3">
+<h3 class="anchored" data-anchor-id="potential-analysis-with-binary-race-coding">Potential Analysis with Binary Race Coding</h3>
+<ul>
+<li>Regression analysis</li>
+<li>t.test</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Linear regression with dummy-coded race variables</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>dummy_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(science_identity <span class="sc">~</span> white <span class="sc">+</span> black <span class="sc">+</span> asian <span class="sc">+</span> hispanic <span class="sc">+</span> multiracial <span class="sc">+</span> college_gpa, </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> dummy_data)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dummy_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = science_identity ~ white + black + asian + hispanic + 
+    multiracial + college_gpa, data = dummy_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1157 -0.7986 -0.0094  0.7565  3.4763 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  4.50824    0.34959  12.896   &lt;2e-16 ***
+white        0.16506    0.10748   1.536   0.1252    
+black       -0.04779    0.14274  -0.335   0.7379    
+asian        0.22991    0.11929   1.927   0.0545 .  
+hispanic    -0.07766    0.14697  -0.528   0.5975    
+multiracial  0.18770    0.24330   0.771   0.4408    
+college_gpa -0.17517    0.10467  -1.673   0.0949 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.162 on 493 degrees of freedom
+Multiple R-squared:  0.02285,   Adjusted R-squared:  0.01096 
+F-statistic: 1.921 on 6 and 493 DF,  p-value: 0.07568</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Analysis of White-Asian students specifically</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>white_asian <span class="ot">&lt;-</span> dummy_data[dummy_data<span class="sc">$</span>white <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> dummy_data<span class="sc">$</span>asian <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(white_asian<span class="sc">$</span>science_identity, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.220716</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Compare with single-race students science identity vs multi-race identity</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>single_race <span class="ot">&lt;-</span> dummy_data[dummy_data<span class="sc">$</span>total_races <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>multi_race <span class="ot">&lt;-</span> dummy_data[dummy_data<span class="sc">$</span>total_races <span class="sc">&gt;</span> <span class="dv">1</span>, ]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(single_race<span class="sc">$</span>science_identity, multi_race<span class="sc">$</span>science_identity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  single_race$science_identity and multi_race$science_identity
+t = -0.2536, df = 302.83, p-value = 0.8
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.2799823  0.2160553
+sample estimates:
+mean of x mean of y 
+ 4.137296  4.169259 </code></pre>
+</div>
+</div>
+</section>
+<section id="advantages-1" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-1">Advantages</h3>
+<ul>
+<li><strong>Captures multiple identities:</strong> Students can be coded as belonging to multiple racial groups.</li>
+<li><strong>Specific comparisons:</strong> Researchers can examine the unique characteristics of specific multiracial combinations.</li>
+<li><strong>Flexible analysis:</strong> No forced categorization, better represents how students actually identify.</li>
+</ul>
+</section>
+<section id="disadvantages-1" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-1">Disadvantages</h3>
+<ul>
+<li><strong>Inflated sample size:</strong> The sum of all racial categories exceeds the actual number of participants.</li>
+<li><strong>Statistical complications:</strong> Traditional categorical tests (chi-square) are no longer appropriate.</li>
+<li><strong>Interpretation complexity:</strong> More difficult to interpret main effects when students belong to multiple categories.</li>
+<li><strong>Multicollinearity concerns:</strong> Racial variables may be correlated with each other.</li>
+</ul>
+</section>
+</section>
+<section id="alternative-way-2-effect-coding" class="level2">
+<h2 class="anchored" data-anchor-id="alternative-way-2-effect-coding">Alternative Way 2: Effect Coding</h2>
+<p><a href="https://link.springer.com/article/10.1007/s11162-015-9364-0">Mayhew &amp; Simonoff&nbsp;(2015)</a> propose <strong>effect coding</strong> as alternative approach that doesn’t rely on a reference group and better handles students who check multiple racial boxes.</p>
+<blockquote class="blockquote">
+<p><strong>Reference</strong>: Mayhew, M. J., &amp; Simonoff, J. S. (2015). Effect Coding as a Mechanism for Improving the Accuracy of Measuring Students Who Self‑Identify with More than One Race. <em>Research in Higher Education</em>, 56(6),&nbsp;571–600.</p>
+</blockquote>
+<section id="statistical-idea" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-idea">Statistical Idea</h3>
+<p>Effect coding (also known for <strong>sum-to-zero coding</strong>) forces the set of race‑indicator columns for <strong>each student</strong> to sum to&nbsp;0. When a respondent can select more than one race, Mayhew &amp;&nbsp;Simonoff&nbsp;(2015) recommend <em>fractional weights</em> so the rule still holds.</p>
+<blockquote class="blockquote">
+<p><strong>Rule of thumb</strong>&nbsp;&nbsp;If a student selects <em>m</em> race boxes, give each selected category a weight of <strong>1 / m</strong>. The omitted reference column automatically gets the negative of the row‑sum, keeping totals at&nbsp;0.</p>
+</blockquote>
+<section id="mini-example-three-race-categories-a-b-c" class="level4">
+<h4 class="anchored" data-anchor-id="mini-example-three-race-categories-a-b-c">Mini example: three race categories (A, B, C)</h4>
+<p>With three categories we need only <strong>two</strong> coded columns (EA and&nbsp;EB). The table below reproduces the logic in Mayhew&nbsp;&amp;&nbsp;Simonoff’s Table&nbsp;1 and shows how multi‑race selections receive fractional weights.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Selected Races</th>
+<th><span class="math inline">\(E_A\)</span></th>
+<th><span class="math inline">\(E_B\)</span></th>
+<th>Expected Mean of <em>y</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(b_0 + b_A\)</span></td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(b_0 + b_B\)</span></td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td><span class="math inline">\(-1\)</span></td>
+<td><span class="math inline">\(-1\)</span></td>
+<td><span class="math inline">\(b_0 - b_A - b_B\)</span></td>
+</tr>
+<tr class="even">
+<td>A &amp; B</td>
+<td><span class="math inline">\(1/2\)</span></td>
+<td><span class="math inline">\(1/2\)</span></td>
+<td><span class="math inline">\(b_0 + \frac{b_A}{2} + \frac{b_B}{2}\)</span></td>
+</tr>
+<tr class="odd">
+<td>A &amp; C</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(-1/2\)</span></td>
+<td><span class="math inline">\(b_0 - \frac{b_B}{2}\)</span></td>
+</tr>
+<tr class="even">
+<td>B &amp; C</td>
+<td><span class="math inline">\(-1/2\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(b_0 - \frac{b_A}{2}\)</span></td>
+</tr>
+<tr class="odd">
+<td>A, B &amp; C</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(b_0\)</span></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Intercept (b0) is the grand mean across all racial groups.</li>
+<li>Each coefficient (bA, bB) is that group’s deviation from the grand mean.</li>
+<li>Because rows always add to&nbsp;0, no single group is the “reference group”.</li>
+</ul>
+</section>
+<section id="generalising-to-k-categories" class="level4">
+<h4 class="anchored" data-anchor-id="generalising-to-k-categories">Generalising to <em>k</em> categories</h4>
+<p><code>contr.sum(k)</code> makes the k&nbsp;–&nbsp;1 columns automatically. It sets up the k − 1 contrast vectors for single-race categories. The last category (by default) is omitted and represented as the negative sum of the other categories’ contrasts.</p>
+</section>
+</section>
+<section id="apply-effect-coding-and-run-the-regression" class="level3">
+<h3 class="anchored" data-anchor-id="apply-effect-coding-and-run-the-regression">Apply Effect Coding and Run the Regression</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Use the same traditional categorical race data</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>effect_data <span class="ot">&lt;-</span> traditional_data</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Convert race_traditional to factor for effect coding</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>effect_data<span class="sc">$</span>race_traditional <span class="ot">&lt;-</span> <span class="fu">factor</span>(effect_data<span class="sc">$</span>race_traditional)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(effect_data<span class="sc">$</span>race_traditional)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+      White       Asian       Black    Hispanic Multiracial       Other 
+        237          92          77          55          27          12 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create effect-coded contrasts</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#This will use "Other" as the omitted category (coded as -1 for all contrasts, like C in the above example)</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(effect_data<span class="sc">$</span>race_traditional) <span class="ot">&lt;-</span> <span class="fu">contr.sum</span>(<span class="dv">6</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#contrasts(effect_data$race_traditional) &lt;- contr.sum(length(levels(effect_data$race_traditional))) - same above</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Check the contrast matrix</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(effect_data<span class="sc">$</span>race_traditional)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            [,1] [,2] [,3] [,4] [,5]
+White          1    0    0    0    0
+Asian          0    1    0    0    0
+Black          0    0    1    0    0
+Hispanic       0    0    0    1    0
+Multiracial    0    0    0    0    1
+Other         -1   -1   -1   -1   -1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Run the linear regression model</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>effect_model_1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(science_identity <span class="sc">~</span> race_traditional <span class="sc">+</span> college_gpa, <span class="at">data =</span> effect_data)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(effect_model_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = science_identity ~ race_traditional + college_gpa, 
+    data = effect_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1993 -0.8330  0.0016  0.7314  3.7727 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)        4.16265    0.35967  11.574  &lt; 2e-16 ***
+race_traditional1 -0.02780    0.10560  -0.263  0.79244    
+race_traditional2  0.37494    0.13348   2.809  0.00517 ** 
+race_traditional3 -0.01650    0.14138  -0.117  0.90714    
+race_traditional4  0.01614    0.15874   0.102  0.91905    
+race_traditional5  0.03196    0.20987   0.152  0.87903    
+college_gpa       -0.03989    0.10991  -0.363  0.71683    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.224 on 493 degrees of freedom
+Multiple R-squared:  0.01832,   Adjusted R-squared:  0.006373 
+F-statistic: 1.533 on 6 and 493 DF,  p-value: 0.1652</code></pre>
+</div>
+</div>
+<ul>
+<li>The intercept 4.16 is the <strong>grand mean</strong> of science identity across all races.</li>
+<li>Each race coefficient represents the difference from the grand mean:
+<ul>
+<li>Asian (-0.028): Students identifying as Asian have a science_identity ~0.028 points below the grand mean (not statistically significant).</li>
+<li>Black (+0.375): Students identifying as Black have science_identity ~0.375 points above the grand mean (significant at p &lt; .01).</li>
+<li>Hispanic (-0.017): Slightly below the grand mean, not significant.</li>
+<li>Multiracial (+0.016): Slightly above the grand mean, not significant.</li>
+<li>White (+0.032): Slightly above the grand mean, not significant.</li>
+</ul></li>
+<li>“Other” is the omitted category:
+<ul>
+<li>Its value is the negative sum of all the other categories’ contrasts.</li>
+<li>So its deviation from the grand mean is:
+<ul>
+<li><span class="math inline">\(-(sum) = -(-0.0278 + 0.3749 - 0.0165 + 0.0161 + 0.03196) ≈ -0.379\)</span></li>
+<li>So “Other” is <span class="math inline">\(-0.379\)</span> points below the grand mean, which is also the lowest science identity group.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="advantages-2" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-2">Advantages</h3>
+<ul>
+<li><strong>No reference group:</strong> Coefficients represent deviations from the grand mean, avoiding hierarchical comparisons.</li>
+<li><strong>Clearer interpretation:</strong> Effects are interpreted relative to the overall sample mean.</li>
+<li><strong>Reduced bias:</strong> Eliminates the arbitrary choice of reference group that can influence interpretation.</li>
+</ul>
+</section>
+<section id="disadvantages-2" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-2">Disadvantages</h3>
+<ul>
+<li><strong>Interpretation challenges:</strong> In multiracial applications, may still obscure differences between specific combinations (e.g., White-Black vs.&nbsp;Black-Asian students)</li>
+</ul>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<section id="which-method-should-i-use" class="level3">
+<h3 class="anchored" data-anchor-id="which-method-should-i-use">Which Method Should I Use?</h3>
+<p>The choice of coding method should ultimately depend on your research questions:</p>
+<ul>
+<li>If your research question focuses on comparing specific racial groups to a meaningful reference category (e.g., comparing minority groups to White students), traditional dummy coding may be appropriate.</li>
+<li>If you want to understand the unique experiences of students with multiple racial identities, dummy coding with binary race variables allows the most flexibility.</li>
+<li>If you want to avoid the hierarchical implications of reference groups and focus on how each group differs from the overall population, effect coding is preferable.</li>
+<li>If your research question requires understanding specific multiracial combinations (e.g., White-Asian vs.&nbsp;Black-Hispanic experiences), consider creating specific categorical variables for the combinations of interest.</li>
+</ul>
+</section>
+<section id="final-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="final-considerations">Final Considerations</h3>
+<p>Regardless of the coding method chosen, researchers should:</p>
+<ul>
+<li>Be transparent about your coding decisions and rationale.</li>
+<li>Consider the theoretical implications of your chosen approach.</li>
+<li>Validate your approach with sensitivity analyses when possible.</li>
+<li>Acknowledge the limitations of your chosen method in the discussion.</li>
+</ul>
+<p>Remember that no single approach perfectly captures the complexity of racial identity. The goal is to choose the method that best serves your research questions while remaining sensitive to the lived experiences of the students you’re studying.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
