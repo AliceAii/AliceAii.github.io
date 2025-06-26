@@ -249,10 +249,109 @@ summary(effect_model_1)
 ### Disadvantages
 - **Interpretation challenges:** In multiracial applications, may still obscure differences between specific combinations (e.g., White-Black vs. Black-Asian students)
 
+### Think further
+
+Can effect coding only be applied to mutually exclusive racial/ethnic categories?
+
+**Short answer:** No.
+
+**Long answer:** Effect coding is **not limited** to mutually exclusive racial or ethnic categories. In fact, according to Mayhew & Simonoff (2015), effect coding is especially well-suited for situations where students can identify with **multiple racial/ethnic groups**.
+
+> *“Effect coding and its application to multi-raced categories... allows students to be analyzed based on their self-identified multi-raced selection. In addition, effect coding allows a more accurate assessment of the slopes representing any one racial group by including the partial estimates for this racial group when it is selected as part of a bi- or multi-raced category.”*  
+> — *Mayhew & Simonoff (2015)*
+
+But:
+
+If students are allowed to select multiple racial/ethnic identities in a "check all that apply" survey, the number of possible combinations grows **exponentially**. For example, if there are 4 races — White, Asian, Black, and Hispanic — a student might identify with:
+
+- A single race (e.g., White)
+- A bi-racial combination (e.g., White and Asian)
+- A tri-racial combination (e.g., White, Asian, and Black)
+- All four races
+
+The total number of **non-empty** race combinations from 4 categories is:
+
+$$
+2^4 - 1 = 15
+$$
+
+This includes all possible non-empty subsets of the 4 categories.
+
+All possible combinations from 4 Races:
+
+| #  | Combination Type       | Races Selected                    |
+|----|------------------------|-----------------------------------|
+| 1  | Pure                   | White                             |
+| 2  | Pure                   | Asian                             |
+| 3  | Pure                   | Black                             |
+| 4  | Pure                   | Hispanic                          |
+| 5  | Bi-racial              | White + Asian                     |
+| 6  | Bi-racial              | White + Black                     |
+| 7  | Bi-racial              | White + Hispanic                  |
+| 8  | Bi-racial              | Asian + Black                     |
+| 9  | Bi-racial              | Asian + Hispanic                  |
+| 10 | Bi-racial              | Black + Hispanic                  |
+| 11 | Tri-racial             | White + Asian + Black             |
+| 12 | Tri-racial             | White + Asian + Hispanic          |
+| 13 | Tri-racial             | White + Black + Hispanic          |
+| 14 | Tri-racial             | Asian + Black + Hispanic          |
+| 15 | Four-race combination  | White + Asian + Black + Hispanic  |
+
+
+
+Following is the **effect coding contrast matrix** with all coefficients expressed as **fractions** and the corresponding expected value expressions *E(y)*, following the logic from Mayhew & Simonoff (2015). *We’re using:*
+
+- Races: **White (W)**, **Asian (A)**, **Black (B)**, **Hispanic (H)**
+- **Hispanic (H)** is the omitted group, so its effect is implicitly coded via $-1$s or complementary fractions.
+- The model is:
+
+$$
+E(y) = \beta_0 + E_W \cdot \beta_W + E_A \cdot \beta_A + E_B \cdot \beta_B
+$$
+
+
+Effect Coding Contrast Matrix for 4 Races (White, Asian, Black, Hispanic)
+
+| Races Selected               | $E_W$           | $E_A$           | $E_B$           | $E(y)$                                     |
+|-------------------------------|------------------|------------------|------------------|-----------------------------------------------|
+| White                       | $1$              | $0$              | $0$              | $\beta_0 + \beta_W$                             |
+| Asian                       | $0$              | $1$              | $0$              | $\beta_0 + \beta_A$                             |
+| Black                       | $0$              | $0$              | $1$              | $\beta_0 + \beta_B$                             |
+| Hispanic                    | $-1$             | $-1$             | $-1$             | $\beta_0 - \beta_W - \beta_A - \beta_B$         |
+| White + Asian               | $\frac{1}{2}$    | $\frac{1}{2}$    | $0$              | $\beta_0 + \frac{1}{2}\beta_W + \frac{1}{2}\beta_A$ |
+| White + Black               | $\frac{1}{2}$    | $0$              | $\frac{1}{2}$    | $\beta_0 + \frac{1}{2}\beta_W + \frac{1}{2}\beta_B$             |
+| White + Hispanic            | $0$              | $-\frac{1}{2}$   | $-\frac{1}{2}$   | $\beta_0 - \frac{1}{2}\beta_A - \frac{1}{2}\beta_B$             |
+| Asian + Black               | $0$              | $\frac{1}{2}$    | $\frac{1}{2}$    | $\beta_0 + \frac{1}{2}\beta_A + \frac{1}{2}\beta_B$             |
+| Asian + Hispanic            | $-\frac{1}{2}$   | $0$              | $-\frac{1}{2}$   | $\beta_0 - \frac{1}{2}\beta_W - \frac{1}{2}\beta_B$             |
+| Black + Hispanic            | $-\frac{1}{2}$   | $-\frac{1}{2}$   | $0$              | $\beta_0 - \frac{1}{2}\beta_W - \frac{1}{2}\beta_A$             |
+| White + Asian + Black       | $\frac{1}{3}$    | $\frac{1}{3}$    | $\frac{1}{3}$    | $\beta_0 + \frac{1}{3}\beta_W + \frac{1}{3}\beta_A + \frac{1}{3}\beta_B$ |
+| White + Asian + Hispanic    | $0$              | $0$              | $-\frac{1}{3}$   | $\beta_0 - \frac{1}{3}\beta_B$                                  |
+| White + Black + Hispanic    | $0$              | $-\frac{1}{3}$   | $0$              | $\beta_0 - \frac{1}{3}\beta_A$                                  |
+| Asian + Black + Hispanic    | $-\frac{1}{3}$   | $0$              | $0$              | $\beta_0 - \frac{1}{3}\beta_W$                                  |
+| White + Asian + Black + Hisp| $0$              | $0$              | $0$              | $\beta_0$                                                       |
+
+
+
+⚠️ Modeling Challenge 
+
+
+As the number of race categories increases, the total combinations grow rapidly:
+
+$$
+\text{Combinations} = 2^k - 1
+$$
+
+- For 5 races: $2^5 - 1 = 31$
+- For 6 races: $2^6 - 1 = 63$
+
+This leads to overfitting, reduced interpretability, and estimation instability.
+
+Maybe this time you want to just to consider effect coding with categorial race variables, just like our r example here. 
+
 
 ## Summary
 
-### Which Method Should I Use?
+### Which Methods Should I Use?
 
 The choice of coding method should ultimately depend on your research questions:
 

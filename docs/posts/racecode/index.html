@@ -257,10 +257,11 @@ window.Quarto = {
   <li><a href="#apply-effect-coding-and-run-the-regression" id="toc-apply-effect-coding-and-run-the-regression" class="nav-link" data-scroll-target="#apply-effect-coding-and-run-the-regression">Apply Effect Coding and Run the Regression</a></li>
   <li><a href="#advantages-2" id="toc-advantages-2" class="nav-link" data-scroll-target="#advantages-2">Advantages</a></li>
   <li><a href="#disadvantages-2" id="toc-disadvantages-2" class="nav-link" data-scroll-target="#disadvantages-2">Disadvantages</a></li>
+  <li><a href="#think-further" id="toc-think-further" class="nav-link" data-scroll-target="#think-further">Think further</a></li>
   </ul></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a>
   <ul class="collapse">
-  <li><a href="#which-method-should-i-use" id="toc-which-method-should-i-use" class="nav-link" data-scroll-target="#which-method-should-i-use">Which Method Should I Use?</a></li>
+  <li><a href="#which-methods-should-i-use" id="toc-which-methods-should-i-use" class="nav-link" data-scroll-target="#which-methods-should-i-use">Which Methods Should I Use?</a></li>
   <li><a href="#final-considerations" id="toc-final-considerations" class="nav-link" data-scroll-target="#final-considerations">Final Considerations</a></li>
   </ul></li>
   </ul>
@@ -728,11 +729,267 @@ F-statistic: 1.533 on 6 and 493 DF,  p-value: 0.1652</code></pre>
 <li><strong>Interpretation challenges:</strong> In multiracial applications, may still obscure differences between specific combinations (e.g., White-Black vs.&nbsp;Black-Asian students)</li>
 </ul>
 </section>
+<section id="think-further" class="level3">
+<h3 class="anchored" data-anchor-id="think-further">Think further</h3>
+<p>Can effect coding only be applied to mutually exclusive racial/ethnic categories?</p>
+<p><strong>Short answer:</strong> No.</p>
+<p><strong>Long answer:</strong> Effect coding is <strong>not limited</strong> to mutually exclusive racial or ethnic categories. In fact, according to Mayhew &amp; Simonoff (2015), effect coding is especially well-suited for situations where students can identify with <strong>multiple racial/ethnic groups</strong>.</p>
+<blockquote class="blockquote">
+<p><em>“Effect coding and its application to multi-raced categories… allows students to be analyzed based on their self-identified multi-raced selection. In addition, effect coding allows a more accurate assessment of the slopes representing any one racial group by including the partial estimates for this racial group when it is selected as part of a bi- or multi-raced category.”</em><br>
+— <em>Mayhew &amp; Simonoff (2015)</em></p>
+</blockquote>
+<p>But:</p>
+<p>If students are allowed to select multiple racial/ethnic identities in a “check all that apply” survey, the number of possible combinations grows <strong>exponentially</strong>. For example, if there are 4 races — White, Asian, Black, and Hispanic — a student might identify with:</p>
+<ul>
+<li>A single race (e.g., White)</li>
+<li>A bi-racial combination (e.g., White and Asian)</li>
+<li>A tri-racial combination (e.g., White, Asian, and Black)</li>
+<li>All four races</li>
+</ul>
+<p>The total number of <strong>non-empty</strong> race combinations from 4 categories is:</p>
+<p><span class="math display">\[
+2^4 - 1 = 15
+\]</span></p>
+<p>This includes all possible non-empty subsets of the 4 categories.</p>
+<p>All possible combinations from 4 Races:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Combination Type</th>
+<th>Races Selected</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Pure</td>
+<td>White</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Pure</td>
+<td>Asian</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Pure</td>
+<td>Black</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Pure</td>
+<td>Hispanic</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Bi-racial</td>
+<td>White + Asian</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Bi-racial</td>
+<td>White + Black</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Bi-racial</td>
+<td>White + Hispanic</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Bi-racial</td>
+<td>Asian + Black</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Bi-racial</td>
+<td>Asian + Hispanic</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Bi-racial</td>
+<td>Black + Hispanic</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Tri-racial</td>
+<td>White + Asian + Black</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Tri-racial</td>
+<td>White + Asian + Hispanic</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Tri-racial</td>
+<td>White + Black + Hispanic</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Tri-racial</td>
+<td>Asian + Black + Hispanic</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Four-race combination</td>
+<td>White + Asian + Black + Hispanic</td>
+</tr>
+</tbody>
+</table>
+<p>Following is the <strong>effect coding contrast matrix</strong> with all coefficients expressed as <strong>fractions</strong> and the corresponding expected value expressions <em>E(y)</em>, following the logic from Mayhew &amp; Simonoff (2015). <em>We’re using:</em></p>
+<ul>
+<li>Races: <strong>White (W)</strong>, <strong>Asian (A)</strong>, <strong>Black (B)</strong>, <strong>Hispanic (H)</strong></li>
+<li><strong>Hispanic (H)</strong> is the omitted group, so its effect is implicitly coded via <span class="math inline">\(-1\)</span>s or complementary fractions.</li>
+<li>The model is:</li>
+</ul>
+<p><span class="math display">\[
+E(y) = \beta_0 + E_W \cdot \beta_W + E_A \cdot \beta_A + E_B \cdot \beta_B
+\]</span></p>
+<p>Effect Coding Contrast Matrix for 4 Races (White, Asian, Black, Hispanic)</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 35%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Races Selected</th>
+<th><span class="math inline">\(E_W\)</span></th>
+<th><span class="math inline">\(E_A\)</span></th>
+<th><span class="math inline">\(E_B\)</span></th>
+<th><span class="math inline">\(E(y)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>White</td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0 + \beta_W\)</span></td>
+</tr>
+<tr class="even">
+<td>Asian</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0 + \beta_A\)</span></td>
+</tr>
+<tr class="odd">
+<td>Black</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(\beta_0 + \beta_B\)</span></td>
+</tr>
+<tr class="even">
+<td>Hispanic</td>
+<td><span class="math inline">\(-1\)</span></td>
+<td><span class="math inline">\(-1\)</span></td>
+<td><span class="math inline">\(-1\)</span></td>
+<td><span class="math inline">\(\beta_0 - \beta_W - \beta_A - \beta_B\)</span></td>
+</tr>
+<tr class="odd">
+<td>White + Asian</td>
+<td><span class="math inline">\(\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0 + \frac{1}{2}\beta_W + \frac{1}{2}\beta_A\)</span></td>
+</tr>
+<tr class="even">
+<td>White + Black</td>
+<td><span class="math inline">\(\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(\beta_0 + \frac{1}{2}\beta_W + \frac{1}{2}\beta_B\)</span></td>
+</tr>
+<tr class="odd">
+<td>White + Hispanic</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(-\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(-\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(\beta_0 - \frac{1}{2}\beta_A - \frac{1}{2}\beta_B\)</span></td>
+</tr>
+<tr class="even">
+<td>Asian + Black</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(\beta_0 + \frac{1}{2}\beta_A + \frac{1}{2}\beta_B\)</span></td>
+</tr>
+<tr class="odd">
+<td>Asian + Hispanic</td>
+<td><span class="math inline">\(-\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(-\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(\beta_0 - \frac{1}{2}\beta_W - \frac{1}{2}\beta_B\)</span></td>
+</tr>
+<tr class="even">
+<td>Black + Hispanic</td>
+<td><span class="math inline">\(-\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(-\frac{1}{2}\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0 - \frac{1}{2}\beta_W - \frac{1}{2}\beta_A\)</span></td>
+</tr>
+<tr class="odd">
+<td>White + Asian + Black</td>
+<td><span class="math inline">\(\frac{1}{3}\)</span></td>
+<td><span class="math inline">\(\frac{1}{3}\)</span></td>
+<td><span class="math inline">\(\frac{1}{3}\)</span></td>
+<td><span class="math inline">\(\beta_0 + \frac{1}{3}\beta_W + \frac{1}{3}\beta_A + \frac{1}{3}\beta_B\)</span></td>
+</tr>
+<tr class="even">
+<td>White + Asian + Hispanic</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(-\frac{1}{3}\)</span></td>
+<td><span class="math inline">\(\beta_0 - \frac{1}{3}\beta_B\)</span></td>
+</tr>
+<tr class="odd">
+<td>White + Black + Hispanic</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(-\frac{1}{3}\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0 - \frac{1}{3}\beta_A\)</span></td>
+</tr>
+<tr class="even">
+<td>Asian + Black + Hispanic</td>
+<td><span class="math inline">\(-\frac{1}{3}\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0 - \frac{1}{3}\beta_W\)</span></td>
+</tr>
+<tr class="odd">
+<td>White + Asian + Black + Hisp</td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(\beta_0\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ Modeling Challenge</p>
+<p>As the number of race categories increases, the total combinations grow rapidly:</p>
+<p><span class="math display">\[
+\text{Combinations} = 2^k - 1
+\]</span></p>
+<ul>
+<li>For 5 races: <span class="math inline">\(2^5 - 1 = 31\)</span></li>
+<li>For 6 races: <span class="math inline">\(2^6 - 1 = 63\)</span></li>
+</ul>
+<p>This leads to overfitting, reduced interpretability, and estimation instability.</p>
+<p>Maybe this time you want to just to consider effect coding with categorial race variables, just like our r example here.</p>
+</section>
 </section>
 <section id="summary" class="level2">
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<section id="which-method-should-i-use" class="level3">
-<h3 class="anchored" data-anchor-id="which-method-should-i-use">Which Method Should I Use?</h3>
+<section id="which-methods-should-i-use" class="level3">
+<h3 class="anchored" data-anchor-id="which-methods-should-i-use">Which Methods Should I Use?</h3>
 <p>The choice of coding method should ultimately depend on your research questions:</p>
 <ul>
 <li>If your research question focuses on comparing specific racial groups to a meaningful reference category (e.g., comparing minority groups to White students), traditional dummy coding may be appropriate.</li>
