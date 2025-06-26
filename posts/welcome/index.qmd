@@ -6,7 +6,7 @@ date: "2025-06-17"
 
 A space for sharing research and reflections.
 
-![](thumbnail.jpg)
+![](welcome.jpg)
 
 <br>
 
