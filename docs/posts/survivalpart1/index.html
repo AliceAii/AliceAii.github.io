@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-07-09">
 
-<title>Blog Post – Shuhan (Alice) Ai</title>
+<title>What is Survival Analysis? – Shuhan (Alice) Ai</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +25,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6bd9cfa162949bde0a231f530c97869d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6bd9cfa162949bde0a231f530c97869d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,35 +68,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -128,7 +99,7 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -138,7 +109,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Shuhan (Alice) Ai</span>
     </a>
   </div>
@@ -149,23 +120,23 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./publications.html"> 
+    <a class="nav-link" href="../../publications.html"> 
 <span class="menu-text">Publications</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./presentation.html"> 
+    <a class="nav-link" href="../../presentation.html"> 
 <span class="menu-text">Presentation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./blog_posts.html" aria-current="page"> 
+    <a class="nav-link" href="../../blog_posts.html"> 
 <span class="menu-text">Blog Posts</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./CV.html"> 
+    <a class="nav-link" href="../../CV.html"> 
 <span class="menu-text">CV</span></a>
   </li>  
 </ul>
@@ -195,183 +166,205 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Blog Post</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">What is Survival Analysis?</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Survival Analysis</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 9, 2025</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Q2F1c2FsJTIwSW5mZXJlbmNl">Causal Inference <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q3JpdGljYWwlMjBRdWFudA==">Critical Quant <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(2)</span></div><div class="category" data-category="U05B">SNA <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U1RBVFM=">STATS <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U3Vydml2YWwlMjBBbmFseXNpcw==">Survival Analysis <span class="quarto-category-count">(1)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#what-is-survival-analysis" id="toc-what-is-survival-analysis" class="nav-link active" data-scroll-target="#what-is-survival-analysis">1. What is survival analysis?</a></li>
+  <li><a href="#examples-of-research-in-higher-education-used-this-methods" id="toc-examples-of-research-in-higher-education-used-this-methods" class="nav-link" data-scroll-target="#examples-of-research-in-higher-education-used-this-methods">2. Examples of research in higher education used this methods</a></li>
+  <li><a href="#some-key-concept-and-notation" id="toc-some-key-concept-and-notation" class="nav-link" data-scroll-target="#some-key-concept-and-notation">3. Some key concept and notation</a></li>
+  <li><a href="#commom-strategies-in-doing-survial-analysis" id="toc-commom-strategies-in-doing-survial-analysis" class="nav-link" data-scroll-target="#commom-strategies-in-doing-survial-analysis">4. Commom strategies in doing survial analysis:</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<p>This post will introduce survival analysis and its application in higher education research.</p>
+<p><img src="survival1.jpg" class="img-fluid"></p>
+<section id="what-is-survival-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-survival-analysis">1. What is survival analysis?</h2>
+<ul>
+<li>Survival analysis concerns a special kind of outcome variable: <strong>the time until an event occurs</strong>.</li>
+<li>For example, imagine we track a cohort of 2015 PhD entrants and follow them for eight years (6 academic year plus a two-year grace period) to study their <strong>time to Phd dissertation defense</strong>.</li>
+<li>We want to model each student’s time to dissertation defense using predictors such as program‐area (STEM, social science, humanities), guaranteed funding length, annual teaching-assistant hours, advisor’s mean annual publication count, number of peer-reviewed papers, and milestone pace (e.g., months to candidacy).</li>
+<li>At first this seems like an ordinary regression task, but a crucial complication arises: many students are still writing—or may have withdrawn—when our eight-year observation window closes.
+<ul>
+<li>Students who are still enrolled have an unknown future completion date: their time-to-degree is <strong>right-censored</strong>.</li>
+<li>Students who formally leave the program without a degree can be handled either as censored.</li>
+</ul></li>
+<li>Survival analysis lets us incorporate these censored cases correctly, estimate semester-by-semester (or month-by-month) hazards of completion, and test how factors like guaranteed funding or advisor productivity alter the <strong>timing</strong> not just the <strong>probability</strong> of earning the PhD.</li>
+</ul>
+</section>
+<section id="examples-of-research-in-higher-education-used-this-methods" class="level2">
+<h2 class="anchored" data-anchor-id="examples-of-research-in-higher-education-used-this-methods">2. Examples of research in higher education used this methods</h2>
+<p>The following papers illustrate the application of survival analysis in higher-education research.</p>
+<blockquote class="blockquote">
+<p><strong>Paper 1</strong>: Kaminski, D., &amp; Geisler, C. (2012). Survival analysis of faculty retention in science and engineering by gender. <em>science</em>, 335(6070), 864-866.</p>
+</blockquote>
+<ul>
+<li><strong>Research question</strong>: How long do assistant professors in nine STEM fields remain at the institutions that hired them, and does that timing differ for men and women?</li>
+<li><strong>Data &amp; event</strong>: 2,966 individual faculty hired 1990-2002 at 14 U.S. research universities; event = leaving the institution (voluntarily or after tenure denial).</li>
+<li><strong>Survival methods</strong>:
+<ul>
+<li>Kaplan-Meier curves to visualise retention patterns and median “time-to-exit”.</li>
+<li>Parametric survival models (best-fit log-normal) plus Cox proportional-hazards models to test discipline and gender effects.</li>
+</ul></li>
+<li><strong>Key findings</strong>: Across STEM as a whole, men and women exit at similar rates (median ≈ 11 years), but mathematics is an outlier—women leave far sooner (median 4.5 yrs vs 7.3 yrs for men). Departments therefore need discipline-specific retention strategies.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Paper 2</strong>: Box-Steffensmeier, J. M., Cunha, R. C., Varbanov, R. A., Hoh, Y. S., Knisley, M. L., &amp; Holmes, M. A. (2015). Survival analysis of faculty retention and promotion in the social sciences by gender. <em>PloS one</em>, 10(11), e0143093.</p>
+</blockquote>
+<ul>
+<li><strong>Research question</strong>: (1) Does time-to-departure differ by gender for social-science faculty? (2) Does time-to-promotion (assistant → associate → full) differ by gender?</li>
+<li><strong>Data &amp; events</strong>: 2,218 assistant professors (1990-2009) in seven disciplines at 19 U.S. universities; three survival outcomes: departure, promotion to associate, promotion to full.</li>
+<li><strong>Survival methods</strong>:
+<ul>
+<li>Kaplan-Meier curves plus log-rank (Gehan-Wilcoxon) tests.</li>
+<li>Cox proportional-hazards models with frailty terms to handle unobserved heterogeneity; interactions to see whether gender gaps vary by discipline or cohort.</li>
+</ul></li>
+<li><strong>Key findings</strong>:
+<ul>
+<li>Retention: no significant gender difference in risk of leaving.</li>
+<li>Promotion: men reach tenure faster; evidence on promotion to full professor is mixed and discipline-specific (e.g., sociology shows a male advantage).</li>
+</ul></li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Paper 3</strong>: Shulin Zhou, Yihui Li, Margot Neverett, Beverly King, Kyle Chapman, and Sharon McNair. Survival Analysis of Transfer Students. AIR Report.</p>
+</blockquote>
+<ul>
+<li><strong>Research question</strong>: (1) What is the semester-by-semester survival (persistence) rate for new transfer students over their first eight semesters? (2) Do survival curves differ by age, STEM vs non-STEM major, major-change status, transfer GPA, credits transferred, enrollment status, gender and URM status? (3) How large are the effects of those covariates on the hazard of departure?</li>
+<li><strong>Data &amp; event</strong>: 11,267 transfer undergraduates who entered a large public R2 university (U.S. Southeast) between 2010 – 2017; event = permanent departure without a bachelor’s degree, with right-censoring for students still enrolled or already graduated within the eight-semester window.</li>
+<li><strong>Survival methods</strong>:
+<ul>
+<li>Kaplan–Meier curve for the cohort; semester-specific hazard plot.</li>
+<li>Stratified Kaplan–Meier + log-rank (Gehan-Wilcoxon) tests for subgroup comparisons.</li>
+<li>Cox proportional-hazards model; violations for STEM major, major-change and enrollment status handled via a time-varying, stratified Cox model with three time bands (Sem 1-2, 3-4, 5-8).</li>
+</ul></li>
+<li><strong>Key findings</strong>:
+<ul>
+<li>+1 transfer GPA point → 31 % lower hazard (HR ≈ 0.69).</li>
+<li>Part-time status nearly doubles hazard in Sem 1-2 (HR ≈ 1.96) but effect fades by Year 3.</li>
+<li>STEM majors 40 % safer in Year 1 (HR ≈ 0.60) yet 34 % riskier after Year 2 (HR ≈ 1.34).</li>
+<li>Changing major highly protective in Year 1 (HR ≈ 0.32) but reverses in Sem 3-4 (HR ≈ 1.44).</li>
+<li>Each extra transfer credit lowers hazard 0.7 %; each extra year of age raises hazard 1 %.</li>
+</ul></li>
+</ul>
+</section>
+<section id="some-key-concept-and-notation" class="level2">
+<h2 class="anchored" data-anchor-id="some-key-concept-and-notation">3. Some key concept and notation</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 44%">
+<col style="width: 37%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symbol/Term</th>
+<th style="text-align: left;">What it means mathematically</th>
+<th style="text-align: left;">PhD-defense example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>T</strong> – event time</td>
+<td style="text-align: left;">The unknown, positive random variable representing the time from program entry until the event occurs.</td>
+<td style="text-align: left;">Months (or semesters) from Fall 2015 matriculation to the moment a student <strong>successfully defends</strong> the dissertation.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>C</strong> – censoring time</td>
+<td style="text-align: left;">The time at which observation stops <strong>before</strong> the event is observed.</td>
+<td style="text-align: left;">• Spring 2023, when the study window closes (8 years).<br>• The semester a student withdraws or transfers.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Y = min (T, C)</strong></td>
+<td style="text-align: left;">The <em>observed</em> time: we either see the event (T) or censoring (C), whichever comes first.</td>
+<td style="text-align: left;">• <em>Y</em> = 48 mo for a Year-4 defender (T &lt; C).<br>• <em>Y</em> = 96 mo for a student still writing at study end (C &lt; T).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>δ</strong> – status indicator</td>
+<td style="text-align: left;"><span class="math inline">\(\delta=\begin{cases}1 &amp; \text{if } T\le C \\[4pt] 0 &amp; \text{if } T&gt;C \end{cases}\)</span></td>
+<td style="text-align: left;">δ = 1 → event observed; δ = 0 → right-censored.<br>δ = 1 for the Year-4 completer; δ = 0 for the still-enrolled student <strong>or</strong> the one who withdrew without defending.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Survival function</strong></td>
+<td style="text-align: left;"><span class="math inline">\(S(t)=\Pr(T&gt;t)\)</span></td>
+<td style="text-align: left;">Probability the event has <strong>not yet</strong> occurred by time <em>t</em>. It starts at 1 when <em>t</em> = 0 and steps downward as defenses occur.<br><span class="math inline">\(S(48)=0.62\)</span> would mean 62% of the cohort have <strong>not</strong> defended by 48 months.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Hazard function</strong></td>
+<td style="text-align: left;"><span class="math inline">\(h(t)=\displaystyle\lim_{\Delta t\to0}\frac{\Pr(t\le T&lt;t+\Delta t \mid T\ge t)}{\Delta t}\)</span></td>
+<td style="text-align: left;">Instantaneous event rate at time <em>t</em> among those who are still at risk just before <em>t</em>.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="commom-strategies-in-doing-survial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="commom-strategies-in-doing-survial-analysis">4. Commom strategies in doing survial analysis:</h2>
+<ul>
+<li><strong>Kaplan–Meier (K-M) curve</strong>：
+<ul>
+<li><strong>What it does?</strong> Draws a step-down curve that shows, at every moment, the <em>percentage of the cohort that has not yet experienced the event</em>. It makes <em>no modelling assumptions</em>—it simply counts who finished and who is still “at risk.”</li>
+<li><strong>PhD dissertation defense example:</strong> Plot months on the x-axis and the proportion of 2015 entrants who have not defended on the y-axis. The curve might sit at 1.0 on day 0, drop to 0.80 after 48 months, and reach 0.30 by month 96.</li>
+<li><strong>Typical questions it answers:</strong> <em>Descriptive timing</em>. What is the median time to defense? (the month where the curve crosses 0.50) What fraction of students are still writing after six years? Does the drop look gradual or are there “cliff” periods (e.g., big steps every April)?</li>
+</ul></li>
+<li><strong>Log-rank test</strong>:
+<ul>
+<li><strong>What it does?</strong> A simple, non-parametric hypothesis test that compares two or more K-M curves and asks: “Are these survival patterns statistically different overall?” It weights each event equally across time.</li>
+<li><strong>PhD dissertation defense example:</strong> Plot separate K-M curves for STEM vs humanities students; run a log-rank test. A small p-value means the curves differ enough that we doubt chance alone created that gap.</li>
+<li><strong>Typical questions it answers:</strong> <em>Group comparisons</em>. Do STEM and non-STEM students defend at different rates? Does guaranteeing five years of funding speed up completion compared to three-year packages?</li>
+</ul></li>
+<li><strong>Cox proportional-hazards (PH) model</strong>
+<ul>
+<li><strong>What it does?</strong> A regression that relates the <em>hazard of finishing at each moment</em> to one or many predictors. It reports <em>hazard ratios (HR)</em>: numbers above 1 mean the event happens sooner, below 1 mean later. The baseline hazard is left unspecified, so we avoid picking a parametric shape.</li>
+<li><strong>PhD dissertation defense example:</strong> Fit a Cox model with funding length, advisor publication rate, months-to-candidacy, and field. An HR = 1.30 for “each additional advisor paper per year” means students with more productive advisors defend 30 % faster at any moment, holding other factors constant.</li>
+<li><strong>Typical questions it answers:</strong> <em>Multivariable timing effects</em>. After adjusting for field and funding, how much does early candidacy speed up defense? Are part-time teaching loads still a drag on completion once GPA and advisor productivity are in the model? Which factors matter independently, and by how much, for the timing (not just the likelihood) of finishing?</li>
+</ul></li>
+</ul>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="UiUyQ1N1cnZpdmFsJTIwQW5hbHlzaXM=" data-listing-date-sort="1752044400000" data-listing-file-modified-sort="1752080311891" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1453">
-<div class="thumbnail">
-<p><a href="./posts/survivalpart1/index.html" class="no-external"></a></p><a href="./posts/survivalpart1/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/survivalpart1/survival1.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/survivalpart1/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/survivalpart1/index.html" class="no-external">What is Survival Analysis?</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/survivalpart1/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('U3Vydml2YWwlMjBBbmFseXNpcw=='); return false;">
-Survival Analysis
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/survivalpart1/index.html" class="no-external">This post will introduce survival analysis and its application in higher education research.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/survivalpart1/index.html" class="no-external">
-<div class="listing-date">
-Jul 9, 2025
-</div>
-<div class="listing-author">
-Shuhan (Alice) Ai
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="UiUyQ0NyaXRpY2FsJTIwUXVhbnQ=" data-listing-date-sort="1750834800000" data-listing-file-modified-sort="1750919574208" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4021">
-<div class="thumbnail">
-<p><a href="./posts/racecode/index.html" class="no-external"></a></p><a href="./posts/racecode/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/racecode/racecode.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/racecode/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/racecode/index.html" class="no-external">How to code Race?</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/racecode/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Q3JpdGljYWwlMjBRdWFudA=='); return false;">
-Critical Quant
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/racecode/index.html" class="no-external">This post will show several ways of race coding in quantitative social science research.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/racecode/index.html" class="no-external">
-<div class="listing-date">
-Jun 25, 2025
-</div>
-<div class="listing-author">
-Shuhan (Alice) Ai
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="U05BJTJDQ2F1c2FsJTIwSW5mZXJlbmNlJTJDU1RBVFM=" data-listing-date-sort="1750402800000" data-listing-file-modified-sort="1750479912133" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="12">
-<div class="thumbnail">
-<p><a href="./posts/ci-with-networkdata/index.html" class="no-external"></a></p><a href="./posts/ci-with-networkdata/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/ci-with-networkdata/snaimage.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/ci-with-networkdata/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/ci-with-networkdata/index.html" class="no-external">Causal Inference in Network Data: A Tutorial</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/ci-with-networkdata/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('U05B'); return false;">
-SNA
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Q2F1c2FsJTIwSW5mZXJlbmNl'); return false;">
-Causal Inference
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('U1RBVFM='); return false;">
-STATS
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/ci-with-networkdata/index.html" class="no-external">This is a tutorial for the causal inference with network data.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/ci-with-networkdata/index.html" class="no-external">
-<div class="listing-date">
-Jun 20, 2025
-</div>
-<div class="listing-author">
-Yingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-listing-date-sort="1750143600000" data-listing-file-modified-sort="1750910629902" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="195">
-<div class="thumbnail">
-<p><a href="./posts/welcome/index.html" class="no-external"></a></p><a href="./posts/welcome/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/welcome/welcome.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/welcome/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/welcome/index.html" class="no-external">Welcome to My Blog</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/welcome/index.html" class="no-external"></a>
-</div>
-<div class="listing-description">
-<a href="./posts/welcome/index.html" class="no-external">A space for sharing research and reflections.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-date">
-Jun 17, 2025
-</div>
-<div class="listing-author">
-Shuhan (Alice) Ai
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

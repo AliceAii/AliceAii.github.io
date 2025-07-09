@@ -2,6 +2,7 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/survivalpart1/index.html",
       "/posts/racecode/index.html",
       "/posts/ci-with-networkdata/index.html",
       "/posts/welcome/index.html"
