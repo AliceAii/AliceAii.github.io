@@ -1,5 +1,14 @@
 ---
-title: "publications"
+title: "Publications"
 format: html
 ---
 
+### Under Review
+
+**Ai, S.**, Eagan, K., Ross-Olivares, J. P., & Jiang, T. (under review). Can community cultural wealth maintain undergraduate women of color toward STEM careers? *Journal of Diversity in Higher Education.*
+
+
+Eagan, K., Ramos, H., **Ai, S. ** (under review). BUILDing Science Identity: Exploring the Efficacy and Moderation Effects of a Nationally Funded Intervention.*Educational Evaluation and Policy Analysis.*
+
+
+Jiang, T., **Ai, S.**, Jiao, C., Li, K. (under Review). Revealing Hidden Contributions on Research Data: The Potential of Data Paper. *Scientometrics.*
