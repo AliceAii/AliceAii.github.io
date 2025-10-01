@@ -276,7 +276,7 @@ print(isolated)  # "Pucci"
 
 | Function | Purpose | Example |
 |----------|---------|---------|
-| `network()` | Create network object | `network(edges, matrix.type = "edgelist")` |
+| `network()` | Create network object | `network(nw, matrix.type = "edgelist")` |
 | `degree()` | Calculate node degrees | `degree(nw, gmode = "graph")` |
 | `component.dist()` | Find connected components | `component.dist(nw)` |
 | `get.inducedSubgraph()` | Extract subnetwork | `get.inducedSubgraph(nw, v = nodes)` |

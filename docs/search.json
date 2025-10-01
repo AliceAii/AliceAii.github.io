@@ -284,6 +284,6 @@
     "href": "posts/snapart1/index.html#quick-reference",
     "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
     "section": "8. Quick Reference",
-    "text": "8. Quick Reference\n\n\n\n\n\n\n\n\nFunction\nPurpose\nExample\n\n\n\n\nnetwork()\nCreate network object\nnetwork(edges, matrix.type = \"edgelist\")\n\n\ndegree()\nCalculate node degrees\ndegree(nw, gmode = \"graph\")\n\n\ncomponent.dist()\nFind connected components\ncomponent.dist(nw)\n\n\nget.inducedSubgraph()\nExtract subnetwork\nget.inducedSubgraph(nw, v = nodes)\n\n\nnetwork.size()\nCount nodes\nnetwork.size(nw)\n\n\nnetwork.edgecount()\nCount edges\nnetwork.edgecount(nw)\n\n\nnetwork.vertex.names()\nGet node names\nnetwork.vertex.names(nw)\n\n\n%v%\nSet/get vertex attributes\nnw %v% \"race\" &lt;- values\n\n\nplot()\nVisualize network\nplot(nw, displaylabels = TRUE)"
+    "text": "8. Quick Reference\n\n\n\n\n\n\n\n\nFunction\nPurpose\nExample\n\n\n\n\nnetwork()\nCreate network object\nnetwork(nw, matrix.type = \"edgelist\")\n\n\ndegree()\nCalculate node degrees\ndegree(nw, gmode = \"graph\")\n\n\ncomponent.dist()\nFind connected components\ncomponent.dist(nw)\n\n\nget.inducedSubgraph()\nExtract subnetwork\nget.inducedSubgraph(nw, v = nodes)\n\n\nnetwork.size()\nCount nodes\nnetwork.size(nw)\n\n\nnetwork.edgecount()\nCount edges\nnetwork.edgecount(nw)\n\n\nnetwork.vertex.names()\nGet node names\nnetwork.vertex.names(nw)\n\n\n%v%\nSet/get vertex attributes\nnw %v% \"race\" &lt;- values\n\n\nplot()\nVisualize network\nplot(nw, displaylabels = TRUE)"
   }
 ]
