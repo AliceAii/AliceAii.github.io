@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-09-30">
+
+<title>Social Network Analysis R Tutorial Part 1: Basic Visualization – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Social Network Analysis R Tutorial Part 1: Basic Visualization</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">SNA</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 30, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#what-is-social-network-analysis" id="toc-what-is-social-network-analysis" class="nav-link active" data-scroll-target="#what-is-social-network-analysis">1. What is Social Network Analysis?</a></li>
+  <li><a href="#getting-started-sna-r-packages" id="toc-getting-started-sna-r-packages" class="nav-link" data-scroll-target="#getting-started-sna-r-packages">2. Getting Started: SNA R Packages</a></li>
+  <li><a href="#creating-network-objects-two-ways-to-build-your-network" id="toc-creating-network-objects-two-ways-to-build-your-network" class="nav-link" data-scroll-target="#creating-network-objects-two-ways-to-build-your-network">3. Creating Network Objects: Two Ways to Build Your Network</a>
+  <ul class="collapse">
+  <li><a href="#edge-list-format" id="toc-edge-list-format" class="nav-link" data-scroll-target="#edge-list-format">3.1 Edge List Format</a></li>
+  <li><a href="#adjacency-matrix-format" id="toc-adjacency-matrix-format" class="nav-link" data-scroll-target="#adjacency-matrix-format">3.2 Adjacency Matrix Format</a></li>
+  </ul></li>
+  <li><a href="#working-with-network-components" id="toc-working-with-network-components" class="nav-link" data-scroll-target="#working-with-network-components">4. Working with Network Components</a></li>
+  <li><a href="#adding-node-attributes" id="toc-adding-node-attributes" class="nav-link" data-scroll-target="#adding-node-attributes">5. Adding Node Attributes</a></li>
+  <li><a href="#visualizing-networks" id="toc-visualizing-networks" class="nav-link" data-scroll-target="#visualizing-networks">6. Visualizing Networks</a>
+  <ul class="collapse">
+  <li><a href="#basic-network-plot" id="toc-basic-network-plot" class="nav-link" data-scroll-target="#basic-network-plot">6.1 Basic Network Plot</a></li>
+  <li><a href="#displaying-node-labels" id="toc-displaying-node-labels" class="nav-link" data-scroll-target="#displaying-node-labels">6.2 Displaying Node Labels</a></li>
+  </ul></li>
+  <li><a href="#finding-isolated-nodes-and-components" id="toc-finding-isolated-nodes-and-components" class="nav-link" data-scroll-target="#finding-isolated-nodes-and-components">7. Finding Isolated Nodes and Components</a></li>
+  <li><a href="#quick-reference" id="toc-quick-reference" class="nav-link" data-scroll-target="#quick-reference">8. Quick Reference</a></li>
+  <li><a href="#resources-to-keep-learning" id="toc-resources-to-keep-learning" class="nav-link" data-scroll-target="#resources-to-keep-learning">9. Resources to Keep Learning</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Ever wondered how to map friendships, track protein interactions, or visualize who’s connected to whom in Renaissance Florence? This tutorial will walk you through the basics of visualizing and analyzing networks in R. Don’t worry if you’re new to this, we’ll start simple and build up gradually.</p>
+<p><img src="sna1-2.png" class="img-fluid"></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this tutirial, we’ll work with <strong>undirected networks</strong> for simplicity and easier visualization. While some of these relationships could be considered directed in real life (e.g., one person nominate another as a freiend), treating them as undirected in this tutorial helps us focus on fundamental concepts without getting tangled in the complexities of directed network analysis. We’ll get to the directed network later.</p>
+</div>
+</div>
+<section id="what-is-social-network-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-social-network-analysis">1. What is Social Network Analysis?</h2>
+<p>Think about your friend group. Some people know everyone, while others have just a few close friends. Some friendships go both ways, while others… well, probably some of us have had that one-sided crush? Social Network Analysis (SNA) lets us study these patterns systematically.</p>
+<p>At its core, SNA is the study of social structures through networks and graph theory. It characterizes networked structures in terms of <strong>nodes</strong> (individual actors, people, schools, or things) and the <strong>ties</strong>, <strong>edges</strong>, or <strong>links</strong> (relationships or interactions) that connect them.</p>
+<ul>
+<li><strong>Key concepts:</strong>
+<ul>
+<li><strong>Node/Vertex</strong>: An individual entity in the network (e.g., a person, protein, organization).</li>
+<li><strong>Edge/Tie</strong>: A connection between two nodes (e.g., friendship, interaction, marriage, college application).</li>
+<li><strong>Directed vs Undirected</strong>:
+<ul>
+<li><strong>Undirected</strong>: Relationships are mutual (e.g., marriage). This is what we’ll focus on in this tutorial.</li>
+<li><strong>Directed</strong>: Relationships have a direction (e.g., A follows B on social media, but B might not follow back). We’ll save this complexity for another day!</li>
+</ul></li>
+<li><strong>Degree</strong>: The number of connections a node has. High degree = popular node! In undirected networks, this is straightforward, just count the connections.</li>
+<li><strong>Component</strong>: A subset of the network where all nodes are connected to each other through some path. Like a friend group where everyone knows everyone else, at least through someone.</li>
+</ul></li>
+</ul>
+</section>
+<section id="getting-started-sna-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started-sna-r-packages">2. Getting Started: SNA R Packages</h2>
+<p>Before we dive into the fun visualization stuff, let’s get our toolkit. We’ll use three main packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkdata)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sna)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(network)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><code>network</code>: Creates and manipulates network objects</li>
+<li><code>sna</code>: Provides tools for network analysis and visualization</li>
+<li><code>networkdata</code>: Contains example network datasets</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="creating-network-objects-two-ways-to-build-your-network" class="level2">
+<h2 class="anchored" data-anchor-id="creating-network-objects-two-ways-to-build-your-network">3. Creating Network Objects: Two Ways to Build Your Network</h2>
+<p>Networks can be stored in different formats, let’s look at the two most common formats: edgelist and adjacency matrix.</p>
+<section id="edge-list-format" class="level3">
+<h3 class="anchored" data-anchor-id="edge-list-format">3.1 Edge List Format</h3>
+<p>An edge list is simply a two-column list where each row says “A is connected to B.”</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Dataset: Butland Protein-Protein Interaction (PPI) Network</strong></p>
+<p>This network represents physical interactions between two proteins. Each node is a protein, and each edge means two proteins physically interact with each other. Scientists mapped these interactions using a technique called yeast two-hybrid screening.</p>
+<ul>
+<li><strong>Type</strong>: Undirected (if protein A interacts with B, then B interacts with A)</li>
+<li><strong>Nodes</strong>: Proteins</li>
+<li><strong>Edges</strong>: Protein-protein interactions</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get the data (this data is from `network` package)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"butland_ppi"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#create network from edge list</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>nw_ppi <span class="ot">&lt;-</span> <span class="fu">network</span>(butland_ppi, <span class="at">matrix.type =</span> <span class="st">"edgelist"</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>) <span class="co"># proteins interact mutually</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#check network properties</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">network.size</span>(nw_ppi)        <span class="co"># how many proteins?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 270</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">network.edgecount</span>(nw_ppi)   <span class="co"># how many interactions?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 716</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <code>help("butland_ppi")</code> to learn about the dataset in the networkdata package.</p>
+</div>
+</div>
+</section>
+<section id="adjacency-matrix-format" class="level3">
+<h3 class="anchored" data-anchor-id="adjacency-matrix-format">3.2 Adjacency Matrix Format</h3>
+<p>An adjacency matrix is like a multiplication table, but instead of showing products, it shows connections. If there’s a connection from node i to node j, you put a 1 in row i, column j. No connection? Put a 0.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Dataset: New Guinean Highland Tribes</strong></p>
+<p>This classic dataset comes from anthropological research on 16 tribes in the Eastern Central Highlands of New Guinea, studied during the 1960s. The relationships here are about alliances and conflicts between tribes. We’ll focus on positive relationships (alliances, trade partnerships, friendly interactions). Fun fact: This dataset has been used in social network analysis teaching for decades!</p>
+<ul>
+<li><strong>Type</strong>: Undirected (alliances are typically mutual)</li>
+<li><strong>Nodes</strong>: 16 Highland tribes</li>
+<li><strong>Edges</strong>: Positive relationships (friendships, alliances, intermarriage)</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get the data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"tribes"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#extract positive relationships (try help("tribes"), attributes(tribes))</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>tribes_pos <span class="ot">&lt;-</span> tribes[, , <span class="dv">1</span>]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#create network from adjacency matrix</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>nw_tribes <span class="ot">&lt;-</span> <span class="fu">network</span>(tribes_pos, </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">matrix.type =</span> <span class="st">"adjacency"</span>, </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Check if a matrix is symmetric with <code>isSymmetric(your_matrix)</code> to verify it’s direction.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="working-with-network-components" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-network-components">4. Working with Network Components</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get component information</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>comp_info <span class="ot">&lt;-</span> <span class="fu">component.dist</span>(nw_ppi)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># comp_info contains:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># - $membership: which component each node belongs to</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># - $csize: size of each component</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the largest component</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>largest_comp <span class="ot">&lt;-</span> <span class="fu">which</span>(comp_info<span class="sc">$</span>membership <span class="sc">==</span> <span class="fu">which.max</span>(comp_info<span class="sc">$</span>csize))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>nw_ppi_largest <span class="ot">&lt;-</span> <span class="fu">get.inducedSubgraph</span>(nw_ppi, <span class="at">v =</span> largest_comp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why focus on the largest component?</strong></p>
+<ul>
+<li>Isolated nodes or small groups may represent data errors or uninteresting cases</li>
+<li>Statistical measures are more meaningful in connected networks</li>
+<li>Visualization is clearer without scattered isolated nodes</li>
+</ul>
+</section>
+<section id="adding-node-attributes" class="level2">
+<h2 class="anchored" data-anchor-id="adding-node-attributes">5. Adding Node Attributes</h2>
+<p>So far, our nodes are just dots. But in real life, people (and proteins, and tribes) have characteristics!</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>****Dataset: AddHealth Adolescent Friendship Network**</p>
+<p>The National Longitudinal Study of Adolescent to Adult Health (AddHealth) is one of the most famous social network datasets in existence. It surveyed students in schools across the U.S., asking “who are your friends?” We’ll work with community 9 and focus on boys’ friendship networks. This dataset is gold for studying peer influence, social integration, and how friendships form during adolescence.</p>
+<p><strong>Note</strong>: While the original data includes directed friendship nominations (you might list someone as a friend who doesn’t list you back), we’ll treat these as undirected for this tutorial. If there’s any connection between two people (one student nominate another as friends), we’ll count it as a mutual friendship.</p>
+<ul>
+<li><strong>Type</strong>: Undirected (for our demonstration)</li>
+<li><strong>Nodes</strong>: Male students in AddHealth community 9</li>
+<li><strong>Edges</strong>: Friendship connections</li>
+<li><strong>Attributes</strong>: Race, grade level, and more</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get tge friendship network filtered for boys</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"addhealth9"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>boys_only <span class="ot">&lt;-</span> addhealth9<span class="sc">$</span>X[, <span class="st">"female"</span>] <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>boys_id <span class="ot">&lt;-</span> <span class="fu">which</span>(boys_only)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#filter edges to keep only boy-to-boy friendships</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>edges_boys <span class="ot">&lt;-</span> addhealth9<span class="sc">$</span>E[addhealth9<span class="sc">$</span>E[, <span class="dv">1</span>] <span class="sc">%in%</span> boys_id <span class="sc">&amp;</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                           addhealth9<span class="sc">$</span>E[, <span class="dv">2</span>] <span class="sc">%in%</span> boys_id, ]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># create network</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>nw_boys <span class="ot">&lt;-</span> <span class="fu">network</span>(edges_boys, <span class="at">matrix.type =</span> <span class="st">"edgelist"</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#add attributes using the %v% operator</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>nw_boys <span class="sc">%v%</span> <span class="st">"race"</span> <span class="ot">&lt;-</span> addhealth9<span class="sc">$</span>X[boys_id, <span class="st">"race"</span>]</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>nw_boys <span class="sc">%v%</span> <span class="st">"grade"</span> <span class="ot">&lt;-</span> addhealth9<span class="sc">$</span>X[boys_id, <span class="st">"grade"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>%v%</code> operator is your friend for vertex attributes! Think of it as saying “this network’s vertices have this property.” Use <code>list.vertex.attributes(nw_boys)</code> to see all available attributes.</p>
+</div>
+</div>
+</section>
+<section id="visualizing-networks" class="level2">
+<h2 class="anchored" data-anchor-id="visualizing-networks">6. Visualizing Networks</h2>
+<p>Alright, time for the fun part! Network plots can be beautiful, informative, or completely messy. The difference often comes down to choosing the right layout and visual parameters.</p>
+<section id="basic-network-plot" class="level3">
+<h3 class="anchored" data-anchor-id="basic-network-plot">6.1 Basic Network Plot</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(nw_ppi, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Protein-Protein Interaction Network"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex.main =</span> <span class="fl">1.5</span>,              <span class="co"># title size</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="fl">1.0</span>,            <span class="co"># node size</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.col =</span> <span class="st">"gray60"</span>,         <span class="co"># edge color</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.col =</span> <span class="st">"lightblue"</span>,    <span class="co"># node color</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.border =</span> <span class="st">"darkblue"</span>,  <span class="co"># node border color</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">mode =</span> <span class="st">"fruchtermanreingold"</span>, <span class="co"># layout algorithm</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">pad =</span> <span class="fl">0.7</span>)                   <span class="co"># padding around plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="displaying-node-labels" class="level3">
+<h3 class="anchored" data-anchor-id="displaying-node-labels">6.2 Displaying Node Labels</h3>
+<p>Sometimes you want to know which node is which. That’s where labels come in handy.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Dataset: Florentine Marriage Network</strong> Welcome to Renaissance Florence! This famous dataset shows marriage alliances between the most powerful families in 15th-century Florence. Each node is a wealthy family, and edges represent marriages between families. The Medici family famously used strategic marriages to build political power.</p>
+<ul>
+<li><strong>Type</strong>: Undirected (marriage creates ties between both families)</li>
+<li><strong>Nodes</strong>: 16 elite Florentine families</li>
+<li><strong>Edges</strong>: Marital unions between families</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(florentine)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(flomarriage, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">displaylabels =</span> <span class="cn">TRUE</span>,        <span class="co"># show node names</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="fl">1.5</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">label.cex =</span> <span class="fl">0.8</span>,             <span class="co"># label size</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">label.pos =</span> <span class="dv">1</span>,               <span class="co"># label position (5 = center)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.col =</span> <span class="st">"gray60"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.col =</span> <span class="st">"lightblue"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.border =</span> <span class="st">"darkblue"</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Florentine Family Marriage Network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Labels can overlap in dense networks. Try adjusting <code>label.pos</code> (1=below, 2=left, 3=above, 4=right, 5=center) or <code>label.cex</code> to make them more readable.</p>
+</div>
+</div>
+<section id="extension" class="level4">
+<h4 class="anchored" data-anchor-id="extension">6.2.1 Extension</h4>
+<p>We can make our visualization tell a richer story by using node attributes to control visual properties. The Florentine marriage dataset includes information about each family’s wealth and political power (number of seats on the city council, called “priorates”). Let’s use these to create a more informative plot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#attributes are available</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list.vertex.attributes</span>(flomarriage)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "na"           "priorates"    "totalties"    "vertex.names" "wealth"      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract wealth and priorates (political representation)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>wealth <span class="ot">&lt;-</span> flomarriage <span class="sc">%v%</span> <span class="st">"wealth"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>priorates <span class="ot">&lt;-</span> flomarriage <span class="sc">%v%</span> <span class="st">"priorates"</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#scale wealth to appropriate node sizes (1-4 range works well)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>node_sizes <span class="ot">&lt;-</span> wealth <span class="sc">/</span> <span class="dv">20</span>  </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#create node shapes based on political representation</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#more priorates = more sides (more politically important)</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#map priorates to number of polygon sides</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>node_sides <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(priorates <span class="sc">&gt;=</span> <span class="dv">50</span>, <span class="dv">8</span>,      <span class="co"># Octagon for high power (50+)</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>              <span class="fu">ifelse</span>(priorates <span class="sc">&gt;=</span> <span class="dv">30</span>, <span class="dv">6</span>,       <span class="co"># Hexagon for medium-high (30-49)</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>              <span class="fu">ifelse</span>(priorates <span class="sc">&gt;=</span> <span class="dv">10</span>, <span class="dv">5</span>,       <span class="co"># Pentagon for medium (10-29)</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>              <span class="fu">ifelse</span>(priorates <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">3</span>))))   <span class="co"># Diamond (4) for low, Triangle (3) for none</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#create the enhanced plot</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(flomarriage, </span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">displaylabels =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> node_sizes,     <span class="co"># Size by wealth</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.sides =</span> node_sides,   <span class="co"># Shape by political power</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">label.cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.col =</span> <span class="st">"gray60"</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.col =</span> <span class="st">"gold"</span>,         <span class="co"># Gold for wealthy families</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Florentine Marriages: Wealth &amp; Political Power"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>What does this reveal?</strong> The Medici family stands out with both high wealth (large node) and significant political representation (many-sided polygon).</p>
+</section>
+</section>
+</section>
+<section id="finding-isolated-nodes-and-components" class="level2">
+<h2 class="anchored" data-anchor-id="finding-isolated-nodes-and-components">7. Finding Isolated Nodes and Components</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get component membership for all nodes</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>comp <span class="ot">&lt;-</span> <span class="fu">component.dist</span>(flomarriage)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#find isolated nodes (nodes not in the largest component)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>family_names <span class="ot">&lt;-</span> <span class="fu">network.vertex.names</span>(flomarriage)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>isolated <span class="ot">&lt;-</span> family_names[comp<span class="sc">$</span>membership <span class="sc">!=</span> <span class="fu">which.max</span>(comp<span class="sc">$</span>csize)]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(isolated)  <span class="co"># "Pucci"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Pucci"</code></pre>
+</div>
+</div>
+</section>
+<section id="quick-reference" class="level2">
+<h2 class="anchored" data-anchor-id="quick-reference">8. Quick Reference</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 32%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>network()</code></td>
+<td>Create network object</td>
+<td><code>network(edges, matrix.type = "edgelist")</code></td>
+</tr>
+<tr class="even">
+<td><code>degree()</code></td>
+<td>Calculate node degrees</td>
+<td><code>degree(nw, gmode = "graph")</code></td>
+</tr>
+<tr class="odd">
+<td><code>component.dist()</code></td>
+<td>Find connected components</td>
+<td><code>component.dist(nw)</code></td>
+</tr>
+<tr class="even">
+<td><code>get.inducedSubgraph()</code></td>
+<td>Extract subnetwork</td>
+<td><code>get.inducedSubgraph(nw, v = nodes)</code></td>
+</tr>
+<tr class="odd">
+<td><code>network.size()</code></td>
+<td>Count nodes</td>
+<td><code>network.size(nw)</code></td>
+</tr>
+<tr class="even">
+<td><code>network.edgecount()</code></td>
+<td>Count edges</td>
+<td><code>network.edgecount(nw)</code></td>
+</tr>
+<tr class="odd">
+<td><code>network.vertex.names()</code></td>
+<td>Get node names</td>
+<td><code>network.vertex.names(nw)</code></td>
+</tr>
+<tr class="even">
+<td><code>%v%</code></td>
+<td>Set/get vertex attributes</td>
+<td><code>nw %v% "race" &lt;- values</code></td>
+</tr>
+<tr class="odd">
+<td><code>plot()</code></td>
+<td>Visualize network</td>
+<td><code>plot(nw, displaylabels = TRUE)</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="resources-to-keep-learning" class="level2">
+<h2 class="anchored" data-anchor-id="resources-to-keep-learning">9. Resources to Keep Learning</h2>
+<ul>
+<li><p>Eric Kolaczyk Statistical Analysis of Network Data (2009). Springer http://link.springer.com/book/10.1007%2F978-0-387-88146-1</p></li>
+<li><p>Eric Kolaczyk and Gabor Csardi Statistical Analysis of Network Data with R (2014). Springer http://link.springer.com/book/10.1007%2F978-1-4939-0983-4</p></li>
+<li><p>David Easley and Jon Kleinberg “Networks, Crowds, and Markets: Reasoning about a Highly Connected World (2010). Available free online. https://www.cs.cornell.edu/home/kleinber/networks-book/</p></li>
+</ul>
+<p><em>This tutorial is based on coursework from STATS 218: Social Network Analysis. All datasets are from the networkdata package.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

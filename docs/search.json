@@ -4,7 +4,7 @@
     "href": "blog_posts.html",
     "title": "Blog Post",
     "section": "",
-    "text": "Survival Analysis R Tutorial\n\n\n\n\n\n\nR\n\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 20, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is Survival Analysis?\n\n\n\n\n\n\nR\n\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 9, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nHow to code Race?\n\n\n\n\n\n\nR\n\n\nCritical Quant\n\n\n\n\n\n\n\n\n\nJun 25, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nCausal Inference in Network Data: A Tutorial\n\n\n\n\n\n\nSNA\n\n\nCausal Inference\n\n\nSTATS\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\nNo matching items"
+    "text": "Social Network Analysis R Tutorial Part 1: Basic Visualization\n\n\n\nR\n\nSNA\n\n\n\n\n\n\n\n\n\nSep 30, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nSurvival Analysis R Tutorial\n\n\n\nR\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 20, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is Survival Analysis?\n\n\n\nR\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 9, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nHow to code Race?\n\n\n\nR\n\nCritical Quant\n\n\n\n\n\n\n\n\n\nJun 25, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nCausal Inference in Network Data: A Tutorial\n\n\n\nSNA\n\nCausal Inference\n\nSTATS\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/welcome/index.html",
@@ -201,5 +201,89 @@
     "title": "Publications",
     "section": "",
     "text": "Under Review\nAi, S., Eagan, K., Ross-Olivares, J. P., & Jiang, T. (under review). Can community cultural wealth maintain undergraduate women of color toward STEM careers? Journal of Diversity in Higher Education.\nEagan, K., Ramos, H., Ai, S.  (under review). BUILDing Science Identity: Exploring the Efficacy and Moderation Effects of a Nationally Funded Intervention.Educational Evaluation and Policy Analysis.\nJiang, T., Ai, S., Jiao, C., Li, K. (under Review). Revealing Hidden Contributions on Research Data: The Potential of Data Paper. Scientometrics."
+  },
+  {
+    "objectID": "posts/snapart1/index.html",
+    "href": "posts/snapart1/index.html",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "",
+    "text": "Ever wondered how to map friendships, track protein interactions, or visualize who’s connected to whom in Renaissance Florence? This tutorial will walk you through the basics of visualizing and analyzing networks in R. Don’t worry if you’re new to this, we’ll start simple and build up gradually."
+  },
+  {
+    "objectID": "posts/snapart1/index.html#what-is-social-network-analysis",
+    "href": "posts/snapart1/index.html#what-is-social-network-analysis",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "1. What is Social Network Analysis?",
+    "text": "1. What is Social Network Analysis?\nThink about your friend group. Some people know everyone, while others have just a few close friends. Some friendships go both ways, while others… well, probably some of us have had that one-sided crush? Social Network Analysis (SNA) lets us study these patterns systematically.\nAt its core, SNA is the study of social structures through networks and graph theory. It characterizes networked structures in terms of nodes (individual actors, people, schools, or things) and the ties, edges, or links (relationships or interactions) that connect them.\n\nKey concepts:\n\nNode/Vertex: An individual entity in the network (e.g., a person, protein, organization).\nEdge/Tie: A connection between two nodes (e.g., friendship, interaction, marriage, college application).\nDirected vs Undirected:\n\nUndirected: Relationships are mutual (e.g., marriage). This is what we’ll focus on in this tutorial.\nDirected: Relationships have a direction (e.g., A follows B on social media, but B might not follow back). We’ll save this complexity for another day!\n\nDegree: The number of connections a node has. High degree = popular node! In undirected networks, this is straightforward, just count the connections.\nComponent: A subset of the network where all nodes are connected to each other through some path. Like a friend group where everyone knows everyone else, at least through someone."
+  },
+  {
+    "objectID": "posts/snapart1/index.html#getting-started-essential-r-packages",
+    "href": "posts/snapart1/index.html#getting-started-essential-r-packages",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "2. Getting Started: Essential R Packages",
+    "text": "2. Getting Started: Essential R Packages\nBefore we dive into the fun visualization stuff, let’s get our toolkit. We’ll use three main packages:\n\n# Load packages\nlibrary(networkdata)\nlibrary(sna)\nlibrary(network)"
+  },
+  {
+    "objectID": "posts/snapart1/index.html#getting-started-sna-r-packages",
+    "href": "posts/snapart1/index.html#getting-started-sna-r-packages",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "2. Getting Started: SNA R Packages",
+    "text": "2. Getting Started: SNA R Packages\nBefore we dive into the fun visualization stuff, let’s get our toolkit. We’ll use three main packages:\n\n# Load packages\nlibrary(networkdata)\nlibrary(sna)\nlibrary(network)\n\n\n\n\n\n\n\nTip\n\n\n\n\nnetwork: Creates and manipulates network objects\nsna: Provides tools for network analysis and visualization\nnetworkdata: Contains example network datasets"
+  },
+  {
+    "objectID": "posts/snapart1/index.html#creating-network-objects-two-ways-to-build-your-network",
+    "href": "posts/snapart1/index.html#creating-network-objects-two-ways-to-build-your-network",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "3. Creating Network Objects: Two Ways to Build Your Network",
+    "text": "3. Creating Network Objects: Two Ways to Build Your Network\nNetworks can be stored in different formats, let’s look at the two most common formats: edgelist and adjacency matrix.\n\n3.1 Edge List Format\nAn edge list is simply a two-column list where each row says “A is connected to B.”\n\n\n\n\n\n\nNote\n\n\n\nDataset: Butland Protein-Protein Interaction (PPI) Network\nThis network represents physical interactions between two proteins. Each node is a protein, and each edge means two proteins physically interact with each other. Scientists mapped these interactions using a technique called yeast two-hybrid screening.\n\nType: Undirected (if protein A interacts with B, then B interacts with A)\nNodes: Proteins\nEdges: Protein-protein interactions\n\n\n\n\n#get the data (this data is from `network` package)\ndata(\"butland_ppi\")\n\n#create network from edge list\nnw_ppi &lt;- network(butland_ppi, matrix.type = \"edgelist\", directed = FALSE) # proteins interact mutually\n\n#check network properties\nnetwork.size(nw_ppi)        # how many proteins?\n\n[1] 270\n\nnetwork.edgecount(nw_ppi)   # how many interactions?\n\n[1] 716\n\n\n\n\n\n\n\n\nTip\n\n\n\nUse help(\"butland_ppi\") to learn about the dataset in the networkdata package.\n\n\n\n\n3.2 Adjacency Matrix Format\nAn adjacency matrix is like a multiplication table, but instead of showing products, it shows connections. If there’s a connection from node i to node j, you put a 1 in row i, column j. No connection? Put a 0.\n\n\n\n\n\n\nNote\n\n\n\nDataset: New Guinean Highland Tribes\nThis classic dataset comes from anthropological research on 16 tribes in the Eastern Central Highlands of New Guinea, studied during the 1960s. The relationships here are about alliances and conflicts between tribes. We’ll focus on positive relationships (alliances, trade partnerships, friendly interactions). Fun fact: This dataset has been used in social network analysis teaching for decades!\n\nType: Undirected (alliances are typically mutual)\nNodes: 16 Highland tribes\nEdges: Positive relationships (friendships, alliances, intermarriage)\n\n\n\n\n#get the data\ndata(\"tribes\")\n\n#extract positive relationships (try help(\"tribes\"), attributes(tribes))\ntribes_pos &lt;- tribes[, , 1]\n\n#create network from adjacency matrix\nnw_tribes &lt;- network(tribes_pos, \n                     matrix.type = \"adjacency\", \n                     directed = FALSE)\n\n\n\n\n\n\n\nTip\n\n\n\nCheck if a matrix is symmetric with isSymmetric(your_matrix) to verify it’s direction."
+  },
+  {
+    "objectID": "posts/snapart1/index.html#working-with-network-components",
+    "href": "posts/snapart1/index.html#working-with-network-components",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "4. Working with Network Components",
+    "text": "4. Working with Network Components\n\n# Get component information\ncomp_info &lt;- component.dist(nw_ppi)\n\n# comp_info contains:\n# - $membership: which component each node belongs to\n# - $csize: size of each component\n\n# Extract the largest component\nlargest_comp &lt;- which(comp_info$membership == which.max(comp_info$csize))\nnw_ppi_largest &lt;- get.inducedSubgraph(nw_ppi, v = largest_comp)\n\nWhy focus on the largest component?\n\nIsolated nodes or small groups may represent data errors or uninteresting cases\nStatistical measures are more meaningful in connected networks\nVisualization is clearer without scattered isolated nodes"
+  },
+  {
+    "objectID": "posts/snapart1/index.html#adding-node-attributes",
+    "href": "posts/snapart1/index.html#adding-node-attributes",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "5. Adding Node Attributes",
+    "text": "5. Adding Node Attributes\nSo far, our nodes are just dots. But in real life, people (and proteins, and tribes) have characteristics!\n\n\n\n\n\n\nNote\n\n\n\n****Dataset: AddHealth Adolescent Friendship Network**\nThe National Longitudinal Study of Adolescent to Adult Health (AddHealth) is one of the most famous social network datasets in existence. It surveyed students in schools across the U.S., asking “who are your friends?” We’ll work with community 9 and focus on boys’ friendship networks. This dataset is gold for studying peer influence, social integration, and how friendships form during adolescence.\nNote: While the original data includes directed friendship nominations (you might list someone as a friend who doesn’t list you back), we’ll treat these as undirected for this tutorial. If there’s any connection between two people (one student nominate another as friends), we’ll count it as a mutual friendship.\n\nType: Undirected (for our demonstration)\nNodes: Male students in AddHealth community 9\nEdges: Friendship connections\nAttributes: Race, grade level, and more\n\n\n\n\n#get tge friendship network filtered for boys\ndata(\"addhealth9\")\n\nboys_only &lt;- addhealth9$X[, \"female\"] == 0\nboys_id &lt;- which(boys_only)\n\n#filter edges to keep only boy-to-boy friendships\nedges_boys &lt;- addhealth9$E[addhealth9$E[, 1] %in% boys_id & \n                           addhealth9$E[, 2] %in% boys_id, ]\n\n# create network\nnw_boys &lt;- network(edges_boys, matrix.type = \"edgelist\", directed = FALSE)\n\n#add attributes using the %v% operator\nnw_boys %v% \"race\" &lt;- addhealth9$X[boys_id, \"race\"]\nnw_boys %v% \"grade\" &lt;- addhealth9$X[boys_id, \"grade\"]\n\n\n\n\n\n\n\nTip\n\n\n\nThe %v% operator is your friend for vertex attributes! Think of it as saying “this network’s vertices have this property.” Use list.vertex.attributes(nw_boys) to see all available attributes."
+  },
+  {
+    "objectID": "posts/snapart1/index.html#visualizing-networks",
+    "href": "posts/snapart1/index.html#visualizing-networks",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "6. Visualizing Networks",
+    "text": "6. Visualizing Networks\nAlright, time for the fun part! Network plots can be beautiful, informative, or completely messy. The difference often comes down to choosing the right layout and visual parameters.\n\n6.1 Basic Network Plot\n\nplot(nw_ppi, \n     main = \"Protein-Protein Interaction Network\",\n     cex.main = 1.5,              # title size\n     vertex.cex = 1.0,            # node size\n     edge.col = \"gray60\",         # edge color\n     vertex.col = \"lightblue\",    # node color\n     vertex.border = \"darkblue\",  # node border color\n     mode = \"fruchtermanreingold\", # layout algorithm\n     pad = 0.7)                   # padding around plot\n\n\n\n\n\n\n\n\n\n\n6.2 Displaying Node Labels\nSometimes you want to know which node is which. That’s where labels come in handy.\n\n\n\n\n\n\nNote\n\n\n\nDataset: Florentine Marriage Network Welcome to Renaissance Florence! This famous dataset shows marriage alliances between the most powerful families in 15th-century Florence. Each node is a wealthy family, and edges represent marriages between families. The Medici family famously used strategic marriages to build political power.\n\nType: Undirected (marriage creates ties between both families)\nNodes: 16 elite Florentine families\nEdges: Marital unions between families\n\n\n\n\ndata(florentine)\n\nplot(flomarriage, \n     displaylabels = TRUE,        # show node names\n     vertex.cex = 1.5,\n     label.cex = 0.8,             # label size\n     label.pos = 1,               # label position (5 = center)\n     edge.col = \"gray60\",\n     vertex.col = \"lightblue\",\n     vertex.border = \"darkblue\",\n     main = \"Florentine Family Marriage Network\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\n\nLabels can overlap in dense networks. Try adjusting label.pos (1=below, 2=left, 3=above, 4=right, 5=center) or label.cex to make them more readable.\n\n\n\n6.2.1 Extension\nWe can make our visualization tell a richer story by using node attributes to control visual properties. The Florentine marriage dataset includes information about each family’s wealth and political power (number of seats on the city council, called “priorates”). Let’s use these to create a more informative plot:\n\n#attributes are available\nlist.vertex.attributes(flomarriage)\n\n[1] \"na\"           \"priorates\"    \"totalties\"    \"vertex.names\" \"wealth\"      \n\n#extract wealth and priorates (political representation)\nwealth &lt;- flomarriage %v% \"wealth\"\npriorates &lt;- flomarriage %v% \"priorates\"\n\n#scale wealth to appropriate node sizes (1-4 range works well)\nnode_sizes &lt;- wealth / 20  \n\n#create node shapes based on political representation\n#more priorates = more sides (more politically important)\n#map priorates to number of polygon sides\nnode_sides &lt;- ifelse(priorates &gt;= 50, 8,      # Octagon for high power (50+)\n              ifelse(priorates &gt;= 30, 6,       # Hexagon for medium-high (30-49)\n              ifelse(priorates &gt;= 10, 5,       # Pentagon for medium (10-29)\n              ifelse(priorates &gt; 0, 4, 3))))   # Diamond (4) for low, Triangle (3) for none\n\n#create the enhanced plot\nplot(flomarriage, \n     displaylabels = TRUE,\n     vertex.cex = node_sizes,     # Size by wealth\n     vertex.sides = node_sides,   # Shape by political power\n     label.cex = 0.7,\n     edge.col = \"gray60\",\n     vertex.col = \"gold\",         # Gold for wealthy families\n     main = \"Florentine Marriages: Wealth & Political Power\")\n\n\n\n\n\n\n\n\nWhat does this reveal? The Medici family stands out with both high wealth (large node) and significant political representation (many-sided polygon)."
+  },
+  {
+    "objectID": "posts/snapart1/index.html#finding-isolated-nodes-and-components",
+    "href": "posts/snapart1/index.html#finding-isolated-nodes-and-components",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "7. Finding Isolated Nodes and Components",
+    "text": "7. Finding Isolated Nodes and Components\n\n#get component membership for all nodes\ncomp &lt;- component.dist(flomarriage)\n\n#find isolated nodes (nodes not in the largest component)\nfamily_names &lt;- network.vertex.names(flomarriage)\nisolated &lt;- family_names[comp$membership != which.max(comp$csize)]\nprint(isolated)  # \"Pucci\"\n\n[1] \"Pucci\""
+  },
+  {
+    "objectID": "posts/snapart1/index.html#quick-reference-your-network-analysis-cheat-sheet",
+    "href": "posts/snapart1/index.html#quick-reference-your-network-analysis-cheat-sheet",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "8. Quick Reference: Your Network Analysis Cheat Sheet",
+    "text": "8. Quick Reference: Your Network Analysis Cheat Sheet\n\n\n\n\n\n\n\n\nFunction\nPurpose\nExample\n\n\n\n\nnetwork()\nCreate network object\nnetwork(edges, matrix.type = \"edgelist\")\n\n\ndegree()\nCalculate node degrees\ndegree(nw, gmode = \"graph\")\n\n\ncomponent.dist()\nFind connected components\ncomponent.dist(nw)\n\n\nget.inducedSubgraph()\nExtract subnetwork\nget.inducedSubgraph(nw, v = nodes)\n\n\nnetwork.size()\nCount nodes\nnetwork.size(nw)\n\n\nnetwork.edgecount()\nCount edges\nnetwork.edgecount(nw)\n\n\nnetwork.vertex.names()\nGet node names\nnetwork.vertex.names(nw)\n\n\n%v%\nSet/get vertex attributes\nnw %v% \"race\" &lt;- values\n\n\nplot()\nVisualize network\nplot(nw, displaylabels = TRUE)"
+  },
+  {
+    "objectID": "posts/snapart1/index.html#resources-to-keep-learning",
+    "href": "posts/snapart1/index.html#resources-to-keep-learning",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "9. Resources to Keep Learning",
+    "text": "9. Resources to Keep Learning\n\nEric Kolaczyk Statistical Analysis of Network Data (2009). Springer http://link.springer.com/book/10.1007%2F978-0-387-88146-1\nEric Kolaczyk and Gabor Csardi Statistical Analysis of Network Data with R (2014). Springer http://link.springer.com/book/10.1007%2F978-1-4939-0983-4\nDavid Easley and Jon Kleinberg “Networks, Crowds, and Markets: Reasoning about a Highly Connected World (2010). Available free online. https://www.cs.cornell.edu/home/kleinber/networks-book/\n\nThis tutorial is based on coursework from STATS 218: Social Network Analysis. All datasets are from the networkdata package."
+  },
+  {
+    "objectID": "posts/snapart1/index.html#quick-reference",
+    "href": "posts/snapart1/index.html#quick-reference",
+    "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
+    "section": "8. Quick Reference",
+    "text": "8. Quick Reference\n\n\n\n\n\n\n\n\nFunction\nPurpose\nExample\n\n\n\n\nnetwork()\nCreate network object\nnetwork(edges, matrix.type = \"edgelist\")\n\n\ndegree()\nCalculate node degrees\ndegree(nw, gmode = \"graph\")\n\n\ncomponent.dist()\nFind connected components\ncomponent.dist(nw)\n\n\nget.inducedSubgraph()\nExtract subnetwork\nget.inducedSubgraph(nw, v = nodes)\n\n\nnetwork.size()\nCount nodes\nnetwork.size(nw)\n\n\nnetwork.edgecount()\nCount edges\nnetwork.edgecount(nw)\n\n\nnetwork.vertex.names()\nGet node names\nnetwork.vertex.names(nw)\n\n\n%v%\nSet/get vertex attributes\nnw %v% \"race\" &lt;- values\n\n\nplot()\nVisualize network\nplot(nw, displaylabels = TRUE)"
   }
 ]
