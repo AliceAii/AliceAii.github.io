@@ -4,7 +4,7 @@
     "href": "blog_posts.html",
     "title": "Blog Post",
     "section": "",
-    "text": "Social Network Analysis R Tutorial Part 1: Basic Visualization\n\n\n\nR\n\nSNA\n\n\n\n\n\n\n\n\n\nSep 30, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nSurvival Analysis R Tutorial\n\n\n\nR\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 20, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is Survival Analysis?\n\n\n\nR\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 9, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nHow to code Race?\n\n\n\nR\n\nCritical Quant\n\n\n\n\n\n\n\n\n\nJun 25, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nCausal Inference in Network Data: A Tutorial\n\n\n\nSNA\n\nCausal Inference\n\nSTATS\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\nNo matching items"
+    "text": "Social Network Analysis R Tutorial Part 1: Basic Visualization\n\n\n\nR\n\nSNA\n\n\n\n\n\n\n\n\n\nSep 30, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nSurvival Analysis R Tutorial\n\n\n\nR\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 20, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is Survival Analysis?\n\n\n\nR\n\nSurvival Analysis\n\n\n\n\n\n\n\n\n\nJul 9, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nHow to code Race?\n\n\n\nR\n\nCritical Quant\n\n\n\n\n\n\n\n\n\nJun 25, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\n\n\n\n\n\n\n\nCausal Inference in Network Data: A Tutorial\n\n\n\nSNA\n\nCausal Inference\n\n\n\n\n\n\n\n\n\nJun 20, 2025\n\n\nYingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\n\n\n\n\n\nJun 17, 2025\n\n\nShuhan (Alice) Ai\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/welcome/index.html",
@@ -285,5 +285,12 @@
     "title": "Social Network Analysis R Tutorial Part 1: Basic Visualization",
     "section": "8. Quick Reference",
     "text": "8. Quick Reference\n\n\n\n\n\n\n\n\nFunction\nPurpose\nExample\n\n\n\n\nnetwork()\nCreate network object\nnetwork(nw, matrix.type = \"edgelist\")\n\n\ndegree()\nCalculate node degrees\ndegree(nw, gmode = \"graph\")\n\n\ncomponent.dist()\nFind connected components\ncomponent.dist(nw)\n\n\nget.inducedSubgraph()\nExtract subnetwork\nget.inducedSubgraph(nw, v = nodes)\n\n\nnetwork.size()\nCount nodes\nnetwork.size(nw)\n\n\nnetwork.edgecount()\nCount edges\nnetwork.edgecount(nw)\n\n\nnetwork.vertex.names()\nGet node names\nnetwork.vertex.names(nw)\n\n\n%v%\nSet/get vertex attributes\nnw %v% \"race\" &lt;- values\n\n\nplot()\nVisualize network\nplot(nw, displaylabels = TRUE)"
+  },
+  {
+    "objectID": "teaching.html",
+    "href": "teaching.html",
+    "title": "Teaching",
+    "section": "",
+    "text": "No matching items"
   }
 ]

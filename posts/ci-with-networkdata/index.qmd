@@ -6,7 +6,7 @@ author:
   - Kayla Teng
   - Detao Ma
 date: "2025-06-20"
-categories: [SNA, Causal Inference, STATS]
+categories: [SNA, Causal Inference]
 image: "snaimage.jpg"
 ---
 

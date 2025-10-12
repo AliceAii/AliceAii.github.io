@@ -9,5 +9,9 @@
       "/posts/ci-with-networkdata/index.html",
       "/posts/welcome/index.html"
     ]
+  },
+  {
+    "listing": "/teaching.html",
+    "items": []
   }
 ]
