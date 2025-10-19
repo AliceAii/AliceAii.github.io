@@ -1,7 +1,18 @@
 ---
 title: "Presentation"
-format: html
+format: 
+  html:
+    css: styles.css
 ---
+
+<style>
+.hanging {
+  text-indent: -2em;   /* moves first line left */
+  margin-left: 2em;    /* indents rest of paragraph */
+}
+</style>
+
+<div class="hanging">
 
 
 ### 2025
@@ -24,3 +35,5 @@ Jiang, T., **Ai, S.**, & Li, K. (2024). *Revealing Contributions on Research Dat
 **Ai, S.** (2024). *STEM Curriculum as a Catalyst: Narrowing Racial and Structural Inequalities.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division L: Educational Policies and Politics, Philadelphia, PA.
 
 Liu, Xi., & **Ai, S. **(2024). *Improving Affect Detections for K-12 Online Math Learning Using Time-related Variables.* Paper presentation at the annual meeting of the American Education Research Association, Division C: Learning and Instruction, Philadelphia, PA.
+
+</div>
