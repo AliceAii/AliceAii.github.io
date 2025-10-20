@@ -436,7 +436,12 @@ Tip
 <li><strong>Silverman’s rule</strong>: <span class="math inline">\(h = 0.9 \times \min(s, IQR/1.34) \times n^{-1/5}\)</span></li>
 <li><strong>Scott’s rule</strong>: <span class="math inline">\(h = 1.06 \times \min(s, IQR/1.34) \times n^{-1/5}\)</span> ← <strong>Recommended</strong></li>
 </ul>
-<p>Where: - <span class="math inline">\(s\)</span> = standard deviation of your data - <span class="math inline">\(IQR\)</span> = interquartile range (75th percentile - 25th percentile) - <span class="math inline">\(n\)</span> = sample size</p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(s\)</span> = standard deviation of your data </li>
+<li><span class="math inline">\(IQR\)</span> = interquartile range (75th percentile - 25th percentile) </li>
+<li><span class="math inline">\(n\)</span> = sample size</li>
+</ul>
 <p>Scott’s rule tends to be slightly more robust, so we’ll use it as our default. The good news? R’s <code>bw.nrd()</code> function calculates this for you automatically!</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -811,43 +816,42 @@ Note
 <section id="example-spatial-point-pattern" class="level3">
 <h3 class="anchored" data-anchor-id="example-spatial-point-pattern">5.2 Example: Spatial Point Pattern</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install and load required package</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(splancs)) <span class="fu">install.packages</span>(<span class="st">"splancs"</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splancs)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate spatial data: 30 random points in unit square</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">456</span>)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>n_points <span class="ot">&lt;-</span> <span class="dv">30</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>x_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(n_points, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>y_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(n_points, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate 2D bandwidth (combining x and y bandwidths)</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>bdw <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">bw.nrd0</span>(x_coord)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">bw.nrd0</span>(y_coord)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"2D bandwidth:"</span>, <span class="fu">round</span>(bdw, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("splancs")</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splancs)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#simulate spatial data: 30 random points in unit square</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">456</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>n_points <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>x_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(n_points, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>y_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(n_points, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate 2D bandwidth (combining x and y bandwidths)</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>bdw <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">bw.nrd0</span>(x_coord)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">bw.nrd0</span>(y_coord)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"2D bandwidth:"</span>, <span class="fu">round</span>(bdw, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>2D bandwidth: 0.1945 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create point pattern and boundary</span></span>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create point pattern and boundary</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>points_matrix <span class="ot">&lt;-</span> <span class="fu">as.points</span>(x_coord, y_coord)</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>boundary <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>, <span class="dv">1</span>,<span class="dv">0</span>, <span class="dv">1</span>,<span class="dv">1</span>, <span class="dv">0</span>,<span class="dv">1</span>, <span class="dv">0</span>,<span class="dv">0</span>), <span class="at">ncol=</span><span class="dv">2</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute 2D kernel density</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">#compute 2D kernel density</span></span>
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>kde_2d <span class="ot">&lt;-</span> <span class="fu">kernel2d</span>(points_matrix, boundary, bdw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Xrange is  0 1 
 Yrange is  0 1 
 Doing quartic kernel</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize</span></span>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#visualize</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">mar=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel 1: Density heatmap</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#panel 1: Density heatmap</span></span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(kde_2d, <span class="at">col=</span><span class="fu">gray</span>((<span class="dv">64</span><span class="sc">:</span><span class="dv">20</span>)<span class="sc">/</span><span class="dv">64</span>),</span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">main=</span><span class="st">"2D Kernel Density Estimate"</span>,</span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab=</span><span class="st">"X coordinate"</span>, <span class="at">ylab=</span><span class="st">"Y coordinate"</span>)</span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(points_matrix, <span class="at">pch=</span><span class="dv">19</span>, <span class="at">col=</span><span class="st">"red"</span>, <span class="at">cex=</span><span class="fl">1.0</span>)</span>
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel 2: Contour plot</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#panel 2: Contour plot</span></span>
 <span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">contour</span>(kde_2d, <span class="at">nlevels=</span><span class="dv">10</span>,</span>
 <span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">main=</span><span class="st">"Density Contours"</span>,</span>
 <span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab=</span><span class="st">"X coordinate"</span>, <span class="at">ylab=</span><span class="st">"Y coordinate"</span>)</span>
@@ -925,8 +929,7 @@ Tip
 <p><strong>How it works:</strong> Generate candidates from an easy distribution, then “reject” the ones that don’t fit your target distribution well. (We’ll dive deep into this later!)</p>
 <p><strong>Real-world example:</strong> You created a kernel density estimate from your data and want to generate synthetic observations that match this pattern. There’s no built-in function for this, and there’s no inverse CDF formula. Rejection sampling to the rescue!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Want to sample from your KDE? Use rejection sampling!</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (We'll show the full code in Section 7)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">#The full code will be shown in Section 7)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Another example:</strong> Truncated distributions. Suppose you need normal random variables, but only between 0 and 10 (maybe modeling physical quantities that can’t be negative). Rejection sampling makes this easy: generate from the normal distribution and reject values outside [0,10].</p>
 <p><strong>Limitation:</strong> Can be slow if your proposal distribution doesn’t match the target well (low acceptance rate).</p>

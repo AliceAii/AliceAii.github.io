@@ -93,8 +93,9 @@ Research has shown that choosing the right bandwidth is more important than choo
 - **Scott's rule**: $h = 1.06 \times \min(s, IQR/1.34) \times n^{-1/5}$ ← **Recommended**
 
 Where:
-- $s$ = standard deviation of your data
-- $IQR$ = interquartile range (75th percentile - 25th percentile)
+
+- $s$ = standard deviation of your data \n
+- $IQR$ = interquartile range (75th percentile - 25th percentile) \n
 - $n$ = sample size
 
 Scott's rule tends to be slightly more robust, so we'll use it as our default. The good news? R's `bw.nrd()` function calculates this for you automatically!
@@ -368,37 +369,36 @@ $$\hat{f}(x_0, y_0) = \frac{1}{nh_xh_y} \sum_{i=1}^{n} K\left(\frac{x_0 - x_i}{h
 ### 5.2 Example: Spatial Point Pattern
 
 ```{r, message=FALSE, warning=FALSE}
-# Install and load required package
-if(!require(splancs)) install.packages("splancs")
+#install.packages("splancs")
 library(splancs)
 
-# Simulate spatial data: 30 random points in unit square
+#simulate spatial data: 30 random points in unit square
 set.seed(456)
 n_points <- 30
 x_coord <- runif(n_points, 0, 1)
 y_coord <- runif(n_points, 0, 1)
 
-# Calculate 2D bandwidth (combining x and y bandwidths)
+#calculate 2D bandwidth (combining x and y bandwidths)
 bdw <- sqrt(bw.nrd0(x_coord)^2 + bw.nrd0(y_coord)^2)
 cat("2D bandwidth:", round(bdw, 4), "\n")
 
-# Create point pattern and boundary
+#create point pattern and boundary
 points_matrix <- as.points(x_coord, y_coord)
 boundary <- matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE)
 
-# Compute 2D kernel density
+#compute 2D kernel density
 kde_2d <- kernel2d(points_matrix, boundary, bdw)
 
-# Visualize
+#visualize
 par(mfrow=c(1,2), mar=c(4,4,3,2))
 
-# Panel 1: Density heatmap
+#panel 1: Density heatmap
 image(kde_2d, col=gray((64:20)/64),
       main="2D Kernel Density Estimate",
       xlab="X coordinate", ylab="Y coordinate")
 points(points_matrix, pch=19, col="red", cex=1.0)
 
-# Panel 2: Contour plot
+#panel 2: Contour plot
 contour(kde_2d, nlevels=10,
         main="Density Contours",
         xlab="X coordinate", ylab="Y coordinate")
@@ -480,8 +480,7 @@ wait_times <- -log(1-u) / 0.5
 **Real-world example:** You created a kernel density estimate from your data and want to generate synthetic observations that match this pattern. There's no built-in function for this, and there's no inverse CDF formula. Rejection sampling to the rescue!
 
 ```{r, message=FALSE, warning=FALSE}
-# Want to sample from your KDE? Use rejection sampling!
-# (We'll show the full code in Section 7)
+#The full code will be shown in Section 7)
 ```
 
 **Another example:** Truncated distributions. Suppose you need normal random variables, but only between 0 and 10 (maybe modeling physical quantities that can't be negative). Rejection sampling makes this easy: generate from the normal distribution and reject values outside [0,10].
