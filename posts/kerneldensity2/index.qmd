@@ -1,0 +1,638 @@
+---
+title: "Real-World Practice with Kernel Density and Regression Diagnostics"
+author: Shuhan (Alice) Ai
+date: "2025-10-20"
+categories: [R, Programming]
+toc: true
+toc-depth: 3
+toc-title: "Contents"
+image: "plot1.png"
+---
+
+## Introduction
+
+Welcome to this advanced tutorial on kernel density estimation! This guide builds on the [foundational kernel concepts from the previous blog post](https://aliceaii.github.io/posts/kerneldensity/) where we covered:
+
+- The basics of kernel density estimation (KDE)
+- Bandwidth selection using Scott's and Silverman's rules
+- Rejection sampling techniques
+- Applications to housing price data
+
+**What's new in this tutorial?**
+
+Today, we'll take things further with two real-world applications and discussion of its application in educational field:
+
+1. **Seismic Analysis**: Analyzing California earthquake data using KDE with simulation-based confidence bands
+2. **Regression Diagnostics**: Identifying influential observations in multivariate regression
+3. **Educational Application**
+
+
+## Learning Objectives
+
+By the end of this tutorial, you will:
+
+- Build simulation-based confidence bands for kernel density estimates
+- Apply 2D kernel smoothing to spatial point patterns
+- Perform leave-one-out influence analysis in regression
+- Interpret diagnostic plots for identifying influential observations
+- Understand when and why these techniques matter in practice
+- Applications in educational research
+
+
+## Part 1: Earthquake Analysis with Confidence Bands
+
+### Motivation: Why Confidence Bands Matter
+
+In our previous tutorial, we estimated densities without quantifying uncertainty. But how confident are we in our estimates? 
+
+**The problem**: A kernel density estimate is just one possible curve based on our sample. If we collected different earthquake data, we'd get a slightly different curve.
+
+**The solution**: **Simulation-based confidence bands** show us the range of plausible density curves, helping us distinguish real features from sampling noise, assess estimation uncertainty, make more reliable inferences about the underlying distribution
+
+Think of it as the difference between saying "the earthquake magnitude distribution looks like this" versus "we're 95% confident the true distribution falls within this band."
+
+## 1.1 Loading Earthquake Data
+
+We're loading real seismic data from Southern California spanning over 50 years. This data comes from the Southern California Earthquake Data Center, which maintains comprehensive records of all detected earthquakes in the region. Our goal is to import this data into R and prepare it for analysis.
+
+We'll analyze earthquake data from Southern California (1970-2025) provided by the [Southern California Earthquake Data Center](https://service.scedc.caltech.edu/).
+
+**Study region**: 
+
+- Longitude: -122.0° to -118.0° (West to East) \n
+- Latitude: 34.0° to 38.0° (South to North) \n
+- Magnitude: ≥ 4.0 \n 
+- Time period: January 1, 1970 to October 10, 2025
+
+```{r, message=FALSE, warning=FALSE}
+rm(list = ls())
+
+library(tidyverse)
+library(splancs)
+library(maps)
+library(viridis)
+
+#read all lines
+lines <- readLines("SearchResults.txt")
+
+#fine the line with column headers starts with #YYYY
+header_line <- grep("^#YYY", lines, value = TRUE)
+data_start <- grep("^#YYY", lines) + 1
+data_lines <- lines[data_start:length(lines)]
+data_lines <- data_lines[!grepl("^#|^$|^<PRE>|^</PRE>", data_lines)] #remove the these lines start with xxx
+
+#transform the text into dataset
+earthquake_data <- read.table(text = data_lines,
+header = FALSE, stringsAsFactors = FALSE, fill = TRUE)
+colnames(earthquake_data) <- c("DATE", "TIME", "ET", "GT", "MAG", "M",
+"LAT", "LON", "DEPTH", "Q", "EVID", "NPH", "NGRM")
+earthquake_data$DATETIME <- as.POSIXct(paste(earthquake_data$DATE, earthquake_data$TIME),
+format = "%Y/%m/%d %H:%M:%OS")
+
+earthquake_data$MAG <- as.numeric(earthquake_data$MAG)
+earthquake_data$LAT <- as.numeric(earthquake_data$LAT)
+earthquake_data$LON <- as.numeric(earthquake_data$LON)
+earthquake_data$DEPTH <- as.numeric(earthquake_data$DEPTH)
+
+head(earthquake_data[, c("DATETIME", "MAG", "LAT", "LON", "DEPTH")])
+```
+
+
+**What we're looking at**:
+
+- Each row represents one seismic event
+- `MAG`: Earthquake magnitude (Richter or moment magnitude scale)
+- `LAT/LON`: Epicenter location
+- `DEPTH`: How deep underground the quake occurred (km)
+- `DATETIME`: When it happened
+
+**Historical context**: This dataset includes the devastating 1971 San Fernando earthquake (M6.6) and the 1994 Northridge earthquake (M6.7), both of which caused significant damage in the Los Angeles area.
+
+## 1.2 Kernel Density Estimation with Scott's Rule
+
+We're creating a smooth density curve of earthquake magnitudes using kernel density estimation (KDE). Instead of using arbitrary histogram bins, we'll place a Gaussian "bump" at each data point and add them up. The bandwidth (how wide each bump is) will be chosen automatically using Scott's rule—a mathematical formula that balances smoothness with detail.
+
+This gives us our first estimate of the magnitude distribution, which we'll use as the foundation for building confidence bands in the next step. We'll estimate the distribution of earthquake magnitudes using a Gaussian kernel.
+
+**Review from previous tutorial**: 
+
+Scott's bandwidth formula: $$h = 1.06 \times \min(\sigma, \text{IQR}/1.34) \times n^{-1/5}$$
+
+This balances:
+- **Smoothness**: Larger $h$ → smoother curve
+- **Detail**: Smaller $h$ → more features (but possibly noise)
+
+```{r, message=FALSE, warning=FALSE}
+#extract magnitudes
+magnitudes <- earthquake_data$MAG
+
+#set Scott bandwidth
+n <- length(magnitudes)
+bandwidth_scott <- 1.06 * min(sd(magnitudes),IQR(magnitudes)/1.34) * 1000^(-.2) #or can use bw.nrd(x)
+
+#get m, vector of 100 equally spaced magnitudes spanning the observed range of magnitudes
+m_values <- seq(min(magnitudes), max(magnitudes), length.out = 100)
+
+#compute kernel density estimates at these points
+kde_original <- density(magnitudes, bw = bandwidth_scott, kernel = "gaussian",
+                        from = min(m_values), to = max(m_values), n = 100)
+
+#save the kernel density estimates
+f_hat_original <- kde_original$y
+```
+
+## 1.3 Simulation-Based 95% Confidence Bands
+
+Here's where it gets exciting! We're going to answer the question: "How certain are we about our density estimate?" We'll do this by:
+
+1. **Simulating 200 alternative datasets** from our estimated density (pretending these are equally plausible datasets we could have observed)
+2. **Computing a KDE for each simulated dataset** using the same bandwidth
+3. **Finding the range** where 95% of these simulated curves fall
+
+This range becomes our confidence band—showing us where the true density likely lies.
+
+**Why this matters:** Without confidence bands, we don't know if features in our density curve are real patterns or just random noise from sampling.
+
+Now let's quantify uncertainty!
+
+**The idea**: 
+
+1. Our KDE is an estimate based on our sample
+2. If we had a different sample from the same underlying distribution, we'd get a slightly different KDE
+3. We can simulate many such "alternative samples" and see how much the KDE varies
+4. The range containing 95% of these simulated KDEs gives us our confidence band
+
+**The algorithm**:
+
+For $b = 1, 2, \ldots, 200$:
+
+1. **Resample**: Draw $n$ new magnitudes from our estimated density
+   - For each: Pick a random observed magnitude $X_i$, then add noise: $X_i^* = X_i + \epsilon$ where $\epsilon \sim N(0, h^2)$
+2. **Re-estimate**: Compute KDE using the same bandwidth
+3. **Store**: Save the density values at our 100 evaluation points
+
+Finally: At each evaluation point, find the 2.5th and 97.5th percentiles across the 200 simulations.
+
+```{r, message=FALSE, warning=FALSE}
+n_sim <- 200
+
+#create a matrix to store simulated density estimtes
+simulated_densities <- matrix(NA, nrow = n_sim, ncol = 100)
+
+#perform simulations
+for (b in 1:n_sim) {
+  #sample from the kernel density estimate
+  sampled_indices <- sample(1:n, size = n, replace = TRUE)
+  simulated_mags <- magnitudes[sampled_indices] +
+                    rnorm(n, mean = 0, sd = bandwidth_scott)
+  
+  #compute KDE for simulated data using same bandwidth
+  kde_sim <- density(simulated_mags, bw = bandwidth_scott, 
+                     kernel = "gaussian", from = min(m_values), 
+                     to = max(m_values), n = 100)
+
+  simulated_densities[b, ] <- kde_sim$y
+}
+
+#get the 2.5th and 97.5th percentiles for confidence bands
+lower_band <- apply(simulated_densities, 2, quantile, probs = 0,025)
+upper_band <- apply(simulated_densities, 2, quantile, probs = 0.975)
+```
+
+## 1.4 Visualization: Figure 1
+
+Let's create a publication-quality plot showing our KDE with confidence bands.
+
+
+
+```{r, message=FALSE, warning=FALSE}
+#create the plot
+plot(m_values, f_hat_original, type = "l", lwd = 2, col = "navy",
+     xlab = "Earthquake Magnitude", ylab = "Density",
+     main = "Figure 1 Kernel Density Estimate of Earthquake Magnitudes\nwith 95% Confidence Bands",
+     ylim = range(c(lower_band, upper_band, f_hat_original)))
+
+#add confidence bands
+lines(m_values, lower_band, lty = 2, col = "red", lwd = 1.5)
+lines(m_values, upper_band, lty = 2, col = "red", lwd = 1.5)
+
+#add shaded region for confidence bands
+polygon(c(m_values, rev(m_values)), 
+        c(lower_band, rev(upper_band)),
+        col = rgb(1, 0, 0, 0.2), border = NA)
+
+#add legend
+legend("topright", 
+       legend = c("KDE", "95% Confidence Bands"),
+       col = c("navy", "red"), lty = c(1, 2), lwd = c(2, 1.5),
+       bty = "n")
+
+```
+
+## 1.5 Two-Dimensional Spatial Analysis
+
+Now we shift from analyzing earthquake magnitudes to analyzing earthquake *locations*. We'll create a 2D heat map showing where earthquakes cluster in space. This extends KDE from one dimension (magnitude) to two dimensions (latitude and longitude).
+
+The math is similar, but now each earthquake contributes a 2D "bump" on a map, and we add them all up to see which areas have the highest earthquake density. This reveals fault lines and seismic hazard zones without needing any geological data—just the pattern of where earthquakes occur!
+
+Earthquakes don't just vary in magnitude—they cluster in space near fault lines. Let's visualize this using 2D kernel smoothing.
+
+**The math** (2D extension):
+
+$$\hat{f}(x_0, y_0) = \frac{1}{nh_xh_y} \sum_{i=1}^{n} K\left(\frac{x_0 - x_i}{h_x}\right) K\left(\frac{y_0 - y_i}{h_y}\right)$$
+
+We'll use the `kernel2d()` function from `splancs` package, which is specifically designed for spatial point patterns.
+
+```{r, message=FALSE, warning=FALSE}
+#extract longitude and latitude
+lon <- earthquake_data$LON
+lat <- earthquake_data$LAT
+
+#create 2c matrix of locations for splancs
+locations <- cbind(lon, lat)
+#locations
+
+#set the boundary
+poly_boundary <- cbind(c(-122, -118, -118, -122, -122),
+                       c(34, 34, 38, 38, 34))
+#poly_boundary
+
+#calculate bandwidth using Scott's rule for 2D
+n <- nrow(locations)
+h_lon <- sd(lon) * n^(-1/6)
+h_lat <- sd(lat) * n^(-1/6)
+#h_lon; h_lat
+
+bandwidth <- mean(c(h_lon, h_lat))
+#bandwidth #.2189
+
+#create grid for evaluation
+grid_size <- 100
+lon_grid <- seq(-122, -118, length.out = grid_size)
+lat_grid <- seq(34, 38, length.out = grid_size)
+
+#compute 2D kernel density using kernel2d from splancs
+kde_result <- kernel2d(locations, poly_boundary, bandwidth, 
+                       nx = grid_size, ny = grid_size)
+
+#extract the density matrix
+kde_2d <- kde_result$z
+
+#get grid coordinates from kernel2d output
+lon_grid <- kde_result$x
+lat_grid <- kde_result$y
+
+#get California county map data
+ca_counties <- map_data("county", region = "california")
+#ca_counties
+
+#filter counties in the region of interest
+ca_counties_filtered <- ca_counties %>%
+  filter(long >= -122, long <= -118,
+         lat >= 34, lat <= 38)
+```
+
+## 1.6 Visualization: Figure 2
+
+Creating a beautiful map with California geography for context.
+
+```{r, message=FALSE, warning=FALSE}
+#prepare the colorset
+light_colors <- colorRampPalette(c("white", "lightyellow", "gold", "orange", "orangered", "red", "darkred"))(100)
+
+par(mar = c(5, 5, 4, 2), bg = "white")
+
+image(lon_grid, lat_grid, kde_2d, 
+      col = light_colors,
+      xlab = "Longitude", ylab = "Latitude",
+      main = "Figure 2 2D Kernel Density Estimate of Earthquake Locations",
+      xlim = c(-122, -118), ylim = c(34, 38),
+      cex.lab = 1.2, cex.main = 1.3)
+
+#add county boundaries
+contour(lon_grid, lat_grid, kde_2d, 
+        add = TRUE, col = "gray40", lwd = 1.2, nlevels = 10, labcex = 0.8)
+
+#add county boundaries
+map("county", region = "california", add = TRUE, col = "black", lwd = 1, lty = 1)
+
+#add earthquake location
+points(lon, lat, pch = 21, cex = 0.8, col = "black", bg = "blue", lwd = 0.5)
+
+#add legend with box
+legend("topright", 
+       legend = c("Locations", "Kernel Density Contours", 
+                  "Region", "County Boundaries"),
+       pch = c(21, NA, NA, NA), 
+       lty = c(NA, 1, 2, 1),
+       col = c("black", "gray40", "black", "gray50"),
+       pt.bg = c("blue", NA, NA, NA),
+       pt.cex = c(1.2, NA, NA, NA),
+       lwd = c(1, 1.2, 2, 1),
+       bty = "o", 
+       bg = "white",
+       box.col = "gray30",
+       cex = 0.65,
+       inset = 0.02)
+
+#add a color scale legend
+xl <- par("usr")[1:2]
+yb <- par("usr")[3:4]
+
+x_bar_start <- xl[1] + 0.05 * diff(xl) 
+bar_width <- 0.08 
+x_bar_end <- x_bar_start + bar_width
+
+y_range <- yb[1] + c(0.15, 0.85) * diff(yb)
+legend_vals <- seq(y_range[1], y_range[2], length.out = 100)
+
+for (i in 1:99) {
+  rect(x_bar_start, legend_vals[i], x_bar_end, legend_vals[i+1], 
+       col = light_colors[i], border = NA)
+}
+
+rect(x_bar_start, y_range[1], x_bar_end, y_range[2], border = "gray30")
+text(x_bar_start - 0.01, y_range[2], "High", pos = 3, cex = 0.6) # pos=2 for left-alignment
+text(x_bar_start - 0.01, y_range[1], "Low", pos = 1, cex = 0.6) # pos=2 for left-alignment
+text(x_bar_start + bar_width/2, mean(y_range), "Density", srt = 90, pos = 3, cex = 0.6)
+
+```
+
+## Part 2: Influential Points in Regression
+
+### Motivation: Not All Data Points Are Equal
+
+Imagine you're advising a real estate company on pricing models. You build a regression model, and it says: "Each $1,000 increase in median home price predicts 0.5 more sales."
+
+But what if this entire finding hinges on just one neighborhood—say, Beverly Hills? If you removed that one data point, would your conclusion change?
+
+**The problem**: Some observations have disproportionate influence on regression estimates. These **influential points** can:
+
+- Drive entire conclusions
+- Mask true relationships
+- Create spurious findings
+
+**The solution**: **Leave-one-out influence analysis** quantifies how much each observation affects your estimates.
+
+## 2.1 The Dataset: LA Housing Prices (August 2013)
+
+We're switching gears from earthquakes to economics! We'll load housing market data from Los Angeles County and prepare it for regression analysis. Each row represents a different neighborhood, with variables measuring home prices and sales volumes.
+
+**Data cleaning task:** We need to remove any rows with missing values ("n/a") to ensure our regression analysis works properly.
+
+We'll analyze housing sales data from Los Angeles County during the post-recession recovery period.
+
+**Variables**:
+
+- `Y`: Number of single-family home sales in August 2013
+- `X1`: Median single-family residence price (thousands of dollars)
+- `X2`: Median condo price (thousands of dollars)
+- `X3`: Median home price per square foot (dollars)
+
+**Research question**: How does housing price affect sales volume?
+
+```{r, message=FALSE, warning=FALSE}
+housing_data <- read.table("LAhousingpricesaug2013.txt", 
+                           header = TRUE, na.strings = "n/a")
+
+#colnames(housing_data)
+
+housing_clean <- housing_data %>%
+  select(Y = SalesofSingleFamilyHomes,
+         X1 = PriceMedianSFR.1000.,
+         X2 = PriceMedianCondos.1000.,
+         X3 = MedianHomePrice.Sq.Ft) %>%
+  na.omit()
+```
+
+**Data characteristics**:
+
+- Each row represents a distinct neighborhood
+- Geographic diversity: From beach communities to inland valleys
+- Price variation: Affordable suburbs to luxury estates
+- Sales variation: Low-activity areas to hot markets
+
+## 2.2 The Full Regression Model
+
+Let's fit our baseline model using all observations.
+
+**Model**: $$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \epsilon$$
+
+```{r, message=FALSE, warning=FALSE}
+full_model <- lm(Y ~ X1 + X2 + X3, data = housing_clean)
+
+summary(full_model)
+
+#extract coefficients
+beta_full <- coef(full_model)
+#beta_full
+beta_1_full <- beta_full["X1"]
+#beta_1_full
+```
+
+## 2.3 Leave-One-Out Analysis
+
+**The idea**: 
+
+For each observation $i$:
+
+1. Remove it from the dataset
+2. Re-fit the regression
+3. Record the new estimate $\hat{\beta}_1^{(-i)}$
+4. Calculate influence: $\text{Influence}_i = \hat{\beta}_1^{(-i)} - \hat{\beta}_1$
+
+**Interpretation**:
+
+- **Positive influence** ($> 0$): Removing this observation increases $\hat{\beta}_1$
+  - The observation was pulling the estimate downward
+  - It's below the general trend
+- **Negative influence** ($< 0$): Removing this observation decreases $\hat{\beta}_1$
+  - The observation was pulling the estimate upward  
+  - It's above the general trend
+- **Large absolute influence**: This observation substantially affects our conclusions
+
+Let's walk through the process for the first observation.
+
+```{r, message=FALSE, warning=FALSE, output}
+#set i = 1
+i <- 1
+#remove i
+housing_minus_i <- housing_clean[-i, ]
+#fit the model without i
+model_minus_i <- lm(Y ~ X1 + X2 + X3, data = housing_minus_i)
+#extract the vector of parameter estimats beta^(-1)
+beta_minus_i <- coef(model_minus_i)
+#extract the corresponding slope of X1
+beta_1_minus_i <- beta_minus_i["X1"]
+#calcualte the influence
+influence_i1 <- beta_1_minus_i - beta_1_full
+influence_i1
+```
+
+**What this tells us**:
+
+If the influence is small (close to 0), this observation doesn't substantially affect our estimate. If it's large, removing this neighborhood changes our conclusions meaningfully. It's pretty small here. 
+
+Now let's repeat this for all 217 observations.
+
+```{r, message=FALSE, warning=FALSE}
+n_obs <- nrow(housing_clean)
+
+#set up vector to store influences
+influences <- numeric(n_obs)
+
+#loop through each observation from i = 1 to n_obs
+for (i in 1:n_obs) {
+  housing_minus_i <- housing_clean[-i, ]
+  model_minus_i <- lm(Y ~ X1 + X2 + X3, data = housing_minus_i)
+  beta_1_minus_i <- coef(model_minus_i)["X1"]
+  influences[i] <- beta_1_minus_i - beta_1_full
+}
+
+summary(influences)
+
+top_influential <- order(abs(influences), decreasing = TRUE)[1:5]
+top_influential
+```
+
+## 2.4 Visualization: Figure 3
+
+```{r, message=FALSE, warning=FALSE}
+par(mar = c(5, 5, 4, 2), bg = "white")
+plot(1:n_obs, influences, 
+     type = "h", lwd = 2, col = "steelblue",
+     xlab = "Observation Index (i)", 
+     ylab = expression(hat(beta)[1]^{(-i)} - hat(beta)[1]),
+     main = "Figure 3 Influence of Observation Points on Estimated Slope for X1")
+
+#add horizontal line at zero
+abline(h = 0, col = "red", lty = 2, lwd = 2)
+
+#add points
+points(1:n_obs, influences, pch = 20, cex = 0.8, col = "darkblue")
+
+#highlight most influential points
+threshold <- quantile(abs(influences), 0.95)
+influential_idx <- which(abs(influences) > threshold)
+points(influential_idx, influences[influential_idx], 
+       pch = 21, cex = 1.5, col = "red", bg = "yellow", lwd = 2)
+
+#add grid
+grid(col = "gray80", lty = "dotted")
+
+```
+
+**How to read this plot**:
+
+1. **X-axis**: Each point represents one neighborhood (observation)
+2. **Y-axis**: How much $\beta_1$ changes when we remove that neighborhood
+3. **Height of bars**: Magnitude of influence
+4. **Red line at y = 0**: No influence (removing the point doesn't change $\beta_1$)
+5. **Yellow highlighted points**: Neighborhoods with unusually large influence
+
+**Patterns to look for**:
+
+- **Cluster near zero**: Most neighborhoods have minimal influence (good!)
+- **Outliers above zero**: Removing these increases $\beta_1$ (they pull it down)
+- **Outliers below zero**: Removing these decreases $\beta_1$ (they pull it up)
+- **Symmetry**: Roughly balanced influences suggest stable estimates
+
+## Part 3: Educational Applications and Implications
+
+## 3.1  School Performance and Geography
+
+The 2D kernel density methods we applied to earthquakes have direct applications in education:
+
+**Example 1: School Achievement Hotspots**
+```{r education-spatial-example, eval=FALSE}
+#hypothetical: Test score performance by school location
+schools <- data.frame(
+  lat = school_latitudes,
+  lon = school_longitudes,
+  performance = test_scores
+)
+
+#2D KDE reveals geographic clusters
+#Are high-performing schools clustered in certain neighborhoods?
+#Does this reflect resources, demographics, or other factors?
+```
+
+**Example 2: College Application Patterns**
+
+- Where do students from your high school apply?
+- Geographic diversity in higher education access
+- Identifying underserved regions
+
+**Example 3: Educational Intervention Planning**
+
+- Where should we open new tutoring centers?
+- Which neighborhoods lack access to STEM programs?
+- Optimizing school bus routes based on student density
+
+Spatial analysis helps educators:
+
+- **Equity assessment**: Identify resource deserts
+- **Strategic planning**: Data-driven facility placement
+- **Policy evaluation**: Did an intervention reach the intended areas?
+- **Communication**: Maps speak louder than tables to stakeholders
+
+
+## 3.2 Regression Diagnostics in Educational Assessment
+
+**Example: Predicting Student Success**
+
+Imagine a model predicting college GPA from:
+- X₁: High school GPA
+- X₂: SAT scores
+- X₃: Number of AP courses
+
+**Questions influence analysis answers**:
+
+1. **Are a few students driving the relationship?**
+   - If one student's removal changes the coefficient dramatically
+   - Maybe they represent a unique population (athletes, legacy admits, transfers)
+
+2. **Do different student populations need different models?**
+   - If first-generation students are consistently influential
+   - Perhaps they deserve a separate model acknowledging different challenges
+
+3. **Are there data quality issues?**
+   - Extremely influential points might be data entry errors
+   - Or they might be interesting edge cases worth studying
+
+### Case Study: Grade Prediction Models
+
+**Scenario**: You're building a model to predict final exam scores based on:
+- Homework completion rate
+- Quiz averages
+- Class attendance
+
+**Using influence analysis**:
+
+```{r, message=FALSE, warning=FALSE}
+#grade_model <- lm(final_exam ~ homework + quizzes + attendance, 
+                  #data = student_data)
+
+#influences <- sapply(1:nrow(student_data), function(i) {
+  #model_minus_i <- lm(final_exam ~ homework + quizzes + attendance,
+                      #data = student_data[-i, ])
+  #coef(model_minus_i)["homework"] - coef(grade_model)["homework"]
+#})
+
+#influential_students <- which(abs(influences) > threshold)
+```
+
+**Interpretation for educators**:
+
+- **High-achieving outliers**: Students who succeed despite low homework completion
+  - Maybe they're self-studying, need less practice, or have test-taking skills
+  - Don't penalize them, but understand they're exceptional
+  
+- **Struggling outliers**: Students with high homework completion but low exam scores
+  - May indicate test anxiety, learning disabilities, or ineffective study habits
+  - Candidates for targeted interventions
+
+- **Model stability**: If removing one student changes the "homework effect" dramatically
+  - The relationship isn't generalizable
+  - Need more nuanced understanding of how homework helps
+

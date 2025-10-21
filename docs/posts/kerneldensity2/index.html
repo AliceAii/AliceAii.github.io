@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-10-20">
+
+<title>Real-World Practice with Kernel Density and Regression Diagnostics – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Real-World Practice with Kernel Density and Regression Diagnostics</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Programming</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 20, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link" data-scroll-target="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#part-1-earthquake-analysis-with-confidence-bands" id="toc-part-1-earthquake-analysis-with-confidence-bands" class="nav-link" data-scroll-target="#part-1-earthquake-analysis-with-confidence-bands">Part 1: Earthquake Analysis with Confidence Bands</a>
+  <ul class="collapse">
+  <li><a href="#motivation-why-confidence-bands-matter" id="toc-motivation-why-confidence-bands-matter" class="nav-link" data-scroll-target="#motivation-why-confidence-bands-matter">Motivation: Why Confidence Bands Matter</a></li>
+  </ul></li>
+  <li><a href="#loading-earthquake-data" id="toc-loading-earthquake-data" class="nav-link" data-scroll-target="#loading-earthquake-data">1.1 Loading Earthquake Data</a></li>
+  <li><a href="#kernel-density-estimation-with-scotts-rule" id="toc-kernel-density-estimation-with-scotts-rule" class="nav-link" data-scroll-target="#kernel-density-estimation-with-scotts-rule">1.2 Kernel Density Estimation with Scott’s Rule</a></li>
+  <li><a href="#simulation-based-95-confidence-bands" id="toc-simulation-based-95-confidence-bands" class="nav-link" data-scroll-target="#simulation-based-95-confidence-bands">1.3 Simulation-Based 95% Confidence Bands</a></li>
+  <li><a href="#visualization-figure-1" id="toc-visualization-figure-1" class="nav-link" data-scroll-target="#visualization-figure-1">1.4 Visualization: Figure 1</a></li>
+  <li><a href="#two-dimensional-spatial-analysis" id="toc-two-dimensional-spatial-analysis" class="nav-link" data-scroll-target="#two-dimensional-spatial-analysis">1.5 Two-Dimensional Spatial Analysis</a></li>
+  <li><a href="#visualization-figure-2" id="toc-visualization-figure-2" class="nav-link" data-scroll-target="#visualization-figure-2">1.6 Visualization: Figure 2</a></li>
+  <li><a href="#part-2-influential-points-in-regression" id="toc-part-2-influential-points-in-regression" class="nav-link" data-scroll-target="#part-2-influential-points-in-regression">Part 2: Influential Points in Regression</a>
+  <ul class="collapse">
+  <li><a href="#motivation-not-all-data-points-are-equal" id="toc-motivation-not-all-data-points-are-equal" class="nav-link" data-scroll-target="#motivation-not-all-data-points-are-equal">Motivation: Not All Data Points Are Equal</a></li>
+  </ul></li>
+  <li><a href="#the-dataset-la-housing-prices-august-2013" id="toc-the-dataset-la-housing-prices-august-2013" class="nav-link" data-scroll-target="#the-dataset-la-housing-prices-august-2013">2.1 The Dataset: LA Housing Prices (August 2013)</a></li>
+  <li><a href="#the-full-regression-model" id="toc-the-full-regression-model" class="nav-link" data-scroll-target="#the-full-regression-model">2.2 The Full Regression Model</a></li>
+  <li><a href="#leave-one-out-analysis" id="toc-leave-one-out-analysis" class="nav-link" data-scroll-target="#leave-one-out-analysis">2.3 Leave-One-Out Analysis</a></li>
+  <li><a href="#visualization-figure-3" id="toc-visualization-figure-3" class="nav-link" data-scroll-target="#visualization-figure-3">2.4 Visualization: Figure 3</a></li>
+  <li><a href="#part-3-educational-applications-and-implications" id="toc-part-3-educational-applications-and-implications" class="nav-link" data-scroll-target="#part-3-educational-applications-and-implications">Part 3: Educational Applications and Implications</a></li>
+  <li><a href="#school-performance-and-geography" id="toc-school-performance-and-geography" class="nav-link" data-scroll-target="#school-performance-and-geography">3.1 School Performance and Geography</a></li>
+  <li><a href="#regression-diagnostics-in-educational-assessment" id="toc-regression-diagnostics-in-educational-assessment" class="nav-link" data-scroll-target="#regression-diagnostics-in-educational-assessment">3.2 Regression Diagnostics in Educational Assessment</a>
+  <ul class="collapse">
+  <li><a href="#case-study-grade-prediction-models" id="toc-case-study-grade-prediction-models" class="nav-link" data-scroll-target="#case-study-grade-prediction-models">Case Study: Grade Prediction Models</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Welcome to this advanced tutorial on kernel density estimation! This guide builds on the <a href="https://aliceaii.github.io/posts/kerneldensity/">foundational kernel concepts from the previous blog post</a> where we covered:</p>
+<ul>
+<li>The basics of kernel density estimation (KDE)</li>
+<li>Bandwidth selection using Scott’s and Silverman’s rules</li>
+<li>Rejection sampling techniques</li>
+<li>Applications to housing price data</li>
+</ul>
+<p><strong>What’s new in this tutorial?</strong></p>
+<p>Today, we’ll take things further with two real-world applications and discussion of its application in educational field:</p>
+<ol type="1">
+<li><strong>Seismic Analysis</strong>: Analyzing California earthquake data using KDE with simulation-based confidence bands</li>
+<li><strong>Regression Diagnostics</strong>: Identifying influential observations in multivariate regression</li>
+<li><strong>Educational Application</strong></li>
+</ol>
+</section>
+<section id="learning-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="learning-objectives">Learning Objectives</h2>
+<p>By the end of this tutorial, you will:</p>
+<ul>
+<li>Build simulation-based confidence bands for kernel density estimates</li>
+<li>Apply 2D kernel smoothing to spatial point patterns</li>
+<li>Perform leave-one-out influence analysis in regression</li>
+<li>Interpret diagnostic plots for identifying influential observations</li>
+<li>Understand when and why these techniques matter in practice</li>
+<li>Applications in educational research</li>
+</ul>
+</section>
+<section id="part-1-earthquake-analysis-with-confidence-bands" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-earthquake-analysis-with-confidence-bands">Part 1: Earthquake Analysis with Confidence Bands</h2>
+<section id="motivation-why-confidence-bands-matter" class="level3">
+<h3 class="anchored" data-anchor-id="motivation-why-confidence-bands-matter">Motivation: Why Confidence Bands Matter</h3>
+<p>In our previous tutorial, we estimated densities without quantifying uncertainty. But how confident are we in our estimates?</p>
+<p><strong>The problem</strong>: A kernel density estimate is just one possible curve based on our sample. If we collected different earthquake data, we’d get a slightly different curve.</p>
+<p><strong>The solution</strong>: <strong>Simulation-based confidence bands</strong> show us the range of plausible density curves, helping us distinguish real features from sampling noise, assess estimation uncertainty, make more reliable inferences about the underlying distribution</p>
+<p>Think of it as the difference between saying “the earthquake magnitude distribution looks like this” versus “we’re 95% confident the true distribution falls within this band.”</p>
+</section>
+</section>
+<section id="loading-earthquake-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-earthquake-data">1.1 Loading Earthquake Data</h2>
+<p>We’re loading real seismic data from Southern California spanning over 50 years. This data comes from the Southern California Earthquake Data Center, which maintains comprehensive records of all detected earthquakes in the region. Our goal is to import this data into R and prepare it for analysis.</p>
+<p>We’ll analyze earthquake data from Southern California (1970-2025) provided by the <a href="https://service.scedc.caltech.edu/">Southern California Earthquake Data Center</a>.</p>
+<p><strong>Study region</strong>:</p>
+<ul>
+<li>Longitude: -122.0° to -118.0° (West to East) </li>
+<li>Latitude: 34.0° to 38.0° (South to North) </li>
+<li>Magnitude: ≥ 4.0 </li>
+<li>Time period: January 1, 1970 to October 10, 2025</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splancs)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(maps)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#read all lines</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>(<span class="st">"SearchResults.txt"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#fine the line with column headers starts with #YYYY</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>header_line <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"^#YYY"</span>, lines, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>data_start <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"^#YYY"</span>, lines) <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>data_lines <span class="ot">&lt;-</span> lines[data_start<span class="sc">:</span><span class="fu">length</span>(lines)]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>data_lines <span class="ot">&lt;-</span> data_lines[<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"^#|^$|^&lt;PRE&gt;|^&lt;/PRE&gt;"</span>, data_lines)] <span class="co">#remove the these lines start with xxx</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#transform the text into dataset</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>earthquake_data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">text =</span> data_lines,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="at">header =</span> <span class="cn">FALSE</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(earthquake_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"DATE"</span>, <span class="st">"TIME"</span>, <span class="st">"ET"</span>, <span class="st">"GT"</span>, <span class="st">"MAG"</span>, <span class="st">"M"</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="st">"LAT"</span>, <span class="st">"LON"</span>, <span class="st">"DEPTH"</span>, <span class="st">"Q"</span>, <span class="st">"EVID"</span>, <span class="st">"NPH"</span>, <span class="st">"NGRM"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>earthquake_data<span class="sc">$</span>DATETIME <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(<span class="fu">paste</span>(earthquake_data<span class="sc">$</span>DATE, earthquake_data<span class="sc">$</span>TIME),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="at">format =</span> <span class="st">"%Y/%m/%d %H:%M:%OS"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>earthquake_data<span class="sc">$</span>MAG <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(earthquake_data<span class="sc">$</span>MAG)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>earthquake_data<span class="sc">$</span>LAT <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(earthquake_data<span class="sc">$</span>LAT)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>earthquake_data<span class="sc">$</span>LON <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(earthquake_data<span class="sc">$</span>LON)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>earthquake_data<span class="sc">$</span>DEPTH <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(earthquake_data<span class="sc">$</span>DEPTH)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(earthquake_data[, <span class="fu">c</span>(<span class="st">"DATETIME"</span>, <span class="st">"MAG"</span>, <span class="st">"LAT"</span>, <span class="st">"LON"</span>, <span class="st">"DEPTH"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             DATETIME MAG    LAT     LON DEPTH
+1 1971-02-09 14:00:41 6.6 34.416 -118.37   8.9
+2 1971-02-09 14:01:12 5.8 34.416 -118.37   6.0
+3 1971-02-09 14:01:36 4.2 34.416 -118.37   6.0
+4 1971-02-09 14:01:40 4.1 34.416 -118.37   6.0
+5 1971-02-09 14:01:53 4.5 34.416 -118.37   6.0
+6 1971-02-09 14:01:54 4.2 34.416 -118.37   6.0</code></pre>
+</div>
+</div>
+<p><strong>What we’re looking at</strong>:</p>
+<ul>
+<li>Each row represents one seismic event</li>
+<li><code>MAG</code>: Earthquake magnitude (Richter or moment magnitude scale)</li>
+<li><code>LAT/LON</code>: Epicenter location</li>
+<li><code>DEPTH</code>: How deep underground the quake occurred (km)</li>
+<li><code>DATETIME</code>: When it happened</li>
+</ul>
+<p><strong>Historical context</strong>: This dataset includes the devastating 1971 San Fernando earthquake (M6.6) and the 1994 Northridge earthquake (M6.7), both of which caused significant damage in the Los Angeles area.</p>
+</section>
+<section id="kernel-density-estimation-with-scotts-rule" class="level2">
+<h2 class="anchored" data-anchor-id="kernel-density-estimation-with-scotts-rule">1.2 Kernel Density Estimation with Scott’s Rule</h2>
+<p>We’re creating a smooth density curve of earthquake magnitudes using kernel density estimation (KDE). Instead of using arbitrary histogram bins, we’ll place a Gaussian “bump” at each data point and add them up. The bandwidth (how wide each bump is) will be chosen automatically using Scott’s rule—a mathematical formula that balances smoothness with detail.</p>
+<p>This gives us our first estimate of the magnitude distribution, which we’ll use as the foundation for building confidence bands in the next step. We’ll estimate the distribution of earthquake magnitudes using a Gaussian kernel.</p>
+<p><strong>Review from previous tutorial</strong>:</p>
+<p>Scott’s bandwidth formula: <span class="math display">\[h = 1.06 \times \min(\sigma, \text{IQR}/1.34) \times n^{-1/5}\]</span></p>
+<p>This balances: - <strong>Smoothness</strong>: Larger <span class="math inline">\(h\)</span> → smoother curve - <strong>Detail</strong>: Smaller <span class="math inline">\(h\)</span> → more features (but possibly noise)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract magnitudes</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>magnitudes <span class="ot">&lt;-</span> earthquake_data<span class="sc">$</span>MAG</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#set Scott bandwidth</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(magnitudes)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>bandwidth_scott <span class="ot">&lt;-</span> <span class="fl">1.06</span> <span class="sc">*</span> <span class="fu">min</span>(<span class="fu">sd</span>(magnitudes),<span class="fu">IQR</span>(magnitudes)<span class="sc">/</span><span class="fl">1.34</span>) <span class="sc">*</span> <span class="dv">1000</span><span class="sc">^</span>(<span class="sc">-</span>.<span class="dv">2</span>) <span class="co">#or can use bw.nrd(x)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#get m, vector of 100 equally spaced magnitudes spanning the observed range of magnitudes</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>m_values <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(magnitudes), <span class="fu">max</span>(magnitudes), <span class="at">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#compute kernel density estimates at these points</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>kde_original <span class="ot">&lt;-</span> <span class="fu">density</span>(magnitudes, <span class="at">bw =</span> bandwidth_scott, <span class="at">kernel =</span> <span class="st">"gaussian"</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                        <span class="at">from =</span> <span class="fu">min</span>(m_values), <span class="at">to =</span> <span class="fu">max</span>(m_values), <span class="at">n =</span> <span class="dv">100</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#save the kernel density estimates</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>f_hat_original <span class="ot">&lt;-</span> kde_original<span class="sc">$</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="simulation-based-95-confidence-bands" class="level2">
+<h2 class="anchored" data-anchor-id="simulation-based-95-confidence-bands">1.3 Simulation-Based 95% Confidence Bands</h2>
+<p>Here’s where it gets exciting! We’re going to answer the question: “How certain are we about our density estimate?” We’ll do this by:</p>
+<ol type="1">
+<li><strong>Simulating 200 alternative datasets</strong> from our estimated density (pretending these are equally plausible datasets we could have observed)</li>
+<li><strong>Computing a KDE for each simulated dataset</strong> using the same bandwidth</li>
+<li><strong>Finding the range</strong> where 95% of these simulated curves fall</li>
+</ol>
+<p>This range becomes our confidence band—showing us where the true density likely lies.</p>
+<p><strong>Why this matters:</strong> Without confidence bands, we don’t know if features in our density curve are real patterns or just random noise from sampling.</p>
+<p>Now let’s quantify uncertainty!</p>
+<p><strong>The idea</strong>:</p>
+<ol type="1">
+<li>Our KDE is an estimate based on our sample</li>
+<li>If we had a different sample from the same underlying distribution, we’d get a slightly different KDE</li>
+<li>We can simulate many such “alternative samples” and see how much the KDE varies</li>
+<li>The range containing 95% of these simulated KDEs gives us our confidence band</li>
+</ol>
+<p><strong>The algorithm</strong>:</p>
+<p>For <span class="math inline">\(b = 1, 2, \ldots, 200\)</span>:</p>
+<ol type="1">
+<li><strong>Resample</strong>: Draw <span class="math inline">\(n\)</span> new magnitudes from our estimated density
+<ul>
+<li>For each: Pick a random observed magnitude <span class="math inline">\(X_i\)</span>, then add noise: <span class="math inline">\(X_i^* = X_i + \epsilon\)</span> where <span class="math inline">\(\epsilon \sim N(0, h^2)\)</span></li>
+</ul></li>
+<li><strong>Re-estimate</strong>: Compute KDE using the same bandwidth</li>
+<li><strong>Store</strong>: Save the density values at our 100 evaluation points</li>
+</ol>
+<p>Finally: At each evaluation point, find the 2.5th and 97.5th percentiles across the 200 simulations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n_sim <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#create a matrix to store simulated density estimtes</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>simulated_densities <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> n_sim, <span class="at">ncol =</span> <span class="dv">100</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#perform simulations</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_sim) {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#sample from the kernel density estimate</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  sampled_indices <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  simulated_mags <span class="ot">&lt;-</span> magnitudes[sampled_indices] <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> bandwidth_scott)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#compute KDE for simulated data using same bandwidth</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  kde_sim <span class="ot">&lt;-</span> <span class="fu">density</span>(simulated_mags, <span class="at">bw =</span> bandwidth_scott, </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">kernel =</span> <span class="st">"gaussian"</span>, <span class="at">from =</span> <span class="fu">min</span>(m_values), </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">to =</span> <span class="fu">max</span>(m_values), <span class="at">n =</span> <span class="dv">100</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  simulated_densities[b, ] <span class="ot">&lt;-</span> kde_sim<span class="sc">$</span>y</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#get the 2.5th and 97.5th percentiles for confidence bands</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>lower_band <span class="ot">&lt;-</span> <span class="fu">apply</span>(simulated_densities, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="dv">0</span>,<span class="dv">025</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>upper_band <span class="ot">&lt;-</span> <span class="fu">apply</span>(simulated_densities, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualization-figure-1" class="level2">
+<h2 class="anchored" data-anchor-id="visualization-figure-1">1.4 Visualization: Figure 1</h2>
+<p>Let’s create a publication-quality plot showing our KDE with confidence bands.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create the plot</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(m_values, f_hat_original, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"navy"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Earthquake Magnitude"</span>, <span class="at">ylab =</span> <span class="st">"Density"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Figure 1 Kernel Density Estimate of Earthquake Magnitudes</span><span class="sc">\n</span><span class="st">with 95% Confidence Bands"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">range</span>(<span class="fu">c</span>(lower_band, upper_band, f_hat_original)))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#add confidence bands</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(m_values, lower_band, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(m_values, upper_band, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#add shaded region for confidence bands</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon</span>(<span class="fu">c</span>(m_values, <span class="fu">rev</span>(m_values)), </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(lower_band, <span class="fu">rev</span>(upper_band)),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#add legend</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"KDE"</span>, <span class="st">"95% Confidence Bands"</span>),</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"navy"</span>, <span class="st">"red"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="fl">1.5</span>),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">bty =</span> <span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="two-dimensional-spatial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="two-dimensional-spatial-analysis">1.5 Two-Dimensional Spatial Analysis</h2>
+<p>Now we shift from analyzing earthquake magnitudes to analyzing earthquake <em>locations</em>. We’ll create a 2D heat map showing where earthquakes cluster in space. This extends KDE from one dimension (magnitude) to two dimensions (latitude and longitude).</p>
+<p>The math is similar, but now each earthquake contributes a 2D “bump” on a map, and we add them all up to see which areas have the highest earthquake density. This reveals fault lines and seismic hazard zones without needing any geological data—just the pattern of where earthquakes occur!</p>
+<p>Earthquakes don’t just vary in magnitude—they cluster in space near fault lines. Let’s visualize this using 2D kernel smoothing.</p>
+<p><strong>The math</strong> (2D extension):</p>
+<p><span class="math display">\[\hat{f}(x_0, y_0) = \frac{1}{nh_xh_y} \sum_{i=1}^{n} K\left(\frac{x_0 - x_i}{h_x}\right) K\left(\frac{y_0 - y_i}{h_y}\right)\]</span></p>
+<p>We’ll use the <code>kernel2d()</code> function from <code>splancs</code> package, which is specifically designed for spatial point patterns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract longitude and latitude</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lon <span class="ot">&lt;-</span> earthquake_data<span class="sc">$</span>LON</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>lat <span class="ot">&lt;-</span> earthquake_data<span class="sc">$</span>LAT</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#create 2c matrix of locations for splancs</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>locations <span class="ot">&lt;-</span> <span class="fu">cbind</span>(lon, lat)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#locations</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#set the boundary</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>poly_boundary <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">122</span>, <span class="sc">-</span><span class="dv">118</span>, <span class="sc">-</span><span class="dv">118</span>, <span class="sc">-</span><span class="dv">122</span>, <span class="sc">-</span><span class="dv">122</span>),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">c</span>(<span class="dv">34</span>, <span class="dv">34</span>, <span class="dv">38</span>, <span class="dv">38</span>, <span class="dv">34</span>))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#poly_boundary</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate bandwidth using Scott's rule for 2D</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(locations)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>h_lon <span class="ot">&lt;-</span> <span class="fu">sd</span>(lon) <span class="sc">*</span> n<span class="sc">^</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>h_lat <span class="ot">&lt;-</span> <span class="fu">sd</span>(lat) <span class="sc">*</span> n<span class="sc">^</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#h_lon; h_lat</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>bandwidth <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">c</span>(h_lon, h_lat))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#bandwidth #.2189</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#create grid for evaluation</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>grid_size <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>lon_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">122</span>, <span class="sc">-</span><span class="dv">118</span>, <span class="at">length.out =</span> grid_size)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>lat_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">34</span>, <span class="dv">38</span>, <span class="at">length.out =</span> grid_size)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#compute 2D kernel density using kernel2d from splancs</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>kde_result <span class="ot">&lt;-</span> <span class="fu">kernel2d</span>(locations, poly_boundary, bandwidth, </span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>                       <span class="at">nx =</span> grid_size, <span class="at">ny =</span> grid_size)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Xrange is  -122 -118 
+Yrange is  34 38 
+Doing quartic kernel</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract the density matrix</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>kde_2d <span class="ot">&lt;-</span> kde_result<span class="sc">$</span>z</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#get grid coordinates from kernel2d output</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>lon_grid <span class="ot">&lt;-</span> kde_result<span class="sc">$</span>x</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>lat_grid <span class="ot">&lt;-</span> kde_result<span class="sc">$</span>y</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#get California county map data</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>ca_counties <span class="ot">&lt;-</span> <span class="fu">map_data</span>(<span class="st">"county"</span>, <span class="at">region =</span> <span class="st">"california"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#ca_counties</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#filter counties in the region of interest</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>ca_counties_filtered <span class="ot">&lt;-</span> ca_counties <span class="sc">%&gt;%</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(long <span class="sc">&gt;=</span> <span class="sc">-</span><span class="dv">122</span>, long <span class="sc">&lt;=</span> <span class="sc">-</span><span class="dv">118</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>         lat <span class="sc">&gt;=</span> <span class="dv">34</span>, lat <span class="sc">&lt;=</span> <span class="dv">38</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualization-figure-2" class="level2">
+<h2 class="anchored" data-anchor-id="visualization-figure-2">1.6 Visualization: Figure 2</h2>
+<p>Creating a beautiful map with California geography for context.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#prepare the colorset</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>light_colors <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"lightyellow"</span>, <span class="st">"gold"</span>, <span class="st">"orange"</span>, <span class="st">"orangered"</span>, <span class="st">"red"</span>, <span class="st">"darkred"</span>))(<span class="dv">100</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(lon_grid, lat_grid, kde_2d, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> light_colors,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"Longitude"</span>, <span class="at">ylab =</span> <span class="st">"Latitude"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">main =</span> <span class="st">"Figure 2 2D Kernel Density Estimate of Earthquake Locations"</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">122</span>, <span class="sc">-</span><span class="dv">118</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">34</span>, <span class="dv">38</span>),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">cex.lab =</span> <span class="fl">1.2</span>, <span class="at">cex.main =</span> <span class="fl">1.3</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#add county boundaries</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">contour</span>(lon_grid, lat_grid, kde_2d, </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"gray40"</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">nlevels =</span> <span class="dv">10</span>, <span class="at">labcex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#add county boundaries</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(<span class="st">"county"</span>, <span class="at">region =</span> <span class="st">"california"</span>, <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">1</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#add earthquake location</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(lon, lat, <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"black"</span>, <span class="at">bg =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#add legend with box</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Locations"</span>, <span class="st">"Kernel Density Contours"</span>, </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Region"</span>, <span class="st">"County Boundaries"</span>),</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>), </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"gray40"</span>, <span class="st">"black"</span>, <span class="st">"gray50"</span>),</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">pt.bg =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>),</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>       <span class="at">pt.cex =</span> <span class="fu">c</span>(<span class="fl">1.2</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>),</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">1.2</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>       <span class="at">bty =</span> <span class="st">"o"</span>, </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>       <span class="at">bg =</span> <span class="st">"white"</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>       <span class="at">box.col =</span> <span class="st">"gray30"</span>,</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>       <span class="at">cex =</span> <span class="fl">0.65</span>,</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>       <span class="at">inset =</span> <span class="fl">0.02</span>)</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">#add a color scale legend</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>xl <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>yb <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>x_bar_start <span class="ot">&lt;-</span> xl[<span class="dv">1</span>] <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> <span class="fu">diff</span>(xl) </span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>bar_width <span class="ot">&lt;-</span> <span class="fl">0.08</span> </span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>x_bar_end <span class="ot">&lt;-</span> x_bar_start <span class="sc">+</span> bar_width</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>y_range <span class="ot">&lt;-</span> yb[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">c</span>(<span class="fl">0.15</span>, <span class="fl">0.85</span>) <span class="sc">*</span> <span class="fu">diff</span>(yb)</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>legend_vals <span class="ot">&lt;-</span> <span class="fu">seq</span>(y_range[<span class="dv">1</span>], y_range[<span class="dv">2</span>], <span class="at">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">99</span>) {</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect</span>(x_bar_start, legend_vals[i], x_bar_end, legend_vals[i<span class="sc">+</span><span class="dv">1</span>], </span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> light_colors[i], <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(x_bar_start, y_range[<span class="dv">1</span>], x_bar_end, y_range[<span class="dv">2</span>], <span class="at">border =</span> <span class="st">"gray30"</span>)</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(x_bar_start <span class="sc">-</span> <span class="fl">0.01</span>, y_range[<span class="dv">2</span>], <span class="st">"High"</span>, <span class="at">pos =</span> <span class="dv">3</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="co"># pos=2 for left-alignment</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(x_bar_start <span class="sc">-</span> <span class="fl">0.01</span>, y_range[<span class="dv">1</span>], <span class="st">"Low"</span>, <span class="at">pos =</span> <span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="co"># pos=2 for left-alignment</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(x_bar_start <span class="sc">+</span> bar_width<span class="sc">/</span><span class="dv">2</span>, <span class="fu">mean</span>(y_range), <span class="st">"Density"</span>, <span class="at">srt =</span> <span class="dv">90</span>, <span class="at">pos =</span> <span class="dv">3</span>, <span class="at">cex =</span> <span class="fl">0.6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="part-2-influential-points-in-regression" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-influential-points-in-regression">Part 2: Influential Points in Regression</h2>
+<section id="motivation-not-all-data-points-are-equal" class="level3">
+<h3 class="anchored" data-anchor-id="motivation-not-all-data-points-are-equal">Motivation: Not All Data Points Are Equal</h3>
+<p>Imagine you’re advising a real estate company on pricing models. You build a regression model, and it says: “Each $1,000 increase in median home price predicts 0.5 more sales.”</p>
+<p>But what if this entire finding hinges on just one neighborhood—say, Beverly Hills? If you removed that one data point, would your conclusion change?</p>
+<p><strong>The problem</strong>: Some observations have disproportionate influence on regression estimates. These <strong>influential points</strong> can:</p>
+<ul>
+<li>Drive entire conclusions</li>
+<li>Mask true relationships</li>
+<li>Create spurious findings</li>
+</ul>
+<p><strong>The solution</strong>: <strong>Leave-one-out influence analysis</strong> quantifies how much each observation affects your estimates.</p>
+</section>
+</section>
+<section id="the-dataset-la-housing-prices-august-2013" class="level2">
+<h2 class="anchored" data-anchor-id="the-dataset-la-housing-prices-august-2013">2.1 The Dataset: LA Housing Prices (August 2013)</h2>
+<p>We’re switching gears from earthquakes to economics! We’ll load housing market data from Los Angeles County and prepare it for regression analysis. Each row represents a different neighborhood, with variables measuring home prices and sales volumes.</p>
+<p><strong>Data cleaning task:</strong> We need to remove any rows with missing values (“n/a”) to ensure our regression analysis works properly.</p>
+<p>We’ll analyze housing sales data from Los Angeles County during the post-recession recovery period.</p>
+<p><strong>Variables</strong>:</p>
+<ul>
+<li><code>Y</code>: Number of single-family home sales in August 2013</li>
+<li><code>X1</code>: Median single-family residence price (thousands of dollars)</li>
+<li><code>X2</code>: Median condo price (thousands of dollars)</li>
+<li><code>X3</code>: Median home price per square foot (dollars)</li>
+</ul>
+<p><strong>Research question</strong>: How does housing price affect sales volume?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>housing_data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"LAhousingpricesaug2013.txt"</span>, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">na.strings =</span> <span class="st">"n/a"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#colnames(housing_data)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>housing_clean <span class="ot">&lt;-</span> housing_data <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">Y =</span> SalesofSingleFamilyHomes,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">X1 =</span> PriceMedianSFR.<span class="fl">1000.</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">X2 =</span> PriceMedianCondos.<span class="fl">1000.</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">X3 =</span> MedianHomePrice.Sq.Ft) <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Data characteristics</strong>:</p>
+<ul>
+<li>Each row represents a distinct neighborhood</li>
+<li>Geographic diversity: From beach communities to inland valleys</li>
+<li>Price variation: Affordable suburbs to luxury estates</li>
+<li>Sales variation: Low-activity areas to hot markets</li>
+</ul>
+</section>
+<section id="the-full-regression-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-full-regression-model">2.2 The Full Regression Model</h2>
+<p>Let’s fit our baseline model using all observations.</p>
+<p><strong>Model</strong>: <span class="math display">\[Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \epsilon\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3, <span class="at">data =</span> housing_clean)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Y ~ X1 + X2 + X3, data = housing_clean)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-25.968 -10.136  -2.337   7.445  66.822 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 32.788440   2.698337  12.151  &lt; 2e-16 ***
+X1           0.007823   0.004427   1.767 0.078648 .  
+X2           0.001952   0.006685   0.292 0.770546    
+X3          -0.042553   0.012387  -3.435 0.000711 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 15.28 on 213 degrees of freedom
+Multiple R-squared:  0.08121,   Adjusted R-squared:  0.06827 
+F-statistic: 6.276 on 3 and 213 DF,  p-value: 0.0004228</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract coefficients</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>beta_full <span class="ot">&lt;-</span> <span class="fu">coef</span>(full_model)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#beta_full</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>beta_1_full <span class="ot">&lt;-</span> beta_full[<span class="st">"X1"</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#beta_1_full</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="leave-one-out-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="leave-one-out-analysis">2.3 Leave-One-Out Analysis</h2>
+<p><strong>The idea</strong>:</p>
+<p>For each observation <span class="math inline">\(i\)</span>:</p>
+<ol type="1">
+<li>Remove it from the dataset</li>
+<li>Re-fit the regression</li>
+<li>Record the new estimate <span class="math inline">\(\hat{\beta}_1^{(-i)}\)</span></li>
+<li>Calculate influence: <span class="math inline">\(\text{Influence}_i = \hat{\beta}_1^{(-i)} - \hat{\beta}_1\)</span></li>
+</ol>
+<p><strong>Interpretation</strong>:</p>
+<ul>
+<li><strong>Positive influence</strong> (<span class="math inline">\(&gt; 0\)</span>): Removing this observation increases <span class="math inline">\(\hat{\beta}_1\)</span>
+<ul>
+<li>The observation was pulling the estimate downward</li>
+<li>It’s below the general trend</li>
+</ul></li>
+<li><strong>Negative influence</strong> (<span class="math inline">\(&lt; 0\)</span>): Removing this observation decreases <span class="math inline">\(\hat{\beta}_1\)</span>
+<ul>
+<li>The observation was pulling the estimate upward<br>
+</li>
+<li>It’s above the general trend</li>
+</ul></li>
+<li><strong>Large absolute influence</strong>: This observation substantially affects our conclusions</li>
+</ul>
+<p>Let’s walk through the process for the first observation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set i = 1</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#remove i</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>housing_minus_i <span class="ot">&lt;-</span> housing_clean[<span class="sc">-</span>i, ]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#fit the model without i</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>model_minus_i <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3, <span class="at">data =</span> housing_minus_i)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#extract the vector of parameter estimats beta^(-1)</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>beta_minus_i <span class="ot">&lt;-</span> <span class="fu">coef</span>(model_minus_i)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#extract the corresponding slope of X1</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>beta_1_minus_i <span class="ot">&lt;-</span> beta_minus_i[<span class="st">"X1"</span>]</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#calcualte the influence</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>influence_i1 <span class="ot">&lt;-</span> beta_1_minus_i <span class="sc">-</span> beta_1_full</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>influence_i1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          X1 
+0.0006900277 </code></pre>
+</div>
+</div>
+<p><strong>What this tells us</strong>:</p>
+<p>If the influence is small (close to 0), this observation doesn’t substantially affect our estimate. If it’s large, removing this neighborhood changes our conclusions meaningfully. It’s pretty small here.</p>
+<p>Now let’s repeat this for all 217 observations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>n_obs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(housing_clean)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#set up vector to store influences</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>influences <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n_obs)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#loop through each observation from i = 1 to n_obs</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_obs) {</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  housing_minus_i <span class="ot">&lt;-</span> housing_clean[<span class="sc">-</span>i, ]</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  model_minus_i <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3, <span class="at">data =</span> housing_minus_i)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  beta_1_minus_i <span class="ot">&lt;-</span> <span class="fu">coef</span>(model_minus_i)[<span class="st">"X1"</span>]</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  influences[i] <span class="ot">&lt;-</span> beta_1_minus_i <span class="sc">-</span> beta_1_full</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(influences)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+-1.195e-03 -4.790e-05  6.444e-07  3.437e-06  6.025e-05  2.310e-03 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>top_influential <span class="ot">&lt;-</span> <span class="fu">order</span>(<span class="fu">abs</span>(influences), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>top_influential</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  75 199 168 105 136</code></pre>
+</div>
+</div>
+</section>
+<section id="visualization-figure-3" class="level2">
+<h2 class="anchored" data-anchor-id="visualization-figure-3">2.4 Visualization: Figure 3</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">2</span>), <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n_obs, influences, </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Observation Index (i)"</span>, </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="fu">expression</span>(<span class="fu">hat</span>(beta)[<span class="dv">1</span>]<span class="sc">^</span>{(<span class="sc">-</span>i)} <span class="sc">-</span> <span class="fu">hat</span>(beta)[<span class="dv">1</span>]),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Figure 3 Influence of Observation Points on Estimated Slope for X1"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#add horizontal line at zero</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#add points</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="dv">1</span><span class="sc">:</span>n_obs, influences, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"darkblue"</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#highlight most influential points</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>threshold <span class="ot">&lt;-</span> <span class="fu">quantile</span>(<span class="fu">abs</span>(influences), <span class="fl">0.95</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>influential_idx <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">abs</span>(influences) <span class="sc">&gt;</span> threshold)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(influential_idx, influences[influential_idx], </span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">bg =</span> <span class="st">"yellow"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#add grid</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>(<span class="at">col =</span> <span class="st">"gray80"</span>, <span class="at">lty =</span> <span class="st">"dotted"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>How to read this plot</strong>:</p>
+<ol type="1">
+<li><strong>X-axis</strong>: Each point represents one neighborhood (observation)</li>
+<li><strong>Y-axis</strong>: How much <span class="math inline">\(\beta_1\)</span> changes when we remove that neighborhood</li>
+<li><strong>Height of bars</strong>: Magnitude of influence</li>
+<li><strong>Red line at y = 0</strong>: No influence (removing the point doesn’t change <span class="math inline">\(\beta_1\)</span>)</li>
+<li><strong>Yellow highlighted points</strong>: Neighborhoods with unusually large influence</li>
+</ol>
+<p><strong>Patterns to look for</strong>:</p>
+<ul>
+<li><strong>Cluster near zero</strong>: Most neighborhoods have minimal influence (good!)</li>
+<li><strong>Outliers above zero</strong>: Removing these increases <span class="math inline">\(\beta_1\)</span> (they pull it down)</li>
+<li><strong>Outliers below zero</strong>: Removing these decreases <span class="math inline">\(\beta_1\)</span> (they pull it up)</li>
+<li><strong>Symmetry</strong>: Roughly balanced influences suggest stable estimates</li>
+</ul>
+</section>
+<section id="part-3-educational-applications-and-implications" class="level2">
+<h2 class="anchored" data-anchor-id="part-3-educational-applications-and-implications">Part 3: Educational Applications and Implications</h2>
+</section>
+<section id="school-performance-and-geography" class="level2">
+<h2 class="anchored" data-anchor-id="school-performance-and-geography">3.1 School Performance and Geography</h2>
+<p>The 2D kernel density methods we applied to earthquakes have direct applications in education:</p>
+<p><strong>Example 1: School Achievement Hotspots</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#hypothetical: Test score performance by school location</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>schools <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lat =</span> school_latitudes,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lon =</span> school_longitudes,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">performance =</span> test_scores</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#2D KDE reveals geographic clusters</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Are high-performing schools clustered in certain neighborhoods?</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Does this reflect resources, demographics, or other factors?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Example 2: College Application Patterns</strong></p>
+<ul>
+<li>Where do students from your high school apply?</li>
+<li>Geographic diversity in higher education access</li>
+<li>Identifying underserved regions</li>
+</ul>
+<p><strong>Example 3: Educational Intervention Planning</strong></p>
+<ul>
+<li>Where should we open new tutoring centers?</li>
+<li>Which neighborhoods lack access to STEM programs?</li>
+<li>Optimizing school bus routes based on student density</li>
+</ul>
+<p>Spatial analysis helps educators:</p>
+<ul>
+<li><strong>Equity assessment</strong>: Identify resource deserts</li>
+<li><strong>Strategic planning</strong>: Data-driven facility placement</li>
+<li><strong>Policy evaluation</strong>: Did an intervention reach the intended areas?</li>
+<li><strong>Communication</strong>: Maps speak louder than tables to stakeholders</li>
+</ul>
+</section>
+<section id="regression-diagnostics-in-educational-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="regression-diagnostics-in-educational-assessment">3.2 Regression Diagnostics in Educational Assessment</h2>
+<p><strong>Example: Predicting Student Success</strong></p>
+<p>Imagine a model predicting college GPA from: - X₁: High school GPA - X₂: SAT scores - X₃: Number of AP courses</p>
+<p><strong>Questions influence analysis answers</strong>:</p>
+<ol type="1">
+<li><strong>Are a few students driving the relationship?</strong>
+<ul>
+<li>If one student’s removal changes the coefficient dramatically</li>
+<li>Maybe they represent a unique population (athletes, legacy admits, transfers)</li>
+</ul></li>
+<li><strong>Do different student populations need different models?</strong>
+<ul>
+<li>If first-generation students are consistently influential</li>
+<li>Perhaps they deserve a separate model acknowledging different challenges</li>
+</ul></li>
+<li><strong>Are there data quality issues?</strong>
+<ul>
+<li>Extremely influential points might be data entry errors</li>
+<li>Or they might be interesting edge cases worth studying</li>
+</ul></li>
+</ol>
+<section id="case-study-grade-prediction-models" class="level3">
+<h3 class="anchored" data-anchor-id="case-study-grade-prediction-models">Case Study: Grade Prediction Models</h3>
+<p><strong>Scenario</strong>: You’re building a model to predict final exam scores based on: - Homework completion rate - Quiz averages - Class attendance</p>
+<p><strong>Using influence analysis</strong>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#grade_model &lt;- lm(final_exam ~ homework + quizzes + attendance, </span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                  <span class="co">#data = student_data)</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#influences &lt;- sapply(1:nrow(student_data), function(i) {</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#model_minus_i &lt;- lm(final_exam ~ homework + quizzes + attendance,</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                      <span class="co">#data = student_data[-i, ])</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#coef(model_minus_i)["homework"] - coef(grade_model)["homework"]</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co">#})</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co">#influential_students &lt;- which(abs(influences) &gt; threshold)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Interpretation for educators</strong>:</p>
+<ul>
+<li><strong>High-achieving outliers</strong>: Students who succeed despite low homework completion
+<ul>
+<li>Maybe they’re self-studying, need less practice, or have test-taking skills</li>
+<li>Don’t penalize them, but understand they’re exceptional</li>
+</ul></li>
+<li><strong>Struggling outliers</strong>: Students with high homework completion but low exam scores
+<ul>
+<li>May indicate test anxiety, learning disabilities, or ineffective study habits</li>
+<li>Candidates for targeted interventions</li>
+</ul></li>
+<li><strong>Model stability</strong>: If removing one student changes the “homework effect” dramatically
+<ul>
+<li>The relationship isn’t generalizable</li>
+<li>Need more nuanced understanding of how homework helps</li>
+</ul></li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
