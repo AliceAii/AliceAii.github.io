@@ -297,6 +297,9 @@ ca_counties_filtered <- ca_counties %>%
 Creating a beautiful map with California geography for context.
 
 ```{r, message=FALSE, warning=FALSE}
+#| fig-width: 5
+#| fig-height: 6
+
 #prepare the colorset
 light_colors <- colorRampPalette(c("white", "lightyellow", "gold", "orange", "orangered", "red", "darkred"))(100)
 
@@ -305,9 +308,9 @@ par(mar = c(5, 5, 4, 2), bg = "white")
 image(lon_grid, lat_grid, kde_2d, 
       col = light_colors,
       xlab = "Longitude", ylab = "Latitude",
-      main = "Figure 2 2D Kernel Density Estimate of Earthquake Locations",
+      main = "Figure 2 2D Kernel Density Estimate \nof Earthquake Locations",
       xlim = c(-122, -118), ylim = c(34, 38),
-      cex.lab = 1.2, cex.main = 1.3)
+      cex.lab = 1.1, cex.main = 1.2)
 
 #add county boundaries
 contour(lon_grid, lat_grid, kde_2d, 
