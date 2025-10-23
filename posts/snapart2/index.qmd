@@ -6,12 +6,12 @@ categories: [R, SNA]
 toc: true
 toc-depth: 3
 toc-title: "Contents"
-image: "Plot1.png"
+image: "plot1.jpg"
 ---
 
 Have you ever wondered how to quantify the "importance" of a person in a social network (like the following graph, which family is the most powerful one among Renaissance Florentine families)? Or how to measure whether a network is tightly connected or fragmented? In this tutorial, we will explore the mathematical and statistical foundations of network analysis, covering degree, density, connectivity, distance measures, and centrality metrics.
 
-![](Plot1.png)
+![](plot1.jpg)
 
 In network analysis, we move beyond simple visualization to **quantitative measurement**. Just as we describe a dataset with statistics like mean and standard deviation, we describe networks with metrics like degree, density, and centrality. These measures help us:
 
