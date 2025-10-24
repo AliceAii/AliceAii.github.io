@@ -105,35 +105,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -244,37 +215,38 @@ window.Quarto = {
     <h2 id="toc-title">Contents</h2>
    
   <ul>
-  <li><a href="#notation-and-preliminaries" id="toc-notation-and-preliminaries" class="nav-link active" data-scroll-target="#notation-and-preliminaries">1. Notation and Preliminaries</a></li>
-  <li><a href="#node-level-statistics" id="toc-node-level-statistics" class="nav-link" data-scroll-target="#node-level-statistics">2. Node-Level Statistics</a>
+  <li><a href="#centrality-analysis-across-three-networks" id="toc-centrality-analysis-across-three-networks" class="nav-link active" data-scroll-target="#centrality-analysis-across-three-networks">1. Centrality Analysis Across Three Networks</a>
   <ul class="collapse">
-  <li><a href="#degree" id="toc-degree" class="nav-link" data-scroll-target="#degree">2.1 Degree</a></li>
-  <li><a href="#nodal-eccentricity" id="toc-nodal-eccentricity" class="nav-link" data-scroll-target="#nodal-eccentricity">2.2 Nodal Eccentricity</a></li>
+  <li><a href="#eigenvector-centrality-quality-over-quantity" id="toc-eigenvector-centrality-quality-over-quantity" class="nav-link" data-scroll-target="#eigenvector-centrality-quality-over-quantity">1.1 Eigenvector Centrality: Quality Over Quantity</a></li>
+  <li><a href="#closeness-centrality-efficiency-in-reaching-others" id="toc-closeness-centrality-efficiency-in-reaching-others" class="nav-link" data-scroll-target="#closeness-centrality-efficiency-in-reaching-others">1.2 Closeness Centrality: Efficiency in Reaching Others</a></li>
+  <li><a href="#betweenness-centrality-bridges-and-brokers" id="toc-betweenness-centrality-bridges-and-brokers" class="nav-link" data-scroll-target="#betweenness-centrality-bridges-and-brokers">1.3 Betweenness Centrality: Bridges and Brokers</a></li>
+  <li><a href="#degree-centrality-the-simple-count" id="toc-degree-centrality-the-simple-count" class="nav-link" data-scroll-target="#degree-centrality-the-simple-count">1.3 Degree Centrality: The Simple Count</a></li>
+  <li><a href="#comparing-all-four-centrality-measures" id="toc-comparing-all-four-centrality-measures" class="nav-link" data-scroll-target="#comparing-all-four-centrality-measures">1.5 Comparing All Four Centrality Measures</a></li>
   </ul></li>
-  <li><a href="#pairwise-statistics" id="toc-pairwise-statistics" class="nav-link" data-scroll-target="#pairwise-statistics">3. Pairwise Statistics</a>
+  <li><a href="#connectivity-robustness-analysis" id="toc-connectivity-robustness-analysis" class="nav-link" data-scroll-target="#connectivity-robustness-analysis">2. Connectivity &amp; Robustness Analysis</a>
   <ul class="collapse">
-  <li><a href="#geodesic-distance" id="toc-geodesic-distance" class="nav-link" data-scroll-target="#geodesic-distance">3.1 Geodesic Distance</a></li>
+  <li><a href="#finding-cutpoints-critical-nodes" id="toc-finding-cutpoints-critical-nodes" class="nav-link" data-scroll-target="#finding-cutpoints-critical-nodes">2.1 Finding cutpoints: critical nodes</a></li>
+  <li><a href="#vertex-connectivity-vs-edge-connectivity" id="toc-vertex-connectivity-vs-edge-connectivity" class="nav-link" data-scroll-target="#vertex-connectivity-vs-edge-connectivity">2.3 Vertex Connectivity vs Edge Connectivity</a></li>
+  <li><a href="#degree-distribution-modeling" id="toc-degree-distribution-modeling" class="nav-link" data-scroll-target="#degree-distribution-modeling">3.1 Degree Distribution Modeling</a></li>
+  <li><a href="#creating-directed-network-and-computing-degrees" id="toc-creating-directed-network-and-computing-degrees" class="nav-link" data-scroll-target="#creating-directed-network-and-computing-degrees">4.1 Creating directed network and computing degrees</a></li>
+  <li><a href="#fitting-degree-distribution-models" id="toc-fitting-degree-distribution-models" class="nav-link" data-scroll-target="#fitting-degree-distribution-models">4.2 Fitting degree distribution models</a></li>
   </ul></li>
-  <li><a href="#network-level-statistics" id="toc-network-level-statistics" class="nav-link" data-scroll-target="#network-level-statistics">4. Network-Level Statistics</a>
+  <li><a href="#component-analysis" id="toc-component-analysis" class="nav-link" data-scroll-target="#component-analysis">4. Component Analysis</a>
   <ul class="collapse">
-  <li><a href="#density" id="toc-density" class="nav-link" data-scroll-target="#density">4.1 Density</a></li>
-  <li><a href="#connectivity" id="toc-connectivity" class="nav-link" data-scroll-target="#connectivity">4.2 Connectivity</a></li>
-  <li><a href="#diameter" id="toc-diameter" class="nav-link" data-scroll-target="#diameter">4.3 Diameter</a></li>
-  <li><a href="#average-eccentricity" id="toc-average-eccentricity" class="nav-link" data-scroll-target="#average-eccentricity">4.4 Average Eccentricity</a></li>
+  <li><a href="#finding-giant-components-in-large-networks" id="toc-finding-giant-components-in-large-networks" class="nav-link" data-scroll-target="#finding-giant-components-in-large-networks">4.1 Finding giant components in large networks</a></li>
+  <li><a href="#does-it-have-a-giant-component" id="toc-does-it-have-a-giant-component" class="nav-link" data-scroll-target="#does-it-have-a-giant-component">4.2 Does It Have a Giant Component?</a></li>
+  <li><a href="#visualizing-the-largest-component" id="toc-visualizing-the-largest-component" class="nav-link" data-scroll-target="#visualizing-the-largest-component">4.4 Visualizing the largest component</a></li>
+  <li><a href="#geodesic-distance-analysis" id="toc-geodesic-distance-analysis" class="nav-link" data-scroll-target="#geodesic-distance-analysis">4.5 Geodesic Distance Analysis</a></li>
   </ul></li>
-  <li><a href="#centrality-measures" id="toc-centrality-measures" class="nav-link" data-scroll-target="#centrality-measures">5. Centrality Measures</a>
+  <li><a href="#temporal-network-analysis---cold-war-dynamics" id="toc-temporal-network-analysis---cold-war-dynamics" class="nav-link" data-scroll-target="#temporal-network-analysis---cold-war-dynamics">5. Temporal Network Analysis - Cold War Dynamics</a>
   <ul class="collapse">
-  <li><a href="#closeness-centrality" id="toc-closeness-centrality" class="nav-link" data-scroll-target="#closeness-centrality">5.1 Closeness Centrality</a></li>
-  <li><a href="#betweenness-centrality" id="toc-betweenness-centrality" class="nav-link" data-scroll-target="#betweenness-centrality">5.2 Betweenness Centrality</a></li>
-  <li><a href="#eigenvector-centrality" id="toc-eigenvector-centrality" class="nav-link" data-scroll-target="#eigenvector-centrality">5.3 Eigenvector Centrality</a></li>
-  <li><a href="#understanding-evcent-vs.-centralization" id="toc-understanding-evcent-vs.-centralization" class="nav-link" data-scroll-target="#understanding-evcent-vs.-centralization">5.4 Understanding <code>evcent()</code> vs.&nbsp;<code>centralization()</code></a></li>
+  <li><a href="#analyzing-components-across-time" id="toc-analyzing-components-across-time" class="nav-link" data-scroll-target="#analyzing-components-across-time">5.1 Analyzing components across time</a></li>
+  <li><a href="#aggregated-cooperation-network" id="toc-aggregated-cooperation-network" class="nav-link" data-scroll-target="#aggregated-cooperation-network">5.2 Aggregated Cooperation Network</a></li>
   </ul></li>
-  <li><a href="#summary-choosing-the-right-measure" id="toc-summary-choosing-the-right-measure" class="nav-link" data-scroll-target="#summary-choosing-the-right-measure">6. Summary: Choosing the Right Measure</a>
+  <li><a href="#summary-key-functions-reference" id="toc-summary-key-functions-reference" class="nav-link" data-scroll-target="#summary-key-functions-reference">6. Summary: Key Functions Reference</a>
   <ul class="collapse">
-  <li><a href="#node-level-measures" id="toc-node-level-measures" class="nav-link" data-scroll-target="#node-level-measures">6.1 Node-Level Measures</a></li>
-  <li><a href="#network-level-measures" id="toc-network-level-measures" class="nav-link" data-scroll-target="#network-level-measures">6.2 Network-Level Measures</a></li>
-  <li><a href="#combining-measures" id="toc-combining-measures" class="nav-link" data-scroll-target="#combining-measures">6.3 Combining Measures</a></li>
+  <li><a href="#important-arguments" id="toc-important-arguments" class="nav-link" data-scroll-target="#important-arguments">6.6 Important Arguments</a></li>
   </ul></li>
-  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading">References and Further Reading</a></li>
   </ul>
 </nav>
     </div>
@@ -287,641 +259,1685 @@ window.Quarto = {
 
 <p>In the <a href="https://aliceaii.github.io/posts/snapart2/">previous tutorial</a>, we explored the mathematical foundations of network statistics, learning about degree, centrality, diameter, and more. Now it’s time to get our hands dirty with R code! This tutorial will show you how to compute all these measures using real network data.</p>
 <p><img src="plot1.jpg" class="img-fluid" style="width:75.0%"></p>
-<p>In network analysis, we move beyond simple visualization to <strong>quantitative measurement</strong>. Just as we describe a dataset with statistics like mean and standard deviation, we describe networks with metrics like degree, density, and centrality. These measures help us:</p>
-<ul>
-<li>Identify influential nodes (Who are the key players?)</li>
-<li>Understand network structure (Is the network cohesive or fragmented?)</li>
-<li>Compare different networks (Is Network A more centralized than Network B?)</li>
-<li>Predict network behavior (How quickly can information spread?)</li>
-</ul>
-<p>This tutorial covers the fundamental statistics we use to describe networks. We’ll start with simple node-level measures (like degree), move to pairwise relationships (like geodesic distance), network-level summaries (like density and diameter), and different types of centrality measures. By the end, you’ll understand the mathematical language of social networks.</p>
-<section id="notation-and-preliminaries" class="level2">
-<h2 class="anchored" data-anchor-id="notation-and-preliminaries">1. Notation and Preliminaries</h2>
-<p>Before diving into specific measures, let’s establish some notation:</p>
-<ul>
-<li><strong><span class="math inline">\(N\)</span></strong> = number of nodes (vertices) in the network</li>
-<li><strong><span class="math inline">\(L\)</span></strong> = number of edges (ties) in the network<br>
-</li>
-<li><strong><span class="math inline">\(Y\)</span></strong> = adjacency matrix where <span class="math inline">\(y_{ij} = 1\)</span> if there’s an edge from node <span class="math inline">\(i\)</span> to node <span class="math inline">\(j\)</span>, and <span class="math inline">\(y_{ij} = 0\)</span> otherwise</li>
-<li><strong><span class="math inline">\(d(i,j)\)</span></strong> = geodesic distance (shortest path length) between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span></li>
-</ul>
-<p>For <strong>undirected networks</strong>, the adjacency matrix is symmetric: <span class="math inline">\(y_{ij} = y_{ji}\)</span>. For <strong>directed networks</strong>, edges have direction, so <span class="math inline">\(y_{ij}\)</span> and <span class="math inline">\(y_{ji}\)</span> can differ.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Throughout this tutorial, we’ll work with undirected networks for simplicity. The concepts generalize to directed networks, but the formulas often need adjustment (for instance, distinguishing between in-degree and out-degree).</p>
-</div>
-</div>
-</section>
-<section id="node-level-statistics" class="level2">
-<h2 class="anchored" data-anchor-id="node-level-statistics">2. Node-Level Statistics</h2>
-<p>Node-level statistics characterize individual nodes in the network. These measures help us answer questions like “Which node is most active?” or “Which node is most peripheral?”</p>
-<section id="degree" class="level3">
-<h3 class="anchored" data-anchor-id="degree">2.1 Degree</h3>
-<p><strong>Degree</strong> is the most basic node-level measure, it simply counts how many direct connections a node has.</p>
-<p><strong>Definition:</strong> The degree of node <span class="math inline">\(i\)</span>, denoted <span class="math inline">\(d_i\)</span> or <span class="math inline">\(\text{Degree}(i)\)</span>, is the number of edges incident to that node.</p>
-<p><strong>Formula:</strong> <span class="math display">\[\text{Degree}(i) = \sum_{j=1}^{N} y_{ij}\]</span> For undirected networks, this counts the number of neighbors node <span class="math inline">\(i\)</span> has. For directed networks, we distinguish:</p>
-<ul>
-<li><strong>In-degree:</strong> <span class="math inline">\(d_i^{in} = \sum_{j=1}^{N} y_{ji}\)</span> (edges pointing into node <span class="math inline">\(i\)</span>)</li>
-<li><strong>Out-degree:</strong> <span class="math inline">\(d_i^{out} = \sum_{j=1}^{N} y_{ij}\)</span> (edges pointing out from node <span class="math inline">\(i\)</span>)</li>
-</ul>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>High degree</strong>: Node is well-connected, active, or popular. In a friendship network, this person knows many people. In a protein interaction network, this protein interacts with many others.</li>
-<li><strong>Low degree</strong>: Node is peripheral or isolated. They have few direct connections.</li>
-</ul>
-<p><strong>Degree distribution:</strong> Rather than looking at individual nodes, we often examine the distribution of degrees across all nodes. This reveals whether most nodes have similar connectivity (uniform distribution) or whether a few “hubs” dominate (heavy-tailed distribution like power law).</p>
-</section>
-<section id="nodal-eccentricity" class="level3">
-<h3 class="anchored" data-anchor-id="nodal-eccentricity">2.2 Nodal Eccentricity</h3>
-<p>While degree measures immediate connectivity, <strong>eccentricity</strong> captures how far a node is from the most distant other node in the network.</p>
-<p><strong>Definition:</strong> The eccentricity of node <span class="math inline">\(i\)</span>, denoted <span class="math inline">\(e_i\)</span> or <span class="math inline">\(e(i)\)</span>, is the maximum geodesic distance from node <span class="math inline">\(i\)</span> to any other node in the network.</p>
-<p><strong>Formula:</strong> <span class="math display">\[e(i) = \max_{j \in V} d(i,j)\]</span> where <span class="math inline">\(V\)</span> is the set of all nodes and <span class="math inline">\(d(i,j)\)</span> is the geodesic distance (shortest path length) from <span class="math inline">\(i\)</span> to <span class="math inline">\(j\)</span>.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>Small eccentricity</strong>: Node is centrally located; it can reach even the farthest nodes in relatively few steps</li>
-<li><strong>Large eccentricity</strong>: Node is on the periphery; the farthest node from it is very far away</li>
-</ul>
-</section>
-</section>
-<section id="pairwise-statistics" class="level2">
-<h2 class="anchored" data-anchor-id="pairwise-statistics">3. Pairwise Statistics</h2>
-<p>Pairwise statistics describe relationships between pairs of nodes. These measures help us understand distances, reachability, and the structure of paths in the network.</p>
-<section id="geodesic-distance" class="level3">
-<h3 class="anchored" data-anchor-id="geodesic-distance">3.1 Geodesic Distance</h3>
-<p><strong>Geodesic distance</strong> is fundamental to understanding how nodes relate to one another in a network. It tells us about reachability and the efficiency of pathways in the network. In social networks, shorter distances mean faster information diffusion. In transportation networks, they mean more direct routes.</p>
-<p><strong>Definition:</strong> The geodesic distance <span class="math inline">\(d(i,j)\)</span> between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> is the length of the shortest path connecting them (the minimum number of edges traversed).</p>
-<p><strong>Formula:</strong> <span class="math display">\[d(i,j) = \min(\text{length of all paths from } i \text{ to } j)\]</span> If no path exists (nodes are in different components), we say <span class="math inline">\(d(i,j) = \infty\)</span>.</p>
-<p><strong>Key properties:</strong></p>
-<ul>
-<li><span class="math inline">\(d(i,i) = 0\)</span> (distance from a node to itself is zero)</li>
-<li><span class="math inline">\(d(i,j) = d(j,i)\)</span> for undirected networks (distance is symmetric)</li>
-<li>Multiple geodesics may exist between two nodes (multiple shortest paths of the same length)</li>
-</ul>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>Small geodesic distance</strong>: Nodes are close; information can flow quickly between them</li>
-<li><strong>Large geodesic distance</strong>: Nodes are far apart; information takes many steps to travel</li>
-<li><strong>Mean geodesic distance</strong>: Average network efficiency for communication</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Imagine a network like this:</p>
-<pre><code>A --- B --- C --- D
-      |           |
-      E --- F --- G</code></pre>
-<ul>
-<li><span class="math inline">\(d(A, B) = 1\)</span> (direct neighbors)</li>
-<li><span class="math inline">\(d(A, C) = 2\)</span> (shortest path: A → B → C)<br>
-</li>
-<li><span class="math inline">\(d(A, E) = 2\)</span> (shortest path: A → B → E)</li>
-<li><span class="math inline">\(d(A, D) = 3\)</span> (shortest path: A → B → C → D)</li>
-<li>Note that <span class="math inline">\(d(B, D) = 2\)</span> via two routes: B → C → D or B → E → F → G → D (both length 4), so the geodesic is through C</li>
-</ul>
-</div>
-</div>
-<p><strong>Computing geodesic distances:</strong> In practice, we use algorithms like <strong>Breadth-First Search (BFS)</strong> or matrix multiplication methods to compute all pairwise geodesic distances efficiently.</p>
-</section>
-</section>
-<section id="network-level-statistics" class="level2">
-<h2 class="anchored" data-anchor-id="network-level-statistics">4. Network-Level Statistics</h2>
-<p>Network-level statistics summarize the entire network in a single number. These measures help us compare networks, understand overall structure, and characterize properties like cohesion, compactness, and vulnerability.</p>
-<section id="density" class="level3">
-<h3 class="anchored" data-anchor-id="density">4.1 Density</h3>
-<p><strong>Density</strong> is perhaps the most fundamental network-level measure—it tells us what fraction of all possible connections actually exist.</p>
-<p><strong>Definition:</strong> Density is the proportion of existing edges relative to all possible edges.</p>
-<p><strong>Formula:</strong></p>
-<p>For <strong>undirected</strong> networks: <span class="math display">\[\text{Density} = \frac{L}{N(N-1)/2} = \frac{2L}{N(N-1)}\]</span> For <strong>directed</strong> networks: <span class="math display">\[\text{Density} = \frac{L}{N(N-1)}\]</span></p>
-<p>where: - <span class="math inline">\(L\)</span> = number of edges actually present - <span class="math inline">\(N\)</span> = number of nodes - <span class="math inline">\(N(N-1)/2\)</span> = maximum possible edges in an undirected network - <span class="math inline">\(N(N-1)\)</span> = maximum possible edges in a directed network</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>Density = 1</strong>: Complete network—every possible edge exists (everyone knows everyone)</li>
-<li><strong>Density = 0</strong>: Empty network—no edges exist (complete isolation)</li>
-<li><strong>High density (e.g., 0.7-0.9)</strong>: Tightly connected, cohesive network. Information spreads quickly. Members have many common connections.</li>
-<li><strong>Low density (e.g., 0.1-0.2)</strong>: Sparse, fragmented network. Information spreads slowly. Few common connections.</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Density tends to decrease as networks grow larger. A social network of 10 people might have density 0.4, while network with 1000 people might have density 0.02. This is natural. It’s harder to maintain high density as the number of possible connections explodes. When comparing networks, consider both density and size.</p>
-<ul>
-<li><strong>Small study group (10 students, 25 friendships)</strong>: Density = <span class="math inline">\(\frac{2 \times 25}{10 \times 9} = 0.56\)</span>. More than half of possible friendships exist, it’s a relatively tight-knit group.</li>
-<li><strong>Large university (1000 students, 15000 friendships)</strong>: Density = <span class="math inline">\(\frac{2 \times 15000}{1000 \times 999} = 0.03\)</span>. Only 3% of possible friendships exist, it’s typical for large networks.</li>
-</ul>
-</div>
-</div>
-<p><strong>Alternative view:</strong> Density is also the average degree divided by <span class="math inline">\(N-1\)</span>: <span class="math display">\[\text{Density} = \frac{\bar{d}}{N-1}\]</span></p>
-<p>where <span class="math inline">\(\bar{d} = \frac{1}{N}\sum_{i=1}^N d_i\)</span> is the mean degree.</p>
-</section>
-<section id="connectivity" class="level3">
-<h3 class="anchored" data-anchor-id="connectivity">4.2 Connectivity</h3>
-<p>While density measures how many edges exist, <strong>connectivity</strong> measures how robust the network is to disruption—how hard it is to disconnect the network by removing nodes or edges.</p>
-<p><strong>Definition:</strong> Connectivity describes the extent to which nodes can reach one another and how resilient the network is to the removal of nodes or edges.</p>
-<p>There are two main types:</p>
-<section id="vertex-connectivity-kappa" class="level4">
-<h4 class="anchored" data-anchor-id="vertex-connectivity-kappa">4.2.1 Vertex Connectivity (<span class="math inline">\(\kappa\)</span>)</h4>
-<p>The minimum number of nodes that must be removed to disconnect the network or reduce it to a single node.</p>
-<p><strong>Interpretation:</strong> - <span class="math inline">\(\kappa = 0\)</span>: Network is already disconnected (multiple components exist) - <span class="math inline">\(\kappa = 1\)</span>: Network has a <strong>cut-vertex</strong> (a single node whose removal disconnects the network) - <span class="math inline">\(\kappa = k\)</span>: You must remove at least <span class="math inline">\(k\)</span> nodes to disconnect the network—very resilient</p>
-</section>
-<section id="edge-connectivity-lambda" class="level4">
-<h4 class="anchored" data-anchor-id="edge-connectivity-lambda">4.2.2 Edge Connectivity (<span class="math inline">\(\lambda\)</span>)</h4>
-<p>The minimum number of edges that must be removed to disconnect the network.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><span class="math inline">\(\lambda = 0\)</span>: Network is already disconnected</li>
-<li><span class="math inline">\(\lambda = 1\)</span>: Network has a <strong>bridge</strong> (a single edge whose removal disconnects the network)</li>
-<li><span class="math inline">\(\lambda = k\)</span>: You must remove at least <span class="math inline">\(k\)</span> edges to disconnect the network</li>
-</ul>
-<p><strong>Relationship:</strong> Always <span class="math inline">\(\kappa \leq \lambda \leq \delta\)</span> where <span class="math inline">\(\delta\)</span> is the minimum degree in the network.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Consider two networks with 9 nodes and similar density:</p>
-<p><strong>Star network:</strong></p>
-<pre><code>    2   3   4   5
-     \ | | | /
-      \|_|_|/
-        1
-       _ _ _
-      / |  | \
-     /  |  |   \
-    6   7   8   9</code></pre>
-<ul>
-<li>Vertex connectivity: <span class="math inline">\(\kappa = 1\)</span> (remove node 1 and the network falls apart)</li>
-<li>Extremely vulnerable—one node’s removal destroys all connections</li>
-</ul>
-<p><strong>Circle network:</strong></p>
-<pre><code>1 — 2 — 3
-|       |
-9       4
-|       |
-8 — 7 — 6 — 5</code></pre>
-<ul>
-<li>Vertex connectivity: <span class="math inline">\(\kappa = 2\)</span> (must remove 2 nodes to disconnect)</li>
-<li>More robust, can withstand single node failures</li>
-</ul>
-<p>Both have roughly the same density, but very different connectivity!</p>
-</div>
-</div>
-</section>
-</section>
-<section id="diameter" class="level3">
-<h3 class="anchored" data-anchor-id="diameter">4.3 Diameter</h3>
-<p><strong>Diameter</strong> summarizes the network’s extent or “size” by measuring the longest shortest path. Diameter captures the <strong>worst-case communication scenario</strong>. Even in a large network, if the diameter is small, any two nodes can reach each other in just a few steps. This is the basis of the famous “six degrees of separation” phenomenon—most social networks have surprisingly small diameters.</p>
-<p><strong>Definition:</strong> The diameter of a network is the maximum geodesic distance between any pair of nodes.</p>
-<p><strong>Formula:</strong> <span class="math display">\[\text{Diameter} = \max_{i,j} d(i,j) = \max_i \max_j d(i,j) = \max_i e_i\]</span> In other words, the diameter equals the largest eccentricity in the network.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>Small diameter (e.g., 2-3)</strong>: Compact network. No two nodes are very far apart. Information can spread quickly.</li>
-<li><strong>Large diameter (e.g., 10+)</strong>: Extended network. Some nodes are very far from others. Information spreads slowly.</li>
-<li><strong>Diameter = 1</strong>: Complete or nearly complete network (everyone directly connected)</li>
-<li><strong>Diameter = <span class="math inline">\(\infty\)</span></strong>: Disconnected network (some nodes can’t reach others)</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>For disconnected networks (networks with multiple components), the diameter is technically infinite because some pairs of nodes have no path between them. In practice, we often report the diameter of the largest connected component.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Example: The Small World Phenomenon </p>
-<p>Stanley Milgram’s famous experiments suggested people in the U.S. are connected by approximately 6 degrees of separation. The diameter of the social network is around 6. This means any two strangers can be connected through a chain of about 6 acquaintances. Modern social media networks have even smaller diameters (around 4-5) due to their structure.</p>
-</div>
-</div>
-</section>
-<section id="average-eccentricity" class="level3">
-<h3 class="anchored" data-anchor-id="average-eccentricity">4.4 Average Eccentricity</h3>
-<p>While diameter gives us the worst-case measure, <strong>average eccentricity</strong> provides a more representative summary of network compactness. Diameter focuses on the extreme case (the single longest shortest path), which might be an outlier. Average eccentricity gives us a more robust, representative measure of how far nodes typically are from their farthest connections. It’s less sensitive to outliers than diameter.</p>
-<p><strong>Definition:</strong> The mean eccentricity across all nodes in the network.</p>
-<p><strong>Formula:</strong> <span class="math display">\[\bar{e} = \frac{1}{N} \sum_{i=1}^{N} e_i\]</span></p>
-<p>where <span class="math inline">\(e_i\)</span> is the eccentricity of node <span class="math inline">\(i\)</span>.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>Low average eccentricity</strong>: On average, nodes are centrally located and can reach distant nodes in few steps</li>
-<li><strong>High average eccentricity</strong>: On average, nodes are positioned such that their farthest connections are far away</li>
-</ul>
-<p><strong>Scaled version:</strong> When comparing networks of different sizes, it’s useful to normalize: <span class="math display">\[\text{Scaled avg eccentricity} = \frac{1}{N(N-1)} \sum_{i=1}^{N} e_i\]</span></p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Imagine a network that’s generally compact but has one long “tail” extending out:</p>
-<pre><code>    A — B — C — D — E — F — G — H — I — J
-                |
-    [dense cluster of 20 nodes]</code></pre>
-<ul>
-<li>Diameter might be 12 (from J to the far side of the cluster)</li>
-<li>Average eccentricity might be only 5 (most nodes have moderate eccentricity)</li>
-</ul>
-<p>Average eccentricity gives a better sense of the typical structure.</p>
-</div>
-</div>
-</section>
-</section>
-<section id="centrality-measures" class="level2">
-<h2 class="anchored" data-anchor-id="centrality-measures">5. Centrality Measures</h2>
-<p>Centrality measures attempt to quantify node “importance” or “prominence” in the network. But what does “important” mean? Different centrality measures capture different aspects of importance:</p>
-<ul>
-<li><strong>Degree centrality</strong>: Importance = direct connections<br>
-</li>
-<li><strong>Closeness centrality</strong>: Importance = efficiency in reaching others</li>
-<li><strong>Betweenness centrality</strong>: Importance = controlling information flow</li>
-<li><strong>Eigenvector centrality</strong>: Importance = being connected to important nodes</li>
-</ul>
-<section id="closeness-centrality" class="level3">
-<h3 class="anchored" data-anchor-id="closeness-centrality">5.1 Closeness Centrality</h3>
-<p><strong>Closeness centrality</strong> measures how quickly a node can reach all other nodes—a measure of efficiency and accessibility.</p>
-<p><strong>Definition:</strong> Closeness centrality captures how “close” a node is to all other nodes in the network, measured by geodesic distances.</p>
-<p><strong>Formula:</strong> <span class="math display">\[C_C(i) = \frac{1}{\sum_{j=1}^{N} d(i,j)} = \frac{N-1}{\sum_{j=1}^{N} d(i,j)}\]</span> The second version (multiplying by <span class="math inline">\(N-1\)</span>) normalizes closeness to <span class="math inline">\([0,1]\)</span> range for easier interpretation.</p>
-<p><strong>Intuition:</strong> Sum up all the geodesic distances from node <span class="math inline">\(i\)</span> to everyone else. If this sum is small, node <span class="math inline">\(i\)</span> is close to everyone, which is high closeness. If the sum is large, node <span class="math inline">\(i\)</span> is far from others, which means low closeness.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>High closeness</strong>: Node can reach others efficiently; well-positioned to spread information quickly or coordinate activity</li>
-<li><strong>Low closeness</strong>: Node is on the periphery; information from this node takes many steps to reach others</li>
-</ul>
-<p><strong>Use cases:</strong></p>
-<ul>
-<li><strong>Communication networks</strong>: High-closeness nodes can broadcast messages efficiently<br>
-</li>
-<li><strong>Disease spread</strong>: High-closeness individuals can infect the population quickly</li>
-<li><strong>Organizations</strong>: High-closeness employees have efficient access to information across departments</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Consider a simple network of 5 nodes:</p>
-<pre><code>    A --- B --- C --- D
-          |
-          E</code></pre>
-<p>Calculate closeness for node B:</p>
-<ul>
-<li><span class="math inline">\(d(B,A) = 1\)</span>, <span class="math inline">\(d(B,C) = 1\)</span>, <span class="math inline">\(d(B,D) = 2\)</span>, <span class="math inline">\(d(B,E) = 1\)</span></li>
-<li>Sum = <span class="math inline">\(1 + 1 + 2 + 1 = 5\)</span></li>
-<li><span class="math inline">\(C_C(B) = \frac{4}{5} = 0.80\)</span></li>
-</ul>
-<p>Compare to node A:</p>
-<ul>
-<li><span class="math inline">\(d(A,B) = 1\)</span>, <span class="math inline">\(d(A,C) = 2\)</span>, <span class="math inline">\(d(A,D) = 3\)</span>, <span class="math inline">\(d(A,E) = 2\)</span></li>
-<li>Sum = <span class="math inline">\(1 + 2 + 3 + 2 = 8\)</span><br>
-</li>
-<li><span class="math inline">\(C_C(A) = \frac{4}{8} = 0.50\)</span></li>
-</ul>
-<p>Node B has higher closenessm it’s more centrally positioned.</p>
-</div>
-</div>
-</section>
-<section id="betweenness-centrality" class="level3">
-<h3 class="anchored" data-anchor-id="betweenness-centrality">5.2 Betweenness Centrality</h3>
-<p><strong>Betweenness centrality</strong> measures how often a node lies on the shortest paths between other nodes—capturing its role as a <strong>broker</strong> or <strong>bridge</strong>.</p>
-<p><strong>Definition:</strong> Betweenness centrality counts the number of times a node appears on geodesic paths between other pairs of nodes.</p>
-<p><strong>Formula:</strong> <span class="math display">\[C_B(i) = \sum_{j \neq k \neq i} \frac{\sigma_{jk}(i)}{\sigma_{jk}}\]</span></p>
-<p>where: - <span class="math inline">\(\sigma_{jk}\)</span> = total number of shortest paths between nodes <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span> - <span class="math inline">\(\sigma_{jk}(i)\)</span> = number of those shortest paths that pass through node <span class="math inline">\(i\)</span></p>
-<p><strong>Normalized version</strong> (for comparison across networks): <span class="math display">\[C_B'(i) = \frac{C_B(i)}{(N-1)(N-2)/2}\]</span></p>
-<p><strong>Intuition:</strong> For every pair of nodes <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span>, ask: “Does the shortest path(s) between them go through node <span class="math inline">\(i\)</span>?” If yes, increment <span class="math inline">\(i\)</span>’s betweenness score. High betweenness means node <span class="math inline">\(i\)</span> sits on many shortest paths—it’s a critical connector or gatekeeper.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>High betweenness</strong>: Node controls information flow; removing it disrupts many shortest paths</li>
-<li><strong>Low betweenness</strong>: Node is not on many shortest paths; less critical for network connectivity</li>
-</ul>
-<p><strong>Use cases:</strong></p>
-<ul>
-<li><strong>Social networks</strong>: High-betweenness individuals bridge different groups; they’re connectors between communities</li>
-<li><strong>Transportation networks</strong>: High-betweenness intersections or stations are bottlenecks<br>
-</li>
-<li><strong>Organizations</strong>: High-betweenness employees connect different departments or teams</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Consider this network:</p>
-<pre><code>    A --- B --- C --- D
-          |           |
-          E --- F --- G</code></pre>
-<p>Node B appears on many shortest paths:</p>
-<ul>
-<li>All paths from A to {C, D, E, F, G} go through B</li>
-<li><span class="math inline">\(C_B(B)\)</span> is high</li>
-</ul>
-<p>Node C has lower betweenness:</p>
-<ul>
-<li>Paths from {A, B, E} to {D, F, G} go through C</li>
-<li>But fewer total paths depend on C</li>
-</ul>
-<p>Node E is at the bottom of the network and has low betweenness despite moderate degree.</p>
-</div>
-</div>
-<p><strong>Computational note:</strong> Computing betweenness centrality can be expensive for large networks (requires finding shortest paths for all pairs). Efficient algorithms like Brandes’ algorithm make this feasible for most networks.</p>
-</section>
-<section id="eigenvector-centrality" class="level3">
-<h3 class="anchored" data-anchor-id="eigenvector-centrality">5.3 Eigenvector Centrality</h3>
-<p><strong>Eigenvector centrality</strong> captures the intuition that <strong>being connected to important nodes makes you important</strong>. It’s a recursive measure where node importance depends on the importance of neighbors.</p>
-<p><strong>Definition:</strong> The centrality of node <span class="math inline">\(i\)</span> is proportional to the sum of the centralities of its neighbors.</p>
-<p><strong>Formula:</strong> <span class="math display">\[C_E(i) = \frac{1}{\lambda} \sum_{j=1}^{N} y_{ij} C_E(j)\]</span> where <span class="math inline">\(\lambda\)</span> is the largest eigenvalue of the adjacency matrix <span class="math inline">\(Y\)</span>, and <span class="math inline">\(C_E(j)\)</span> is the eigenvector centrality of neighbor <span class="math inline">\(j\)</span>.</p>
-<p>This can be written in matrix form as: <span class="math display">\[\lambda \mathbf{c} = Y \mathbf{c}\]</span> where <span class="math inline">\(\mathbf{c}\)</span> is the eigenvector corresponding to the largest eigenvalue <span class="math inline">\(\lambda\)</span> of <span class="math inline">\(Y\)</span>.</p>
-<p><strong>Alternative formulation:</strong> Eigenvector centrality can also be expressed as a sum over all walk lengths: <span class="math display">\[C_E(i) = \sum_{l=1}^{\infty} \frac{1}{\lambda^l} \sum_{j=1}^{N} y_{ij}^{(l)}\]</span> where <span class="math inline">\(y_{ij}^{(l)}\)</span> is the number of walks of length <span class="math inline">\(l\)</span> from <span class="math inline">\(i\)</span> to <span class="math inline">\(j\)</span>. This shows that eigenvector centrality weights walks inversely by their length, shorter walks matter more.</p>
-<p><strong>Intuition:</strong> Imagine you’re connected to 5 people. If those 5 people are themselves well-connected, your eigenvector centrality is high. If they’re isolated, your eigenvector centrality remains low. Quality of connections matters more than quantity.</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>High eigenvector centrality</strong>: Node is connected to well-connected nodes; part of the network’s “core”<br>
-</li>
-<li><strong>Low eigenvector centrality</strong>: Node is connected to peripheral nodes; on the edge of the network</li>
-</ul>
-<p><strong>Use cases:</strong></p>
-<ul>
-<li><strong>Social networks</strong>: High-eigenvector nodes are connected to influential people (even if they don’t know many people themselves)</li>
-<li><strong>Web search</strong>: Google’s PageRank is a variant of eigenvector centrality, web pages linked by important pages are themselves important</li>
-<li><strong>Core-periphery structure</strong>: Eigenvector centrality naturally separates core (high values) from periphery (low values)</li>
-</ul>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Eigenvector centrality gets its name because it’s literally the eigenvector of the adjacency matrix! The largest eigenvalue and its corresponding eigenvector provide the centrality scores. This mathematical foundation gives eigenvector centrality nice theoretical properties.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Imagine two people, A and B, each with degree 3: - A knows: (1) a CEO, (2) a university president, (3) a senator - B knows: (1) B’s neighbor, (2) B’s cousin, (3) B’s classmate</p>
-<p>A and B have the same degree (3), but A has much higher eigenvector centrality because A’s connections are themselves highly connected. Eigenvector centrality captures this quality-over-quantity principle.</p>
-</div>
-</div>
-</section>
-<section id="understanding-evcent-vs.-centralization" class="level3">
-<h3 class="anchored" data-anchor-id="understanding-evcent-vs.-centralization">5.4 Understanding <code>evcent()</code> vs.&nbsp;<code>centralization()</code></h3>
-<p>These are two related but distinct concepts in network analysis:</p>
-<p><strong><code>evcent()</code> - Eigenvector Centrality Scores</strong></p>
-<p>This function computes eigenvector centrality for <strong>each node</strong> in the network.</p>
-<ul>
-<li><strong>Input:</strong> Network</li>
-<li><strong>Output:</strong> A vector of centrality scores, one per node<br>
-</li>
-<li><strong>Interpretation:</strong> Node-level measure. Tells you which individual nodes are most central.</li>
-</ul>
-<p>Example use:</p>
+<p>This tutorial covers <strong>five major topics</strong> using real-world data:</p>
+<ol type="1">
+<li><strong>Centrality Measures</strong>: Identifying important nodes across biological, social, and political networks</li>
+<li><strong>Connectivity Analysis</strong>: Understanding network robustness using Renaissance Florence</li>
+<li><strong>Degree Distributions</strong>: Modeling connectivity patterns in protein interaction networks</li>
+<li><strong>Component Analysis</strong>: Finding connected groups in large biological networks</li>
+<li><strong>Temporal Networks</strong>: Analyzing how Cold War alliances evolved over time</li>
+</ol>
+<p>By the end, you’ll have a complete toolkit for analyzing networks in any domain!</p>
+<p>We’ll use the exact same datasets with <a href="https://aliceaii.github.io/posts/snapart1/">SNA Part1</a>, so you can directly compare how different statistics reveal different aspects of network structure. By the end, you’ll be able to conduct a complete network analysis on your own data!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#library(sna)</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#evcent(network_object)</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># returns: [0.23, 0.45, 0.67, 0.89, 0.34, ...]</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># node 4 has highest eigenvector centrality</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkdata)  </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sna)          <span class="co">#network analysis</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(network)      <span class="co">#network objects</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(degreenet)    <span class="co">#degree distribution modeling</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)      </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><strong><code>centralization()</code> - Network Centralization</strong></p>
-<p>This function computes a <strong>single score</strong> for the entire network measuring how centralized it is.</p>
+<section id="centrality-analysis-across-three-networks" class="level2">
+<h2 class="anchored" data-anchor-id="centrality-analysis-across-three-networks">1. Centrality Analysis Across Three Networks</h2>
+<p>In this section, we’ll analyze three networks to see how centrality varies by context:</p>
 <ul>
-<li><strong>Input:</strong> Vector of node centrality scores (from any centrality measure)</li>
-<li><strong>Output:</strong> A single number between 0 and 1</li>
-<li><strong>Interpretation:</strong> Network-level measure. Tells you whether the network structure is dominated by one or few central nodes (high centralization) or whether centrality is evenly distributed (low centralization).</li>
+<li>Dataset 1: Protein-Protein Interaction (PPI) Network</li>
+<li>Dataset 2: AddHealth Friendship Network</li>
+<li>Dataset 3: Highland Tribes Network</li>
 </ul>
-<p><strong>Formula:</strong> <span class="math display">\[\text{Centralization} = \frac{\sum_{i=1}^{N} (C_{\max} - C_i)}{(N-1)(N-2)}\]</span></p>
-<p>where: - <span class="math inline">\(C_i\)</span> is the centrality score of node <span class="math inline">\(i\)</span> - <span class="math inline">\(C_{\max}\)</span> is the maximum centrality score in the network</p>
-<p><strong>Interpretation:</strong></p>
-<ul>
-<li><strong>Centralization = 1</strong>: Perfect star structure—one node dominates, all others equal</li>
-<li><strong>Centralization = 0</strong>: All nodes have equal centrality—completely decentralized</li>
-<li><strong>High centralization (0.7-1.0)</strong>: Hierarchical structure with clear leaders</li>
-<li><strong>Low centralization (0.0-0.3)</strong>: Egalitarian structure with distributed importance</li>
-</ul>
-<p>Example use:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get eigenvector centrality scores for all nodes</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#ev_scores &lt;- evcent(network_object)</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate how centralized the network is based on eigenvector centrality</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#centralization(network_object, evcent)</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#returns: 0.73 (fairly centralized network)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(butland_ppi)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(addhealth9)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(tribes)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#process addHealth: boys only, largest component</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> <span class="fu">which</span>(addhealth9<span class="sc">$</span>X[, <span class="st">"female"</span>] <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>myedges <span class="ot">&lt;-</span> (addhealth9<span class="sc">$</span>E[, <span class="dv">1</span>] <span class="sc">%in%</span> inds) <span class="sc">*</span> (addhealth9<span class="sc">$</span>E[, <span class="dv">2</span>] <span class="sc">%in%</span> inds) <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>myedges <span class="ot">&lt;-</span> addhealth9<span class="sc">$</span>E[myedges, ]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> <span class="fu">component.largest</span>(<span class="fu">as.network</span>(myedges[, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)], <span class="at">directed =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                         <span class="at">result =</span> <span class="st">"graph"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>addh9 <span class="ot">&lt;-</span> <span class="fu">as.network</span>(tmp, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#process PPI:extract largest component</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>bppi <span class="ot">&lt;-</span> <span class="fu">as.network</span>(<span class="fu">component.largest</span>(<span class="fu">as.network</span>(butland_ppi, <span class="at">directed =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">result =</span> <span class="st">"graph"</span>), </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#process tribes: positive relationships only</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>tribe <span class="ot">&lt;-</span> <span class="fu">as.network</span>(<span class="fu">component.largest</span>(<span class="fu">as.network</span>(tribes[, , <span class="st">"pos"</span>], <span class="at">directed =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">result =</span> <span class="st">"graph"</span>), </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                    <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Network Sizes:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Network Sizes:</code></pre>
 </div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"PPI:"</span>, <span class="fu">network.size</span>(bppi), <span class="st">"proteins,"</span>, <span class="fu">network.edgecount</span>(bppi), <span class="st">"interactions</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PPI: 230 proteins, 695 interactions</code></pre>
 </div>
-<div class="callout-title-container flex-fill">
-Tip
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"AddHealth:"</span>, <span class="fu">network.size</span>(addh9), <span class="st">"students,"</span>, <span class="fu">network.edgecount</span>(addh9), <span class="st">"friendships</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>AddHealth: 118 students, 273 friendships</code></pre>
 </div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><strong><code>evcent()</code></strong>: “Which nodes are central?” → Returns a score for EACH node</li>
-<li><strong><code>centralization()</code></strong>: “Is the network centralized?” → Returns ONE score for the WHOLE network</li>
-</ul>
-<p>Think of it this way: <code>evcent()</code> identifies the stars in your network. <code>centralization()</code> tells you whether your network has a clear star structure or not.</p>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tribes:"</span>, <span class="fu">network.size</span>(tribe), <span class="st">"tribes,"</span>, <span class="fu">network.edgecount</span>(tribe), <span class="st">"alliances</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tribes: 12 tribes, 23 alliances</code></pre>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>While we discussed this in the context of eigenvector centrality, <code>centralization()</code> can be applied to ANY centrality measure:</p>
+<section id="eigenvector-centrality-quality-over-quantity" class="level3">
+<h3 class="anchored" data-anchor-id="eigenvector-centrality-quality-over-quantity">1.1 Eigenvector Centrality: Quality Over Quantity</h3>
+<p>You’re important if you’re connected to other important nodes. It’s not just <em>how many</em> connections you have, but <em>who</em> you’re connected to.</p>
+<p>Node-level eigenvector centrality and distribution:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#centralization(network, degree)        # Degree centralization</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#centralization(network, closeness)     # Closeness centralization  </span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#centralization(network, betweenness)   # Betweenness centralization</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#centralization(network, evcent)        # Eigenvector centralization</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>This flexibility allows you to ask: “Is my network centralized in terms of connections (degree)? In terms of efficiency (closeness)? In terms of brokerage (betweenness)?”</p>
-</div>
-</div>
-</section>
-</section>
-<section id="summary-choosing-the-right-measure" class="level2">
-<h2 class="anchored" data-anchor-id="summary-choosing-the-right-measure">6. Summary: Choosing the Right Measure</h2>
-<p>With so many network statistics, how do you choose which ones to use? Here’s a practical guide:</p>
-<section id="node-level-measures" class="level3">
-<h3 class="anchored" data-anchor-id="node-level-measures">6.1 Node-Level Measures</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 34%">
-<col style="width: 40%">
-</colgroup>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#compute eigenvector centrality</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ev_ppi <span class="ot">&lt;-</span> <span class="fu">evcent</span>(bppi, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ev_addh9 <span class="ot">&lt;-</span> <span class="fu">evcent</span>(addh9, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>ev_tribe <span class="ot">&lt;-</span> <span class="fu">evcent</span>(tribe, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#summary statistics</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>ev_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network =</span> <span class="fu">c</span>(<span class="st">"PPI"</span>, <span class="st">"AddHealth"</span>, <span class="st">"Tribes"</span>),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min =</span> <span class="fu">c</span>(<span class="fu">min</span>(ev_ppi), <span class="fu">min</span>(ev_addh9), <span class="fu">min</span>(ev_tribe)),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q1 =</span> <span class="fu">c</span>(<span class="fu">quantile</span>(ev_ppi, <span class="fl">0.25</span>), <span class="fu">quantile</span>(ev_addh9, <span class="fl">0.25</span>), <span class="fu">quantile</span>(ev_tribe, <span class="fl">0.25</span>)),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Median =</span> <span class="fu">c</span>(<span class="fu">median</span>(ev_ppi), <span class="fu">median</span>(ev_addh9), <span class="fu">median</span>(ev_tribe)),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(ev_ppi), <span class="fu">mean</span>(ev_addh9), <span class="fu">mean</span>(ev_tribe)),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Q3 =</span> <span class="fu">c</span>(<span class="fu">quantile</span>(ev_ppi, <span class="fl">0.75</span>), <span class="fu">quantile</span>(ev_addh9, <span class="fl">0.75</span>), <span class="fu">quantile</span>(ev_tribe, <span class="fl">0.75</span>)),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max =</span> <span class="fu">c</span>(<span class="fu">max</span>(ev_ppi), <span class="fu">max</span>(ev_addh9), <span class="fu">max</span>(ev_tribe)),</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD =</span> <span class="fu">c</span>(<span class="fu">sd</span>(ev_ppi), <span class="fu">sd</span>(ev_addh9), <span class="fu">sd</span>(ev_tribe))</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(ev_summary, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Eigenvector Centrality: Summary Statistics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Eigenvector Centrality: Summary Statistics</caption>
 <thead>
 <tr class="header">
-<th>Measure</th>
-<th>Use When…</th>
-<th>Key Question</th>
+<th style="text-align: left;">Network</th>
+<th style="text-align: right;">Min</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">Max</th>
+<th style="text-align: right;">SD</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Degree</strong></td>
-<td>You want to identify most active/connected nodes</td>
-<td>Who has the most connections?</td>
+<td style="text-align: left;">PPI</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0008</td>
+<td style="text-align: right;">0.0069</td>
+<td style="text-align: right;">0.0354</td>
+<td style="text-align: right;">0.0508</td>
+<td style="text-align: right;">0.2672</td>
+<td style="text-align: right;">0.0558</td>
 </tr>
 <tr class="even">
-<td><strong>Closeness</strong></td>
-<td>You care about efficiency in reaching others</td>
-<td>Who can spread information most efficiently?</td>
+<td style="text-align: left;">AddHealth</td>
+<td style="text-align: right;">0.0001</td>
+<td style="text-align: right;">0.0099</td>
+<td style="text-align: right;">0.0287</td>
+<td style="text-align: right;">0.0583</td>
+<td style="text-align: right;">0.0744</td>
+<td style="text-align: right;">0.3584</td>
+<td style="text-align: right;">0.0716</td>
 </tr>
 <tr class="odd">
-<td><strong>Betweenness</strong></td>
-<td>You want to find bridges between groups</td>
-<td>Who controls information flow?</td>
-</tr>
-<tr class="even">
-<td><strong>Eigenvector</strong></td>
-<td>You believe importance comes from being connected to important nodes</td>
-<td>Who’s connected to the influential players?</td>
-</tr>
-<tr class="odd">
-<td><strong>Eccentricity</strong></td>
-<td>You want to know how peripheral a node is</td>
-<td>How far is the farthest node from here?</td>
+<td style="text-align: left;">Tribes</td>
+<td style="text-align: right;">0.0420</td>
+<td style="text-align: right;">0.1085</td>
+<td style="text-align: right;">0.2390</td>
+<td style="text-align: right;">0.2436</td>
+<td style="text-align: right;">0.3716</td>
+<td style="text-align: right;">0.4585</td>
+<td style="text-align: right;">0.1617</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#visualize distributions</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ev_ppi, <span class="at">main =</span> <span class="st">"PPI Network"</span>, <span class="at">xlab =</span> <span class="st">"Eigenvector Centrality"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ev_addh9, <span class="at">main =</span> <span class="st">"AddHealth Network"</span>, <span class="at">xlab =</span> <span class="st">"Eigenvector Centrality"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"lightcoral"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ev_tribe, <span class="at">main =</span> <span class="st">"Tribes Network"</span>, <span class="at">xlab =</span> <span class="st">"Eigenvector Centrality"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"lightgreen"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/eigenvector-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Network-level ev centralization:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ev_central_ppi <span class="ot">&lt;-</span> <span class="fu">centralization</span>(bppi, evcent, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ev_central_addh9 <span class="ot">&lt;-</span> <span class="fu">centralization</span>(addh9, evcent, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ev_central_tribe <span class="ot">&lt;-</span> <span class="fu">centralization</span>(tribe, evcent, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Eigenvector Centralization:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Eigenvector Centralization:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"PPI:"</span>, <span class="fu">round</span>(ev_central_ppi, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PPI: 0.331</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"AddHealth:"</span>, <span class="fu">round</span>(ev_central_addh9, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>AddHealth: 0.432</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tribes:"</span>, <span class="fu">round</span>(ev_central_tribe, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tribes: 0.365</code></pre>
+</div>
+</div>
 </section>
-<section id="network-level-measures" class="level3">
-<h3 class="anchored" data-anchor-id="network-level-measures">6.2 Network-Level Measures</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 34%">
-<col style="width: 40%">
-</colgroup>
+<section id="closeness-centrality-efficiency-in-reaching-others" class="level3">
+<h3 class="anchored" data-anchor-id="closeness-centrality-efficiency-in-reaching-others">1.2 Closeness Centrality: Efficiency in Reaching Others</h3>
+<p>How quickly can you reach everyone else? High closeness means short paths to all other nodes—efficient for spreading information.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>close_ppi <span class="ot">&lt;-</span> <span class="fu">closeness</span>(bppi, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>close_addh9 <span class="ot">&lt;-</span> <span class="fu">closeness</span>(addh9, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>close_tribe <span class="ot">&lt;-</span> <span class="fu">closeness</span>(tribe, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>close_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network =</span> <span class="fu">c</span>(<span class="st">"PPI"</span>, <span class="st">"AddHealth"</span>, <span class="st">"Tribes"</span>),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min =</span> <span class="fu">c</span>(<span class="fu">min</span>(close_ppi), <span class="fu">min</span>(close_addh9), <span class="fu">min</span>(close_tribe)),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Median =</span> <span class="fu">c</span>(<span class="fu">median</span>(close_ppi), <span class="fu">median</span>(close_addh9), <span class="fu">median</span>(close_tribe)),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(close_ppi), <span class="fu">mean</span>(close_addh9), <span class="fu">mean</span>(close_tribe)),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max =</span> <span class="fu">c</span>(<span class="fu">max</span>(close_ppi), <span class="fu">max</span>(close_addh9), <span class="fu">max</span>(close_tribe)),</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD =</span> <span class="fu">c</span>(<span class="fu">sd</span>(close_ppi), <span class="fu">sd</span>(close_addh9), <span class="fu">sd</span>(close_tribe))</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(close_summary, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Closeness Centrality: Summary Statistics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Closeness Centrality: Summary Statistics</caption>
 <thead>
 <tr class="header">
-<th>Measure</th>
-<th>Use When…</th>
-<th>Key Question</th>
+<th style="text-align: left;">Network</th>
+<th style="text-align: right;">Min</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Max</th>
+<th style="text-align: right;">SD</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Density</strong></td>
-<td>You want a quick connectivity summary</td>
-<td>How connected is this network overall?</td>
+<td style="text-align: left;">PPI</td>
+<td style="text-align: right;">0.1363</td>
+<td style="text-align: right;">0.2756</td>
+<td style="text-align: right;">0.2744</td>
+<td style="text-align: right;">0.4053</td>
+<td style="text-align: right;">0.0507</td>
 </tr>
 <tr class="even">
-<td><strong>Diameter</strong></td>
-<td>You care about maximum communication distance</td>
-<td>What’s the longest path between any two nodes?</td>
+<td style="text-align: left;">AddHealth</td>
+<td style="text-align: right;">0.1263</td>
+<td style="text-align: right;">0.2254</td>
+<td style="text-align: right;">0.2241</td>
+<td style="text-align: right;">0.3063</td>
+<td style="text-align: right;">0.0386</td>
 </tr>
 <tr class="odd">
-<td><strong>Average Eccentricity</strong></td>
-<td>You want a typical (not worst-case) reachability measure</td>
-<td>On average, how far can nodes reach?</td>
-</tr>
-<tr class="even">
-<td><strong>Connectivity</strong></td>
-<td>You want to assess network robustness</td>
-<td>How vulnerable is this network to disruption?</td>
-</tr>
-<tr class="odd">
-<td><strong>Centralization</strong></td>
-<td>You want to know if the network has a clear hierarchy</td>
-<td>Is there a dominant central node/structure?</td>
+<td style="text-align: left;">Tribes</td>
+<td style="text-align: right;">0.3929</td>
+<td style="text-align: right;">0.5238</td>
+<td style="text-align: right;">0.5161</td>
+<td style="text-align: right;">0.7333</td>
+<td style="text-align: right;">0.0977</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(close_ppi, <span class="at">main =</span> <span class="st">"PPI"</span>, <span class="at">xlab =</span> <span class="st">"Closeness"</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(close_addh9, <span class="at">main =</span> <span class="st">"AddHealth"</span>, <span class="at">xlab =</span> <span class="st">"Closeness"</span>, <span class="at">col =</span> <span class="st">"lightcoral"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(close_tribe, <span class="at">main =</span> <span class="st">"Tribes"</span>, <span class="at">xlab =</span> <span class="st">"Closeness"</span>, <span class="at">col =</span> <span class="st">"lightgreen"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/closeness-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>close_central_ppi <span class="ot">&lt;-</span> <span class="fu">centralization</span>(bppi, closeness, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>close_central_addh9 <span class="ot">&lt;-</span> <span class="fu">centralization</span>(addh9, closeness, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>close_central_tribe <span class="ot">&lt;-</span> <span class="fu">centralization</span>(tribe, closeness, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"PPI:"</span>, <span class="fu">round</span>(close_central_ppi, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PPI: 0.263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"AddHealth:"</span>, <span class="fu">round</span>(close_central_addh9, <span class="dv">3</span>), <span class="st">"→ Very distributed (cohesive friendships)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>AddHealth: 0.166 → Very distributed (cohesive friendships)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tribes:"</span>, <span class="fu">round</span>(close_central_tribe, <span class="dv">3</span>), <span class="st">"→ Clear geographic/political positioning</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tribes: 0.498 → Clear geographic/political positioning</code></pre>
+</div>
+</div>
 </section>
-<section id="combining-measures" class="level3">
-<h3 class="anchored" data-anchor-id="combining-measures">6.3 Combining Measures</h3>
-<p>The most insightful network analyses use <strong>multiple complementary measures</strong>:</p>
+<section id="betweenness-centrality-bridges-and-brokers" class="level3">
+<h3 class="anchored" data-anchor-id="betweenness-centrality-bridges-and-brokers">1.3 Betweenness Centrality: Bridges and Brokers</h3>
+<p>How often do you lie on shortest paths between others? High betweenness means you’re a bridge connecting different parts of the network.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>btw_ppi <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(bppi, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>btw_addh9 <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(addh9, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>btw_tribe <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(tribe, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>btw_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network =</span> <span class="fu">c</span>(<span class="st">"PPI"</span>, <span class="st">"AddHealth"</span>, <span class="st">"Tribes"</span>),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min =</span> <span class="fu">c</span>(<span class="fu">min</span>(btw_ppi), <span class="fu">min</span>(btw_addh9), <span class="fu">min</span>(btw_tribe)),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Median =</span> <span class="fu">c</span>(<span class="fu">median</span>(btw_ppi), <span class="fu">median</span>(btw_addh9), <span class="fu">median</span>(btw_tribe)),</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(btw_ppi), <span class="fu">mean</span>(btw_addh9), <span class="fu">mean</span>(btw_tribe)),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max =</span> <span class="fu">c</span>(<span class="fu">max</span>(btw_ppi), <span class="fu">max</span>(btw_addh9), <span class="fu">max</span>(btw_tribe)),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD =</span> <span class="fu">c</span>(<span class="fu">sd</span>(btw_ppi), <span class="fu">sd</span>(btw_addh9), <span class="fu">sd</span>(btw_tribe))</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(btw_summary, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Betweenness Centrality: Summary Statistics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Betweenness Centrality: Summary Statistics</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Network</th>
+<th style="text-align: right;">Min</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Max</th>
+<th style="text-align: right;">SD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PPI</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">7.09</td>
+<td style="text-align: right;">318.81</td>
+<td style="text-align: right;">8334.84</td>
+<td style="text-align: right;">785.55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AddHealth</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">92.37</td>
+<td style="text-align: right;">211.32</td>
+<td style="text-align: right;">1669.50</td>
+<td style="text-align: right;">293.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tribes</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">5.50</td>
+<td style="text-align: right;">31.00</td>
+<td style="text-align: right;">9.28</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(btw_ppi, <span class="at">main =</span> <span class="st">"PPI"</span>, <span class="at">xlab =</span> <span class="st">"Betweenness"</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">breaks =</span> <span class="dv">30</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(btw_addh9, <span class="at">main =</span> <span class="st">"AddHealth"</span>, <span class="at">xlab =</span> <span class="st">"Betweenness"</span>, <span class="at">col =</span> <span class="st">"lightcoral"</span>, <span class="at">breaks =</span> <span class="dv">30</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(btw_tribe, <span class="at">main =</span> <span class="st">"Tribes"</span>, <span class="at">xlab =</span> <span class="st">"Betweenness"</span>, <span class="at">col =</span> <span class="st">"lightgreen"</span>, <span class="at">breaks =</span> <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/betweenness-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>btw_central_ppi <span class="ot">&lt;-</span> <span class="fu">centralization</span>(bppi, betweenness, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>btw_central_addh9 <span class="ot">&lt;-</span> <span class="fu">centralization</span>(addh9, betweenness, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>btw_central_tribe <span class="ot">&lt;-</span> <span class="fu">centralization</span>(tribe, betweenness, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"PPI:"</span>, <span class="fu">round</span>(btw_central_ppi, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PPI: 0.308 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"AddHealth:"</span>, <span class="fu">round</span>(btw_central_addh9, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>AddHealth: 0.217 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tribes:"</span>, <span class="fu">round</span>(btw_central_tribe, <span class="dv">3</span>), <span class="st">"→ Critical bridge tribes</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tribes: 0.506 → Critical bridge tribes</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Betweenness is usually right-skewed. Most nodes have near-zero betweenness (they’re not on many shortest paths), while a few “broker” nodes have extremely high values.</p>
+</div>
+</div>
+</section>
+<section id="degree-centrality-the-simple-count" class="level3">
+<h3 class="anchored" data-anchor-id="degree-centrality-the-simple-count">1.3 Degree Centrality: The Simple Count</h3>
+<p>Don’t forget the basics! <strong>Degree</strong> just counts direct connections. Often the most interpretable measure.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>deg_ppi <span class="ot">&lt;-</span> <span class="fu">degree</span>(bppi, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>deg_addh9 <span class="ot">&lt;-</span> <span class="fu">degree</span>(addh9, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>deg_tribe <span class="ot">&lt;-</span> <span class="fu">degree</span>(tribe, <span class="at">gmode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>degree_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network =</span> <span class="fu">c</span>(<span class="st">"PPI"</span>, <span class="st">"AddHealth"</span>, <span class="st">"Tribes"</span>),</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min =</span> <span class="fu">c</span>(<span class="fu">min</span>(deg_ppi), <span class="fu">min</span>(deg_addh9), <span class="fu">min</span>(deg_tribe)),</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Median =</span> <span class="fu">c</span>(<span class="fu">median</span>(deg_ppi), <span class="fu">median</span>(deg_addh9), <span class="fu">median</span>(deg_tribe)),</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(deg_ppi), <span class="fu">mean</span>(deg_addh9), <span class="fu">mean</span>(deg_tribe)),</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max =</span> <span class="fu">c</span>(<span class="fu">max</span>(deg_ppi), <span class="fu">max</span>(deg_addh9), <span class="fu">max</span>(deg_tribe))</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(degree_summary, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Degree: Summary Statistics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Degree: Summary Statistics</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Network</th>
+<th style="text-align: right;">Min</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PPI</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">6.04</td>
+<td style="text-align: right;">36</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AddHealth</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4.63</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tribes</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3.83</td>
+<td style="text-align: right;">7</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(deg_ppi, <span class="at">main =</span> <span class="st">"PPI"</span>, <span class="at">xlab =</span> <span class="st">"Degree"</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(deg_addh9, <span class="at">main =</span> <span class="st">"AddHealth"</span>, <span class="at">xlab =</span> <span class="st">"Degree"</span>, <span class="at">col =</span> <span class="st">"lightcoral"</span>, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(deg_tribe, <span class="at">main =</span> <span class="st">"Tribes"</span>, <span class="at">xlab =</span> <span class="st">"Degree"</span>, <span class="at">col =</span> <span class="st">"lightgreen"</span>, <span class="at">breaks =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/degree-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>deg_central_ppi <span class="ot">&lt;-</span> <span class="fu">centralization</span>(bppi, degree, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>deg_central_addh9 <span class="ot">&lt;-</span> <span class="fu">centralization</span>(addh9, degree, <span class="at">mode =</span> <span class="st">"graph"</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>deg_central_tribe <span class="ot">&lt;-</span> <span class="fu">centralization</span>(tribe, degree, <span class="at">mode =</span> <span class="st">"graph"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="comparing-all-four-centrality-measures" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-all-four-centrality-measures">1.5 Comparing All Four Centrality Measures</h3>
+<p>Do different centrality measures agree? Let’s check correlations:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#PPI network correlations</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>cent_ppi <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Degree =</span> deg_ppi, <span class="at">Eigenvector =</span> ev_ppi, </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">Closeness =</span> close_ppi, <span class="at">Betweenness =</span> btw_ppi)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>cor_ppi <span class="ot">&lt;-</span> <span class="fu">cor</span>(cent_ppi)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(cor_ppi, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Centrality Correlations: PPI Network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Centrality Correlations: PPI Network</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Degree</th>
+<th style="text-align: right;">Eigenvector</th>
+<th style="text-align: right;">Closeness</th>
+<th style="text-align: right;">Betweenness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Degree</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.891</td>
+<td style="text-align: right;">0.717</td>
+<td style="text-align: right;">0.578</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Eigenvector</td>
+<td style="text-align: right;">0.891</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.662</td>
+<td style="text-align: right;">0.258</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Closeness</td>
+<td style="text-align: right;">0.717</td>
+<td style="text-align: right;">0.662</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.492</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Betweenness</td>
+<td style="text-align: right;">0.578</td>
+<td style="text-align: right;">0.258</td>
+<td style="text-align: right;">0.492</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#AddHealth correlations</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>cent_addh9 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Degree =</span> deg_addh9, <span class="at">Eigenvector =</span> ev_addh9, </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">Closeness =</span> close_addh9, <span class="at">Betweenness =</span> btw_addh9)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>cor_addh9 <span class="ot">&lt;-</span> <span class="fu">cor</span>(cent_addh9)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(cor_addh9, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Centrality Correlations: AddHealth Network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Centrality Correlations: AddHealth Network</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Degree</th>
+<th style="text-align: right;">Eigenvector</th>
+<th style="text-align: right;">Closeness</th>
+<th style="text-align: right;">Betweenness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Degree</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.648</td>
+<td style="text-align: right;">0.572</td>
+<td style="text-align: right;">0.582</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Eigenvector</td>
+<td style="text-align: right;">0.648</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.729</td>
+<td style="text-align: right;">0.401</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Closeness</td>
+<td style="text-align: right;">0.572</td>
+<td style="text-align: right;">0.729</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.556</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Betweenness</td>
+<td style="text-align: right;">0.582</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">0.556</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Tribes correlations</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>cent_tribe <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Degree =</span> deg_tribe, <span class="at">Eigenvector =</span> ev_tribe, </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">Closeness =</span> close_tribe, <span class="at">Betweenness =</span> btw_tribe)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>cor_tribe <span class="ot">&lt;-</span> <span class="fu">cor</span>(cent_tribe)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(cor_tribe, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Centrality Correlations: Tribes Network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Centrality Correlations: Tribes Network</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Degree</th>
+<th style="text-align: right;">Eigenvector</th>
+<th style="text-align: right;">Closeness</th>
+<th style="text-align: right;">Betweenness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Degree</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.870</td>
+<td style="text-align: right;">0.910</td>
+<td style="text-align: right;">0.664</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Eigenvector</td>
+<td style="text-align: right;">0.870</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.721</td>
+<td style="text-align: right;">0.322</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Closeness</td>
+<td style="text-align: right;">0.910</td>
+<td style="text-align: right;">0.721</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.826</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Betweenness</td>
+<td style="text-align: right;">0.664</td>
+<td style="text-align: right;">0.322</td>
+<td style="text-align: right;">0.826</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Summary: network centralization comparison</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>centralization_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Network =</span> <span class="fu">c</span>(<span class="st">"PPI"</span>, <span class="st">"AddHealth"</span>, <span class="st">"Tribes"</span>),</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Degree =</span> <span class="fu">c</span>(deg_central_ppi, deg_central_addh9, deg_central_tribe),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Closeness =</span> <span class="fu">c</span>(close_central_ppi, close_central_addh9, close_central_tribe),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Betweenness =</span> <span class="fu">c</span>(btw_central_ppi, btw_central_addh9, btw_central_tribe),</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Eigenvector =</span> <span class="fu">c</span>(ev_central_ppi, ev_central_addh9, ev_central_tribe)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(centralization_df, <span class="at">digits =</span> <span class="dv">3</span>, </span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Network Centralization: Comprehensive Comparison"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Network Centralization: Comprehensive Comparison</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Network</th>
+<th style="text-align: right;">Degree</th>
+<th style="text-align: right;">Closeness</th>
+<th style="text-align: right;">Betweenness</th>
+<th style="text-align: right;">Eigenvector</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PPI</td>
+<td style="text-align: right;">0.132</td>
+<td style="text-align: right;">0.263</td>
+<td style="text-align: right;">0.308</td>
+<td style="text-align: right;">0.331</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AddHealth</td>
+<td style="text-align: right;">0.073</td>
+<td style="text-align: right;">0.166</td>
+<td style="text-align: right;">0.217</td>
+<td style="text-align: right;">0.432</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tribes</td>
+<td style="text-align: right;">0.345</td>
+<td style="text-align: right;">0.498</td>
+<td style="text-align: right;">0.506</td>
+<td style="text-align: right;">0.365</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul>
-<li><strong>Describe structure:</strong> Start with density and degree distribution to understand basic connectivity</li>
-<li><strong>Identify key nodes:</strong> Use multiple centrality measures—degree (volume), betweenness (brokerage), eigenvector (prestige)<br>
-</li>
-<li><strong>Assess robustness:</strong> Combine connectivity and diameter to understand vulnerability</li>
-<li><strong>Compare networks:</strong> Use normalized measures (density, centralization, scaled eccentricity) for valid comparisons</li>
+<li><strong>Degree &amp; Eigenvector</strong> often correlate highly (popular nodes tend to know popular people)</li>
+<li><strong>Betweenness</strong> often correlates weakly with other kinds of centrality (bridges aren’t always hubs)</li>
+<li><strong>Closeness</strong> depends on overall network structure</li>
+<li>Always compute multiple measures, each reveals different aspects of importance.</li>
 </ul>
-<div class="callout-tips">
-<p>There is no universally best network measure. The right choice depends on: - Your research question (What kind of importance matters?) - Your network type (Social? Biological? Infrastructure?) - Your domain knowledge (What processes are you modeling?)</p>
-<p>Use theory and context to guide your choice, not just computational convenience.</p>
+</div>
 </div>
 </section>
 </section>
-<section id="references-and-further-reading" class="level2">
-<h2 class="anchored" data-anchor-id="references-and-further-reading">References and Further Reading</h2>
-<p>Eric Kolaczyk. Statistical Analysis of Network Data (2009).Springer http://link.springer.com/book/10.1007%2F978-0-387-88146-1Links</p>
-<p>Eric Kolaczyk and Gabor Csardi. Statistical Analysis of Network Data with R (2014). Springer http://link.springer.com/book/10.1007%2F978-1-4939-0983-4Links</p>
-<p>David Easley and Jon Kleinberg. “Networks, Crowds, and Markets: Reasoning about a Highly Connected World (2010). https://www.cs.cornell.edu/home/kleinber/networks-book/Links to an external site.</p>
-<p><em>This tutorial is based on coursework from STATS 218: Social Network Analysis.</em></p>
+<section id="connectivity-robustness-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="connectivity-robustness-analysis">2. Connectivity &amp; Robustness Analysis</h2>
+<p>Let’s shift to Renaissance Florence (the Florentine Marriage Network) to study <strong>network connectivity</strong>. How robust is a network to node removal?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(florentine)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>flo_lc <span class="ot">&lt;-</span> <span class="fu">as.network</span>(<span class="fu">component.largest</span>(flomarriage, <span class="at">result =</span> <span class="st">"graph"</span>), </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="finding-cutpoints-critical-nodes" class="level3">
+<h3 class="anchored" data-anchor-id="finding-cutpoints-critical-nodes">2.1 Finding cutpoints: critical nodes</h3>
+<p>A <strong>cutpoint</strong> (or articulation point) is a node whose removal disconnects the network. These are structurally critical positions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>cutpoints_indicator <span class="ot">&lt;-</span> <span class="fu">cutpoints</span>(flo_lc, <span class="at">mode =</span> <span class="st">"graph"</span>, <span class="at">return.indicator =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>cutpoint_families <span class="ot">&lt;-</span> <span class="fu">network.vertex.names</span>(flo_lc)[<span class="fu">which</span>(cutpoints_indicator <span class="sc">==</span> <span class="dv">1</span>)]</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Cutpoint families (critical bridges):</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cutpoint families (critical bridges):</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cutpoint_families)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Albizzi"  "Guadagni" "Medici"   "Salviati"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Number of cutpoints:"</span>, <span class="fu">length</span>(cutpoint_families), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Number of cutpoints: 4 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(flo_lc, </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.col =</span> <span class="fu">ifelse</span>(cutpoints_indicator <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"red"</span>, <span class="st">"lightblue"</span>),</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="dv">2</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">displaylabels =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">label.cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Florentine Marriage Network</span><span class="sc">\n</span><span class="st">(Cutpoints in Red)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cutpoints-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Cutpoint families are <strong>structural bridges</strong>. Their removal would fragment the network:</p>
+<ul>
+<li>Removing a cutpoint increases the number of components</li>
+<li>These families have unique structural importance beyond degree or centrality</li>
+<li>In alliance networks, cutpoints are vulnerable attack targets</li>
+</ul>
+<p>The Florentine network has 4 cutpoints, showing moderate robustness.</p>
+</div>
+</div>
+</section>
+<section id="vertex-connectivity-vs-edge-connectivity" class="level3">
+<h3 class="anchored" data-anchor-id="vertex-connectivity-vs-edge-connectivity">2.3 Vertex Connectivity vs Edge Connectivity</h3>
+<p><strong>Vertex connectivity (κ):</strong> Minimum number of nodes to remove to disconnect the network<br>
+<strong>Edge connectivity (λ):</strong> Minimum number of edges to remove to disconnect the network</p>
+<p>For Florentine marriages:</p>
+<ul>
+<li>Vertex connectivity = 1 (because cutpoints exist—removing one node disconnects it)</li>
+<li>This makes it relatively <strong>vulnerable</strong> to targeted attacks</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Application Importance:</p>
+<ul>
+<li><strong>Social networks:</strong> Cutpoints are key brokers; losing them fragments communities</li>
+<li><strong>Infrastructure:</strong> Cutpoints are failure points in transportation/communication networks</li>
+<li><strong>Organizational networks:</strong> Cutpoints identify critical personnel for knowledge transfer</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="degree-distribution-modeling" class="level3">
+<h3 class="anchored" data-anchor-id="degree-distribution-modeling">3.1 Degree Distribution Modeling</h3>
+<p>The Yeast Protein Interaction Network. Now let’s analyze a large biological network to understand <strong>degree distributions</strong>, the pattern of connectivity across nodes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>yeast_data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"CCSB-Y2H.txt"</span>, </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">header =</span> <span class="cn">FALSE</span>, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>yeast_edgelist <span class="ot">&lt;-</span> yeast_data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="co">#check self-loops</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(yeast_edgelist[,<span class="dv">1</span>] <span class="sc">==</span> yeast_edgelist[,<span class="dv">2</span>]) <span class="co">#total have 168 self-loops</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="co">#remove self-loops</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>yeast_edgelist_clean <span class="ot">&lt;-</span> yeast_edgelist[yeast_edgelist[, <span class="dv">1</span>] <span class="sc">!=</span> yeast_edgelist[, <span class="dv">2</span>], ]</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Original edges:"</span>, <span class="fu">nrow</span>(yeast_edgelist), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Edges after removing self-loops:"</span>, <span class="fu">nrow</span>(yeast_edgelist_clean), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="creating-directed-network-and-computing-degrees" class="level3">
+<h3 class="anchored" data-anchor-id="creating-directed-network-and-computing-degrees">4.1 Creating directed network and computing degrees</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create directed network</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>yeast_edgelist_clean <span class="ot">&lt;-</span> butland_ppi</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>yeast_net <span class="ot">&lt;-</span> <span class="fu">network</span>(yeast_edgelist_clean, <span class="at">matrix.type =</span> <span class="st">"edgelist"</span>, <span class="at">directed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute degree sequences</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>out_deg <span class="ot">&lt;-</span> <span class="fu">degree</span>(yeast_net, <span class="at">cmode =</span> <span class="st">"outdegree"</span>)  <span class="co"># Proteins this protein binds to</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>in_deg <span class="ot">&lt;-</span> <span class="fu">degree</span>(yeast_net, <span class="at">cmode =</span> <span class="st">"indegree"</span>)    <span class="co"># Proteins that bind to this protein</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>total_deg <span class="ot">&lt;-</span> out_deg <span class="sc">+</span> in_deg                      <span class="co"># Total activity</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Check correlation</span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>cor_in_out <span class="ot">&lt;-</span> <span class="fu">cor</span>(in_deg, out_deg)</span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Correlation between in-degree and out-degree:"</span>, <span class="fu">round</span>(cor_in_out, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Correlation between in-degree and out-degree: 0.116 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize degree distributions</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(out_deg, <span class="at">breaks =</span> <span class="dv">30</span>, <span class="at">main =</span> <span class="st">"Out-Degree Distribution"</span>,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Out-Degree"</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">cex.main =</span> <span class="fl">1.5</span>)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(in_deg, <span class="at">breaks =</span> <span class="dv">30</span>, <span class="at">main =</span> <span class="st">"In-Degree Distribution"</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"In-Degree"</span>, <span class="at">col =</span> <span class="st">"lightgreen"</span>, <span class="at">cex.main =</span> <span class="fl">1.5</span>)</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(total_deg, <span class="at">breaks =</span> <span class="dv">30</span>, <span class="at">main =</span> <span class="st">"Total Degree Distribution"</span>,</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Total Degree"</span>, <span class="at">col =</span> <span class="st">"lightcoral"</span>, <span class="at">cex.main =</span> <span class="fl">1.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/yeast-directed-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="fitting-degree-distribution-models" class="level3">
+<h3 class="anchored" data-anchor-id="fitting-degree-distribution-models">4.2 Fitting degree distribution models</h3>
+<p>Many biological networks show <strong>heavy-tailed</strong> degree distributions (a few “hub” proteins with many connections). Let’s test different statistical models:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co">#fit various degree distribution models</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="co">#note: These require the degreenet package</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Discrete Pareto/Zipf (power law)</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>dpml_fit <span class="ot">&lt;-</span> <span class="fu">adpmle</span>(total_deg)</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Yule distribution</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>yule_fit <span class="ot">&lt;-</span> <span class="fu">ayulemle</span>(total_deg)</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Waring distribution</span></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>waring_fit <span class="ot">&lt;-</span> <span class="fu">awarmle</span>(total_deg)</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Poisson distribution</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>pois_fit <span class="ot">&lt;-</span> <span class="fu">apoimle</span>(total_deg)</span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Conway-Maxwell-Poisson</span></span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a>cmp_fit <span class="ot">&lt;-</span> <span class="fu">acmpmle</span>(total_deg)</span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a><span class="co">#compare models using AIC/BIC</span></span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a><span class="co">#lower values = better fit</span></span>
+<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a>model_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Zipf"</span>, <span class="st">"Yule"</span>, <span class="st">"Waring"</span>, <span class="st">"Poisson"</span>, <span class="st">"CMP"</span>),</span>
+<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">c</span>(dpml_fit<span class="sc">$</span>AIC, yule_fit<span class="sc">$</span>AIC, waring_fit<span class="sc">$</span>AIC, </span>
+<span id="cb55-24"><a href="#cb55-24" aria-hidden="true" tabindex="-1"></a>          pois_fit<span class="sc">$</span>AIC, cmp_fit<span class="sc">$</span>AIC),</span>
+<span id="cb55-25"><a href="#cb55-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">BIC =</span> <span class="fu">c</span>(dpml_fit<span class="sc">$</span>BIC, yule_fit<span class="sc">$</span>BIC, waring_fit<span class="sc">$</span>BIC, </span>
+<span id="cb55-26"><a href="#cb55-26" aria-hidden="true" tabindex="-1"></a>          pois_fit<span class="sc">$</span>BIC, cmp_fit<span class="sc">$</span>BIC)</span>
+<span id="cb55-27"><a href="#cb55-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb55-28"><a href="#cb55-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-29"><a href="#cb55-29" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(model_comparison, <span class="at">digits =</span> <span class="dv">1</span>, </span>
+<span id="cb55-30"><a href="#cb55-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Degree Distribution Model Comparison (Lower = Better)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Common Degree Distributions in Real Networks
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Power law (Zipf/Yule):</strong> “Scale-free” networks. Common in biological, social, and technological networks. A few hubs dominate.</li>
+<li><strong>Poisson:</strong> Random networks. Most nodes have similar degree around the mean.</li>
+<li><strong>Waring:</strong> Overdispersed. More variability than Poisson.</li>
+<li><strong>CMP:</strong> Flexible—can be overdispersed or underdispersed.</li>
+</ul>
+<p>Protein interaction networks typically show power-law-like distributions.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="component-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="component-analysis">4. Component Analysis</h2>
+<section id="finding-giant-components-in-large-networks" class="level3">
+<h3 class="anchored" data-anchor-id="finding-giant-components-in-large-networks">4.1 Finding giant components in large networks</h3>
+<p>When networks are large and potentially fragmented, <strong>component analysis</strong> is crucial. Let’s analyze the undirected yeast network:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>yeast_net_undirected <span class="ot">&lt;-</span> <span class="fu">network</span>(yeast_edgelist_clean, </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">matrix.type =</span> <span class="st">"edgelist"</span>, </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Network size:"</span>, <span class="fu">network.size</span>(yeast_net_undirected), <span class="st">"proteins</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Network size: 270 proteins</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of edges:"</span>, <span class="fu">network.edgecount</span>(yeast_net_undirected), <span class="st">"interactions</span><span class="sc">\n\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of edges: 716 interactions</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>comp_dist <span class="ot">&lt;-</span> <span class="fu">component.dist</span>(yeast_net_undirected)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>sorted_sizes <span class="ot">&lt;-</span> <span class="fu">sort</span>(comp_dist<span class="sc">$</span>csize, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of components:"</span>, <span class="fu">length</span>(comp_dist<span class="sc">$</span>csize), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of components: 20 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Largest component size:"</span>, sorted_sizes[<span class="dv">1</span>], <span class="st">"proteins</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Largest component size: 230 proteins</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Second largest:"</span>, sorted_sizes[<span class="dv">2</span>], <span class="st">"proteins</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Second largest: 3 proteins</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Component sizes:"</span>, <span class="fu">head</span>(sorted_sizes, <span class="dv">10</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Component sizes: 230 3 3 2 2 2 2 2 2 2 </code></pre>
+</div>
+</div>
+</section>
+<section id="does-it-have-a-giant-component" class="level3">
+<h3 class="anchored" data-anchor-id="does-it-have-a-giant-component">4.2 Does It Have a Giant Component?</h3>
+<p>A <strong>giant component</strong> is one that contains a substantial fraction of all nodes (typically &gt;50%).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>n_total <span class="ot">&lt;-</span> <span class="fu">network.size</span>(yeast_net_undirected)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>largest_size <span class="ot">&lt;-</span> <span class="fu">max</span>(comp_dist<span class="sc">$</span>csize)</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>proportion_in_largest <span class="ot">&lt;-</span> largest_size <span class="sc">/</span> n_total</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Proportion in largest component:"</span>, <span class="fu">round</span>(proportion_in_largest, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Proportion in largest component: 0.852 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (proportion_in_largest <span class="sc">&gt;</span> <span class="fl">0.5</span>) {</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"YES - This network has a GIANT COMPONENT!</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Interpretation: Most proteins are interconnected in one large interaction network.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"NO giant component - network is highly fragmented.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>YES - This network has a GIANT COMPONENT!
+Interpretation: Most proteins are interconnected in one large interaction network.</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizing-the-largest-component" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-largest-component">4.4 Visualizing the largest component</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>largest_comp_id <span class="ot">&lt;-</span> <span class="fu">which.max</span>(comp_dist<span class="sc">$</span>csize)</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>nodes_in_largest <span class="ot">&lt;-</span> <span class="fu">which</span>(comp_dist<span class="sc">$</span>membership <span class="sc">==</span> largest_comp_id)</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>largest_component <span class="ot">&lt;-</span> <span class="fu">get.inducedSubgraph</span>(yeast_net_undirected, <span class="at">v =</span> nodes_in_largest)</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>largest_comp_degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(largest_component, <span class="at">cmode =</span> <span class="st">"freeman"</span>)</span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(largest_component,</span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"Largest Component:"</span>, <span class="fu">max</span>(comp_dist<span class="sc">$</span>csize), <span class="st">"Proteins"</span>),</span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="fu">sqrt</span>(largest_comp_degree) <span class="sc">*</span> <span class="fl">0.3</span>,</span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.col =</span> <span class="st">"lightblue"</span>,</span>
+<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.col =</span> <span class="fu">rgb</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.2</span>),</span>
+<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">displayisolates =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-largest-component-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="geodesic-distance-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="geodesic-distance-analysis">4.5 Geodesic Distance Analysis</h3>
+<p>For the full network, let’s analyze <strong>geodesic distances</strong> (shortest paths):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co">#compute all pairwise geodesic distances</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>geodist_matrix <span class="ot">&lt;-</span> <span class="fu">geodist</span>(yeast_net_undirected)</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>dist_matrix <span class="ot">&lt;-</span> geodist_matrix<span class="sc">$</span>gdist</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a><span class="co">#extract upper triangle (undirected network is symmetric)</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>upper_tri_indices <span class="ot">&lt;-</span> <span class="fu">upper.tri</span>(dist_matrix)</span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>all_distances <span class="ot">&lt;-</span> dist_matrix[upper_tri_indices]</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a><span class="co">#separate reachable and unreachable pairs</span></span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>reachable_distances <span class="ot">&lt;-</span> all_distances[<span class="fu">is.finite</span>(all_distances)]</span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>n_reachable <span class="ot">&lt;-</span> <span class="fu">length</span>(reachable_distances)</span>
+<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a>total_pairs <span class="ot">&lt;-</span> <span class="fu">length</span>(all_distances)</span>
+<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-14"><a href="#cb73-14" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate statistics</span></span>
+<span id="cb73-15"><a href="#cb73-15" aria-hidden="true" tabindex="-1"></a>prop_reachable <span class="ot">&lt;-</span> n_reachable <span class="sc">/</span> total_pairs</span>
+<span id="cb73-16"><a href="#cb73-16" aria-hidden="true" tabindex="-1"></a>mean_geodist <span class="ot">&lt;-</span> <span class="fu">mean</span>(reachable_distances)</span>
+<span id="cb73-17"><a href="#cb73-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-18"><a href="#cb73-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Total node pairs:"</span>, total_pairs, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total node pairs: 36315 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reachable pairs:"</span>, n_reachable, <span class="st">"("</span>, <span class="fu">round</span>(prop_reachable <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">"%)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reachable pairs: 26358 ( 72.6 %)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean geodesic distance:"</span>, <span class="fu">round</span>(mean_geodist, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean geodesic distance: 3.78 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co">#distance distribution</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>distance_table <span class="ot">&lt;-</span> <span class="fu">table</span>(reachable_distances)</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>distance_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Distance =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(distance_table)),</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Frequency =</span> <span class="fu">as.numeric</span>(distance_table),</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Proportion =</span> <span class="fu">round</span>(<span class="fu">as.numeric</span>(distance_table) <span class="sc">/</span> n_reachable, <span class="dv">4</span>)</span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(distance_df, <span class="at">caption =</span> <span class="st">"Geodesic Distance Distribution (Reachable Pairs)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Geodesic Distance Distribution (Reachable Pairs)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Distance</th>
+<th style="text-align: right;">Frequency</th>
+<th style="text-align: right;">Proportion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">716</td>
+<td style="text-align: right;">0.0272</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3607</td>
+<td style="text-align: right;">0.1368</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">6943</td>
+<td style="text-align: right;">0.2634</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">8358</td>
+<td style="text-align: right;">0.3171</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4138</td>
+<td style="text-align: right;">0.1570</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1667</td>
+<td style="text-align: right;">0.0632</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">686</td>
+<td style="text-align: right;">0.0260</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">197</td>
+<td style="text-align: right;">0.0075</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">0.0014</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0.0003</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co">#visualize</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(reachable_distances,</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(reachable_distances) <span class="sc">+</span> <span class="dv">1</span>, <span class="at">by =</span> <span class="dv">1</span>) <span class="sc">-</span> <span class="fl">0.5</span>,</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Distribution of Geodesic Distances"</span>,</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Shortest Path Length"</span>,</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"skyblue"</span>,</span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">border =</span> <span class="st">"white"</span>)</span>
+<span id="cb80-9"><a href="#cb80-9" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> mean_geodist, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb80-10"><a href="#cb80-10" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">paste</span>(<span class="st">"Mean ="</span>, <span class="fu">round</span>(mean_geodist, <span class="dv">2</span>)),</span>
+<span id="cb80-11"><a href="#cb80-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/geodesic-analysis-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Proportion reachable:</strong> Shows how connected the network is overall</li>
+<li><strong>Mean geodesic distance:</strong> Average “degrees of separation” in the network</li>
+<li><strong>Distribution shape:</strong> Tells us if distances are uniform or if some pairs are very far apart</li>
+</ul>
+<p>Small-world networks have short average distances despite large size!</p>
+</div>
+</div>
+</section>
+</section>
+<section id="temporal-network-analysis---cold-war-dynamics" class="level2">
+<h2 class="anchored" data-anchor-id="temporal-network-analysis---cold-war-dynamics">5. Temporal Network Analysis - Cold War Dynamics</h2>
+<p>So far, we’ve analyzed <strong>static</strong> networks—single snapshots. But many real networks evolve! Let’s analyze <strong>Cold War cooperation networks from 1950-1985</strong>.</p>
+<p>Load the Cold War dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(coldwar)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a><span class="co">#This is a 3D array: 66 countries × 66 countries × 8 time periods</span></span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>cc_array <span class="ot">&lt;-</span> coldwar<span class="sc">$</span>cc   <span class="co">#cooperation and conflict network</span></span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">dimnames</span>(coldwar<span class="sc">$</span>cc)[[<span class="dv">1</span>]]</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">dimnames</span>(coldwar<span class="sc">$</span>cc)[[<span class="dv">3</span>]]</span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Dataset structure:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset structure:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Countries:"</span>, <span class="fu">length</span>(countries), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Countries: 66 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Time periods:"</span>, <span class="fu">length</span>(years), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time periods: 8 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Years:"</span>, years, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Years: 1950 1955 1960 1965 1970 1975 1980 1985 </code></pre>
+</div>
+</div>
+<section id="analyzing-components-across-time" class="level3">
+<h3 class="anchored" data-anchor-id="analyzing-components-across-time">5.1 Analyzing components across time</h3>
+<p>For each year, let’s identify the two largest alliance blocs:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co">#store results</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>component_results <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a><span class="co">#analyze each year</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(years)) {</span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>  year <span class="ot">&lt;-</span> years[i]</span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== Year:"</span>, year, <span class="st">"===</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#extract adjacency matrix for this year</span></span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a>  adj_matrix <span class="ot">&lt;-</span> cc_array[, , i]</span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#keep only cooperative relations (set negative to 0)</span></span>
+<span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a>  adj_matrix[adj_matrix <span class="sc">&lt;</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb89-14"><a href="#cb89-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">diag</span>(adj_matrix) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb89-15"><a href="#cb89-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb89-16"><a href="#cb89-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#create network</span></span>
+<span id="cb89-17"><a href="#cb89-17" aria-hidden="true" tabindex="-1"></a>  net_year <span class="ot">&lt;-</span> <span class="fu">network</span>(adj_matrix, <span class="at">matrix.type =</span> <span class="st">"adjacency"</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb89-18"><a href="#cb89-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">network.vertex.names</span>(net_year) <span class="ot">&lt;-</span> countries</span>
+<span id="cb89-19"><a href="#cb89-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb89-20"><a href="#cb89-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#compute components</span></span>
+<span id="cb89-21"><a href="#cb89-21" aria-hidden="true" tabindex="-1"></a>  comp_dist_year <span class="ot">&lt;-</span> <span class="fu">component.dist</span>(net_year)</span>
+<span id="cb89-22"><a href="#cb89-22" aria-hidden="true" tabindex="-1"></a>  sorted_comp_sizes <span class="ot">&lt;-</span> <span class="fu">sort</span>(comp_dist_year<span class="sc">$</span>csize, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb89-23"><a href="#cb89-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb89-24"><a href="#cb89-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Number of components:"</span>, <span class="fu">length</span>(comp_dist_year<span class="sc">$</span>csize), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb89-25"><a href="#cb89-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Top 3 component sizes:"</span>, <span class="fu">head</span>(sorted_comp_sizes, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb89-26"><a href="#cb89-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb89-27"><a href="#cb89-27" aria-hidden="true" tabindex="-1"></a>  <span class="co">#get two largest components</span></span>
+<span id="cb89-28"><a href="#cb89-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(comp_dist_year<span class="sc">$</span>csize) <span class="sc">&gt;=</span> <span class="dv">2</span>) {</span>
+<span id="cb89-29"><a href="#cb89-29" aria-hidden="true" tabindex="-1"></a>    largest_size <span class="ot">&lt;-</span> sorted_comp_sizes[<span class="dv">1</span>]</span>
+<span id="cb89-30"><a href="#cb89-30" aria-hidden="true" tabindex="-1"></a>    second_largest_size <span class="ot">&lt;-</span> sorted_comp_sizes[<span class="dv">2</span>]</span>
+<span id="cb89-31"><a href="#cb89-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb89-32"><a href="#cb89-32" aria-hidden="true" tabindex="-1"></a>    largest_id <span class="ot">&lt;-</span> <span class="fu">which</span>(comp_dist_year<span class="sc">$</span>csize <span class="sc">==</span> largest_size)[<span class="dv">1</span>]</span>
+<span id="cb89-33"><a href="#cb89-33" aria-hidden="true" tabindex="-1"></a>    second_largest_id <span class="ot">&lt;-</span> <span class="fu">which</span>(comp_dist_year<span class="sc">$</span>csize <span class="sc">==</span> second_largest_size)</span>
+<span id="cb89-34"><a href="#cb89-34" aria-hidden="true" tabindex="-1"></a>    second_largest_id <span class="ot">&lt;-</span> second_largest_id[second_largest_id <span class="sc">!=</span> largest_id][<span class="dv">1</span>]</span>
+<span id="cb89-35"><a href="#cb89-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb89-36"><a href="#cb89-36" aria-hidden="true" tabindex="-1"></a>    countries_largest <span class="ot">&lt;-</span> countries[comp_dist_year<span class="sc">$</span>membership <span class="sc">==</span> largest_id]</span>
+<span id="cb89-37"><a href="#cb89-37" aria-hidden="true" tabindex="-1"></a>    countries_second <span class="ot">&lt;-</span> countries[comp_dist_year<span class="sc">$</span>membership <span class="sc">==</span> second_largest_id]</span>
+<span id="cb89-38"><a href="#cb89-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb89-39"><a href="#cb89-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Largest component ("</span>, largest_size, <span class="st">" countries):</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
+<span id="cb89-40"><a href="#cb89-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste</span>(countries_largest, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb89-41"><a href="#cb89-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb89-42"><a href="#cb89-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Second largest ("</span>, second_largest_size, <span class="st">" countries):</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
+<span id="cb89-43"><a href="#cb89-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste</span>(countries_second, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb89-44"><a href="#cb89-44" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb89-45"><a href="#cb89-45" aria-hidden="true" tabindex="-1"></a>    component_results[[year]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb89-46"><a href="#cb89-46" aria-hidden="true" tabindex="-1"></a>      <span class="at">largest =</span> countries_largest,</span>
+<span id="cb89-47"><a href="#cb89-47" aria-hidden="true" tabindex="-1"></a>      <span class="at">second_largest =</span> countries_second,</span>
+<span id="cb89-48"><a href="#cb89-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">largest_size =</span> largest_size,</span>
+<span id="cb89-49"><a href="#cb89-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">second_size =</span> second_largest_size</span>
+<span id="cb89-50"><a href="#cb89-50" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb89-51"><a href="#cb89-51" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb89-52"><a href="#cb89-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Only ONE component exists (all countries connected)</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb89-53"><a href="#cb89-53" aria-hidden="true" tabindex="-1"></a>    component_results[[year]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb89-54"><a href="#cb89-54" aria-hidden="true" tabindex="-1"></a>      <span class="at">largest =</span> countries,</span>
+<span id="cb89-55"><a href="#cb89-55" aria-hidden="true" tabindex="-1"></a>      <span class="at">second_largest =</span> <span class="fu">character</span>(<span class="dv">0</span>),</span>
+<span id="cb89-56"><a href="#cb89-56" aria-hidden="true" tabindex="-1"></a>      <span class="at">largest_size =</span> comp_dist_year<span class="sc">$</span>csize[<span class="dv">1</span>],</span>
+<span id="cb89-57"><a href="#cb89-57" aria-hidden="true" tabindex="-1"></a>      <span class="at">second_size =</span> <span class="dv">0</span></span>
+<span id="cb89-58"><a href="#cb89-58" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb89-59"><a href="#cb89-59" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb89-60"><a href="#cb89-60" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Year: 1950 ===
+Number of components: 55 
+Top 3 component sizes: 8 4 2 
+
+Largest component (8 countries):
+AUL, CAN, NEW, PHI, ROK, TUR, UKG, USA 
+
+Second largest (4 countries):
+BUL, HUN, RUM, USR 
+
+=== Year: 1955 ===
+Number of components: 64 
+Top 3 component sizes: 3 1 1 
+
+Largest component (3 countries):
+ROK, TAW, USA 
+
+Second largest (1 countries):
+AFG 
+
+=== Year: 1960 ===
+Number of components: 62 
+Top 3 component sizes: 4 2 1 
+
+Largest component (4 countries):
+NOR, ROK, TUR, USA 
+
+Second largest (2 countries):
+CUB, USR 
+
+=== Year: 1965 ===
+Number of components: 61 
+Top 3 component sizes: 6 1 1 
+
+Largest component (6 countries):
+AUL, NEW, ROK, THI, UKG, USA 
+
+Second largest (1 countries):
+AFG 
+
+=== Year: 1970 ===
+Number of components: 56 
+Top 3 component sizes: 9 3 1 
+
+Largest component (9 countries):
+AUL, ISR, JOR, NEW, PHI, ROK, THI, UKG, USA 
+
+Second largest (3 countries):
+EGY, IRQ, USR 
+
+=== Year: 1975 ===
+Number of components: 65 
+Top 3 component sizes: 2 1 1 
+
+Largest component (2 countries):
+ROK, USA 
+
+Second largest (1 countries):
+AFG 
+
+=== Year: 1980 ===
+Number of components: 58 
+Top 3 component sizes: 8 2 1 
+
+Largest component (8 countries):
+CAN, GFR, ITA, NOR, NTH, ROK, UKG, USA 
+
+Second largest (2 countries):
+ISR, JOR 
+
+=== Year: 1985 ===
+Number of components: 58 
+Top 3 component sizes: 7 2 2 
+
+Largest component (7 countries):
+EGY, GFR, HON, ROK, SAU, UKG, USA 
+
+Second largest (2 countries):
+GDR, USR </code></pre>
+</div>
+</div>
+<p>Summary: Cold War Alliance Evolution</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>summary_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Year =</span> years,</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Largest_Size =</span> <span class="fu">sapply</span>(component_results, <span class="cf">function</span>(x) x<span class="sc">$</span>largest_size),</span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Second_Size =</span> <span class="fu">sapply</span>(component_results, <span class="cf">function</span>(x) x<span class="sc">$</span>second_size),</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Fragmentation =</span> <span class="fu">sapply</span>(component_results, <span class="cf">function</span>(x) {</span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (x<span class="sc">$</span>largest_size <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span> <span class="sc">-</span> (x<span class="sc">$</span>largest_size <span class="sc">/</span> <span class="fu">length</span>(countries))</span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_df, <span class="at">digits =</span> <span class="dv">3</span>, </span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Cold War Network Evolution: Component Sizes Over Time"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Cold War Network Evolution: Component Sizes Over Time</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Year</th>
+<th style="text-align: right;">Largest_Size</th>
+<th style="text-align: right;">Second_Size</th>
+<th style="text-align: right;">Fragmentation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1950</td>
+<td style="text-align: left;">1950</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.879</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1955</td>
+<td style="text-align: left;">1955</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.955</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1960</td>
+<td style="text-align: left;">1960</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.939</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1965</td>
+<td style="text-align: left;">1965</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.909</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1970</td>
+<td style="text-align: left;">1970</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.864</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1975</td>
+<td style="text-align: left;">1975</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.970</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1980</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.879</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1985</td>
+<td style="text-align: left;">1985</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.894</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Looking at these patterns, we can see:</p>
+<ul>
+<li><strong>Largest components</strong> consistently center around the US and key allies (UK, Australia, Canada, South Korea)</li>
+<li><strong>Component sizes fluctuate</strong> dramatically—from 2 countries (1975) to 9 countries (1970)</li>
+<li><strong>Second-largest components</strong> are strikingly small, occasionally including Soviet-aligned nations</li>
+<li>This fragmentation reflects <strong>Cold War bipolarity</strong>: distinct Western and Eastern blocs with limited cooperation</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="aggregated-cooperation-network" class="level3">
+<h3 class="anchored" data-anchor-id="aggregated-cooperation-network">5.2 Aggregated Cooperation Network</h3>
+<p>What if we aggregate cooperation across all years?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="co">#sum across all years</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>cooperation_sum <span class="ot">&lt;-</span> <span class="fu">apply</span>(cc_array, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), sum)</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>cooperation_sum[cooperation_sum <span class="sc">&lt;</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(cooperation_sum) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a><span class="co">#create binary: 1 if any cooperation, 0 otherwise</span></span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>cooperation_binary <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(cooperation_sum <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a><span class="co">#create aggregated network</span></span>
+<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a>net_aggregated <span class="ot">&lt;-</span> <span class="fu">network</span>(cooperation_binary, <span class="at">matrix.type =</span> <span class="st">"adjacency"</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb92-11"><a href="#cb92-11" aria-hidden="true" tabindex="-1"></a><span class="fu">network.vertex.names</span>(net_aggregated) <span class="ot">&lt;-</span> countries</span>
+<span id="cb92-12"><a href="#cb92-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-13"><a href="#cb92-13" aria-hidden="true" tabindex="-1"></a><span class="co">#analyze components</span></span>
+<span id="cb92-14"><a href="#cb92-14" aria-hidden="true" tabindex="-1"></a>comp_dist_agg <span class="ot">&lt;-</span> <span class="fu">component.dist</span>(net_aggregated)</span>
+<span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a>sorted_sizes_agg <span class="ot">&lt;-</span> <span class="fu">sort</span>(comp_dist_agg<span class="sc">$</span>csize, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-17"><a href="#cb92-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"=== Aggregated Network (1950-1985) ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Aggregated Network (1950-1985) ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of components:"</span>, <span class="fu">length</span>(comp_dist_agg<span class="sc">$</span>csize), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of components: 40 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Largest component:"</span>, sorted_sizes_agg[<span class="dv">1</span>], <span class="st">"countries</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Largest component: 26 countries</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Second largest:"</span>, sorted_sizes_agg[<span class="dv">2</span>], <span class="st">"countries</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Second largest: 2 countries</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plot</span></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>degree_agg <span class="ot">&lt;-</span> <span class="fu">degree</span>(net_aggregated, <span class="at">cmode =</span> <span class="st">"freeman"</span>)</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>component_colors <span class="ot">&lt;-</span> <span class="fu">rainbow</span>(<span class="fu">min</span>(<span class="fu">length</span>(<span class="fu">unique</span>(comp_dist_agg<span class="sc">$</span>membership)), <span class="dv">10</span>))</span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>node_colors <span class="ot">&lt;-</span> component_colors[comp_dist_agg<span class="sc">$</span>membership]</span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">789</span>)</span>
+<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a><span class="fu">gplot</span>(net_aggregated,</span>
+<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">gmode =</span> <span class="st">"graph"</span>,</span>
+<span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">mode =</span> <span class="st">"fruchtermanreingold"</span>,</span>
+<span id="cb100-10"><a href="#cb100-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">vertex.cex =</span> <span class="fu">sqrt</span>(degree_agg <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fl">0.5</span>,</span>
+<span id="cb100-11"><a href="#cb100-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">vertex.col =</span> node_colors,</span>
+<span id="cb100-12"><a href="#cb100-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">vertex.border =</span> <span class="st">"black"</span>,</span>
+<span id="cb100-13"><a href="#cb100-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">edge.col =</span> <span class="fu">rgb</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.3</span>),</span>
+<span id="cb100-14"><a href="#cb100-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="fu">network.vertex.names</span>(net_aggregated),</span>
+<span id="cb100-15"><a href="#cb100-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">label.cex =</span> <span class="fl">0.6</span>,</span>
+<span id="cb100-16"><a href="#cb100-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">label.pos =</span> <span class="dv">5</span>,</span>
+<span id="cb100-17"><a href="#cb100-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">main =</span> <span class="st">"Aggregated Cooperation Network (1950-1985)"</span>,</span>
+<span id="cb100-18"><a href="#cb100-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">displayisolates =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/coldwar-aggregate-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="summary-key-functions-reference" class="level2">
+<h2 class="anchored" data-anchor-id="summary-key-functions-reference">6. Summary: Key Functions Reference</h2>
+<p>Here’s a quick reference of all the key functions we’ve covered:</p>
+<p><strong>Basic Properties</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>network.size()</code></td>
+<td>Number of nodes</td>
+<td><code>network.size(nw)</code></td>
+</tr>
+<tr class="even">
+<td><code>network.edgecount()</code></td>
+<td>Number of edges</td>
+<td><code>network.edgecount(nw)</code></td>
+</tr>
+<tr class="odd">
+<td><code>is.directed()</code></td>
+<td>Check if directed</td>
+<td><code>is.directed(nw)</code></td>
+</tr>
+<tr class="even">
+<td><code>gden()</code></td>
+<td>Network density</td>
+<td><code>gden(nw)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Connectivity</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 32%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>component.dist()</code></td>
+<td>Find components</td>
+<td><code>component.dist(nw)</code></td>
+</tr>
+<tr class="even">
+<td><code>get.inducedSubgraph()</code></td>
+<td>Extract subnetwork</td>
+<td><code>get.inducedSubgraph(nw, v = nodes)</code></td>
+</tr>
+<tr class="odd">
+<td><code>cutpoints()</code></td>
+<td>Find articulation points</td>
+<td><code>cutpoints(nw, mode = "graph")</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Distance Measures</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>geodist()</code></td>
+<td>All pairwise distances</td>
+<td><code>geodist(nw)</code></td>
+</tr>
+<tr class="even">
+<td>Distance matrix</td>
+<td>Shortest path lengths</td>
+<td><code>geodist(nw)$gdist</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Node-Level Centrality</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 32%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>degree()</code></td>
+<td>Degree centrality</td>
+<td><code>degree(nw, gmode = "graph")</code></td>
+</tr>
+<tr class="even">
+<td><code>closeness()</code></td>
+<td>Closeness centrality</td>
+<td><code>closeness(nw, gmode = "graph")</code></td>
+</tr>
+<tr class="odd">
+<td><code>betweenness()</code></td>
+<td>Betweenness centrality</td>
+<td><code>betweenness(nw, gmode = "graph")</code></td>
+</tr>
+<tr class="even">
+<td><code>evcent()</code></td>
+<td>Eigenvector centrality</td>
+<td><code>evcent(nw, gmode = "graph")</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Network-Level Measures</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 32%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>centralization()</code></td>
+<td>Network centralization</td>
+<td><code>centralization(nw, degree, mode = "graph")</code></td>
+</tr>
+<tr class="even">
+<td><code>max(eccentricity)</code></td>
+<td>Network diameter</td>
+<td><code>max(apply(dist_matrix, 1, max))</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Degree Distribution Modeling</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>adpmle()</code></td>
+<td>Fit Zipf/Pareto</td>
+<td><code>adpmle(degree_sequence)</code></td>
+</tr>
+<tr class="even">
+<td><code>ayulemle()</code></td>
+<td>Fit Yule</td>
+<td><code>ayulemle(degree_sequence)</code></td>
+</tr>
+<tr class="odd">
+<td><code>awarmle()</code></td>
+<td>Fit Waring</td>
+<td><code>awarmle(degree_sequence)</code></td>
+</tr>
+<tr class="even">
+<td><code>apoimle()</code></td>
+<td>Fit Poisson</td>
+<td><code>apoimle(degree_sequence)</code></td>
+</tr>
+<tr class="odd">
+<td><code>acmpmle()</code></td>
+<td>Fit CMP</td>
+<td><code>acmpmle(degree_sequence)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Temporal Network Analysis</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 32%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Purpose</th>
+<th>Code Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Loop through time</td>
+<td>Analyze each period</td>
+<td><code>for(i in 1:n_periods) {...}</code></td>
+</tr>
+<tr class="even">
+<td>Track components</td>
+<td>Monitor evolution</td>
+<td><code>component.dist(net_t)</code></td>
+</tr>
+<tr class="odd">
+<td>Aggregation</td>
+<td>Combine over time</td>
+<td><code>apply(array, c(1,2), sum)</code></td>
+</tr>
+</tbody>
+</table>
+<section id="important-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="important-arguments">6.6 Important Arguments</h3>
+<ul>
+<li><strong><code>gmode</code></strong>: For undirected networks use <code>gmode = "graph"</code>, for directed use <code>gmode = "digraph"</code></li>
+<li><strong><code>cmode</code></strong>: For directed degree, use <code>cmode = "indegree"</code> or <code>cmode = "outdegree"</code></li>
+<li><strong><code>mode</code></strong>: Similar to gmode—use <code>mode = "graph"</code> for undirected networks</li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

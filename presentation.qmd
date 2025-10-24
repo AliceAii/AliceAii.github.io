@@ -14,15 +14,24 @@ format:
 
 <div class="hanging">
 
-
 ### 2025
 **Ai, S.**, Eagan, K., & Wu, J. (2025). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. Paper presentation at the annual meeting of the Association for the Study of Higher Education, Denver, CO. 
 
 **Ai, S.**, & Eagan, K. (2025). *What Factors Promote High School Students’ Development of Science Identity and STEM Major Aspiration? An Analysis of HSLS:09 Data.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO.
 
 **Ai, S.** (2025). *A Critical Race Analysis of Black and Hispanic Female Graduate Students’ Enrollment Trends from 2012 to 2021.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO.
+</div>
 
----
+> **Cherished memories**: big blue bear, aquarium tigers, union station, botanic gardens, ramen bar, homelands of the Nuuchiu (Ute), Tsistsistas (Cheyenne), and Hinono’ei (Arapaho) peoples
+
+<style>
+.hanging {
+  text-indent: -2em;   /* moves first line left */
+  margin-left: 2em;    /* indents rest of paragraph */
+}
+</style>
+
+<div class="hanging">
 
 ### 2024
 
@@ -37,3 +46,9 @@ Jiang, T., **Ai, S.**, & Li, K. (2024). *Revealing Contributions on Research Dat
 Liu, Xi., & **Ai, S. **(2024). *Improving Affect Detections for K-12 Online Math Learning Using Time-related Variables.* Paper presentation at the annual meeting of the American Education Research Association, Division C: Learning and Instruction, Philadelphia, PA.
 
 </div>
+
+> **Cherished memories**: home, first-time attendee, Hmong, homeland of the Dakhóta Oyáte (Dakota people)
+
+
+
+
