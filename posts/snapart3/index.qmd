@@ -328,7 +328,7 @@ Application Importance:
 - **Organizational networks:** Cutpoints identify critical personnel for knowledge transfer
 :::
 
-### 3.1 Degree Distribution Modeling
+## 3. Degree Distribution and Degree Distribution Modeling
 
 The Yeast Protein Interaction Network. Now let's analyze a large biological network to understand **degree distributions**, the pattern of connectivity across nodes.
 
@@ -347,7 +347,7 @@ cat("Original edges:", nrow(yeast_edgelist), "\n")
 cat("Edges after removing self-loops:", nrow(yeast_edgelist_clean), "\n")
 ```
 
-### 4.1 Creating directed network and computing degrees
+### 3.1 Creating directed network and computing degrees
 
 
 ```{r yeast-directed, message=FALSE, warning=FALSE, fig.width=12, fig.height=4}
@@ -375,41 +375,33 @@ hist(total_deg, breaks = 30, main = "Total Degree Distribution",
      xlab = "Total Degree", col = "lightcoral", cex.main = 1.5)
 ```
 
-### 4.2 Fitting degree distribution models
+### 3.2 Fitting degree distribution models
 
 Many biological networks show **heavy-tailed** degree distributions (a few "hub" proteins with many connections). Let's test different statistical models:
 
-```{r degree-models, eval=FALSE}
+```{r degree-models, message=FALSE, warning=FALSE}
 #fit various degree distribution models
 #note: These require the degreenet package
 
-# 1. Discrete Pareto/Zipf (power law)
-dpml_fit <- adpmle(total_deg)
+#1.Discrete Pareto/Zipf (power law)
+dpml_fit <- adpmle(total_deg, cutoff = 1)
+dpml_fit$theta
 
-# 2. Yule distribution
-yule_fit <- ayulemle(total_deg)
+#2.Yule distribution
+yule_fit <- ayulemle(total_deg, cutoff = 1)
+yule_fit$theta
 
-# 3. Waring distribution
-waring_fit <- awarmle(total_deg)
+#3.Waring distribution
+waring_fit <- awarmle(total_deg, cutoff = 1)
+waring_fit$theta
 
-# 4. Poisson distribution
-pois_fit <- apoimle(total_deg)
+#4.Poisson distribution
+pois_fit <- apoimle(total_deg, cutoff = 1)
+pois_fit$theta
 
-# 5. Conway-Maxwell-Poisson
-cmp_fit <- acmpmle(total_deg)
-
-#compare models using AIC/BIC
-#lower values = better fit
-model_comparison <- data.frame(
-  Model = c("Zipf", "Yule", "Waring", "Poisson", "CMP"),
-  AIC = c(dpml_fit$AIC, yule_fit$AIC, waring_fit$AIC, 
-          pois_fit$AIC, cmp_fit$AIC),
-  BIC = c(dpml_fit$BIC, yule_fit$BIC, waring_fit$BIC, 
-          pois_fit$BIC, cmp_fit$BIC)
-)
-
-kable(model_comparison, digits = 1, 
-      caption = "Degree Distribution Model Comparison (Lower = Better)")
+#5.Conway-Maxwell-Poisson
+cmp_fit <- acmpmle(total_deg, cutoff = 1)
+cmp_fit$theta
 ```
 
 ::: {.callout-note}
@@ -421,6 +413,31 @@ kable(model_comparison, digits = 1,
 
 Protein interaction networks typically show power-law-like distributions.
 :::
+
+### 3.3 How can we compare the fits of the different models?
+
+We can use the `lldpall()`, etc, functions to compute the corrected AIC and the BIC for the models.
+
+```{r, message=FALSE, warning=FALSE}
+
+dpml_results <- lldpall(v = dpml_fit$theta, x = total_deg, cutoff = 1)
+yule_results <- llyuleall(v = yule_fit$theta, x = total_deg, cutoff = 1)
+war_results <- llwarall(v = waring_fit$theta, x = total_deg, cutoff = 1)
+poi_results <- llpoiall(v = pois_fit$theta, x = total_deg, cutoff = 1)
+
+model_comparison <- data.frame(
+    Model = c("Discrete Pareto/Zipf", "Yule", "Waring", "Poisson"),
+    Parameters = c(dpml_results[1], yule_results[1], war_results[1], poi_results[1]),
+    Log_Likelihood = c(dpml_results[2], yule_results[2], war_results[2], poi_results[2]),
+    AICC = c(dpml_results[3], yule_results[3], war_results[3], poi_results[3]),
+    BIC = c(dpml_results[4], yule_results[4], war_results[4], poi_results[4])
+    )
+
+kable(model_comparison, digits = 2,
+col.names = c("Model", "Parameters", "Log-Likelihood", "AIC", "BIC"),
+caption = "Degree Distribution Model Comparison")
+```
+
 
 ## 4. Component Analysis
 
