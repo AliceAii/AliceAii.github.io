@@ -2,7 +2,7 @@
 title: "Introduction to Kernel Density Estimation and Rejection Sampling"
 author: Shuhan (Alice) Ai
 date: "2025-10-13"
-categories: [R, Kernel]
+categories: [R, Kernel Density]
 toc: true
 toc-depth: 3
 toc-title: "Contents"
