@@ -2,7 +2,7 @@
 title: "Introduction to Kernel Density Estimation and Rejection Sampling"
 author: Shuhan (Alice) Ai
 date: "2025-10-13"
-categories: [R, Programming]
+categories: [R, Kernel]
 toc: true
 toc-depth: 3
 toc-title: "Contents"
@@ -222,7 +222,7 @@ Now let's apply KDE to real data: Los Angeles housing prices from August 2013.
 
 ```{r, message=FALSE, warning=FALSE}
 #load the housing data
-housing <- read.table("/Users/aishuhan/Desktop/LAhousingpricesaug2013.txt", header=TRUE)
+housing <- read.table("/Users/aishuhan/Documents/GitHub/AliceAii.github.io/posts/kerneldensity2/LAhousingpricesaug2013.txt", header=TRUE)
 
 #extract median single-family home prices (in $1000s)
 prices <- as.numeric(housing$PriceMedianSFR.1000.)

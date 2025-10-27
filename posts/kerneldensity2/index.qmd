@@ -2,7 +2,7 @@
 title: "Real-World Practice with Kernel Density and Regression Diagnostics"
 author: Shuhan (Alice) Ai
 date: "2025-10-20"
-categories: [R, Programming]
+categories: [R, Kernel Density]
 toc: true
 toc-depth: 3
 toc-title: "Contents"
