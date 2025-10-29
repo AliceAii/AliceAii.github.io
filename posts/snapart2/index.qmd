@@ -552,5 +552,5 @@ David Easley and Jon Kleinberg. "Networks, Crowds, and Markets: Reasoning about 
 https://www.cs.cornell.edu/home/kleinber/networks-book/Links to an external site.
 
 
-*This tutorial is based on coursework from STATS 218: Social Network Analysis.*
 
+*This tutorial is based on UCLA [STATS 218: Social Network Analysis](https://handcock.github.io/teaching/218/) taught by Prof [Mark Handcock](https://handcock.github.io/).*

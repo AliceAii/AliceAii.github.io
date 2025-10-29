@@ -1015,3 +1015,4 @@ print(comparison)
 4. Monitor acceptance rate: Should match theoretical 1/M
 5. Consider alternatives: If acceptance rate < 0.01, consider other methods
 
+*This tutorial is based on UCLA [STATS 202A: Statistics Programming](http://www.stat.ucla.edu/~frederic/202a/F25/) taught by Prof [Rick Schoenberg](http://www.stat.ucla.edu/~frederic/). *

@@ -300,5 +300,4 @@ http://link.springer.com/book/10.1007%2F978-1-4939-0983-4
 "Networks, Crowds, and Markets: Reasoning about a Highly Connected World (2010). Available free online.
 https://www.cs.cornell.edu/home/kleinber/networks-book/
 
-
-*This tutorial is based on coursework from STATS 218: Social Network Analysis. All datasets are from the networkdata package.*
+*This tutorial is based on UCLA [STATS 218: Social Network Analysis](https://handcock.github.io/teaching/218/) taught by Prof [Mark Handcock](https://handcock.github.io/).*

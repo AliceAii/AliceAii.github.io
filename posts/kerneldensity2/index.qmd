@@ -639,3 +639,4 @@ Imagine a model predicting college GPA from:
   - The relationship isn't generalizable
   - Need more nuanced understanding of how homework helps
 
+*This tutorial is based on UCLA [STATS 202A: Statistics Programming](http://www.stat.ucla.edu/~frederic/202a/F25/) taught by Prof [Rick Schoenberg](http://www.stat.ucla.edu/~frederic/). *
