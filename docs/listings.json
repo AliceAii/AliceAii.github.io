@@ -2,6 +2,8 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/snapart5/index.html",
+      "/posts/snapart4/index.html",
       "/posts/snapart3/index.html",
       "/posts/snapart2/index.html",
       "/posts/kerneldensity2/index.html",

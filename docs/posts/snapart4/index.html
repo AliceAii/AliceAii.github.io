@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-10-29">
+
+<title>Social Network Analysis R Tutorial Part 4: Introduction to Network Models and ERGM – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Social Network Analysis R Tutorial Part 4: Introduction to Network Models and ERGM</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">SNA</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 29, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#understanding-network-models" id="toc-understanding-network-models" class="nav-link active" data-scroll-target="#understanding-network-models">1. Understanding Network Models</a>
+  <ul class="collapse">
+  <li><a href="#the-null-model" id="toc-the-null-model" class="nav-link" data-scroll-target="#the-null-model">1.1 The Null Model</a></li>
+  <li><a href="#homogeneous-bernoulli-model-erdős-rényi-model" id="toc-homogeneous-bernoulli-model-erdős-rényi-model" class="nav-link" data-scroll-target="#homogeneous-bernoulli-model-erdős-rényi-model">1.2 Homogeneous Bernoulli Model (Erdős-Rényi Model)</a></li>
+  <li><a href="#modeling-cohesive-subgroups" id="toc-modeling-cohesive-subgroups" class="nav-link" data-scroll-target="#modeling-cohesive-subgroups">1.3 Modeling Cohesive Subgroups</a></li>
+  <li><a href="#the-p_1-model-holland-leinhardt-1981" id="toc-the-p_1-model-holland-leinhardt-1981" class="nav-link" data-scroll-target="#the-p_1-model-holland-leinhardt-1981">1.4 The <span class="math inline">\(p_1\)</span> Model (Holland &amp; Leinhardt, 1981)</a></li>
+  </ul></li>
+  <li><a href="#the-ergm-package" id="toc-the-ergm-package" class="nav-link" data-scroll-target="#the-ergm-package">2. The ERGM Package:</a>
+  <ul class="collapse">
+  <li><a href="#core-model-fitting-functions" id="toc-core-model-fitting-functions" class="nav-link" data-scroll-target="#core-model-fitting-functions">2.1 Core Model Fitting Functions</a></li>
+  <li><a href="#model-comparison-functions" id="toc-model-comparison-functions" class="nav-link" data-scroll-target="#model-comparison-functions">2.2 Model Comparison Functions</a></li>
+  <li><a href="#coefficient-extraction-functions" id="toc-coefficient-extraction-functions" class="nav-link" data-scroll-target="#coefficient-extraction-functions">2.3 Coefficient Extraction Functions</a></li>
+  <li><a href="#common-ergm-terms-statistics" id="toc-common-ergm-terms-statistics" class="nav-link" data-scroll-target="#common-ergm-terms-statistics">2.4 Common ERGM Terms (Statistics)</a></li>
+  <li><a href="#understanding-nodematch-vs-nodemix" id="toc-understanding-nodematch-vs-nodemix" class="nav-link" data-scroll-target="#understanding-nodematch-vs-nodemix">2.5 Understanding <code>nodematch</code> vs <code>nodemix</code></a></li>
+  </ul></li>
+  <li><a href="#model-fit-statistics-how-good-is-your-model" id="toc-model-fit-statistics-how-good-is-your-model" class="nav-link" data-scroll-target="#model-fit-statistics-how-good-is-your-model">3. Model Fit Statistics: How Good Is Your Model?</a>
+  <ul class="collapse">
+  <li><a href="#deviance" id="toc-deviance" class="nav-link" data-scroll-target="#deviance">3.1 Deviance</a></li>
+  <li><a href="#aic-and-bic" id="toc-aic-and-bic" class="nav-link" data-scroll-target="#aic-and-bic">3.2 AIC and BIC</a></li>
+  <li><a href="#likelihood-ratio-test" id="toc-likelihood-ratio-test" class="nav-link" data-scroll-target="#likelihood-ratio-test">3.3 Likelihood Ratio Test</a></li>
+  </ul></li>
+  <li><a href="#putting-it-all-together-a-modeling-strategy" id="toc-putting-it-all-together-a-modeling-strategy" class="nav-link" data-scroll-target="#putting-it-all-together-a-modeling-strategy">4. Putting It All Together: A Modeling Strategy</a>
+  <ul class="collapse">
+  <li><a href="#step-1-start-simple" id="toc-step-1-start-simple" class="nav-link" data-scroll-target="#step-1-start-simple">Step 1: Start Simple</a></li>
+  <li><a href="#step-2-add-effects" id="toc-step-2-add-effects" class="nav-link" data-scroll-target="#step-2-add-effects">Step 2: Add Effects</a></li>
+  <li><a href="#step-3-compare-models" id="toc-step-3-compare-models" class="nav-link" data-scroll-target="#step-3-compare-models">Step 3: Compare Models</a></li>
+  <li><a href="#step-4-add-individual-heterogeneity-if-needed" id="toc-step-4-add-individual-heterogeneity-if-needed" class="nav-link" data-scroll-target="#step-4-add-individual-heterogeneity-if-needed">Step 4: Add Individual Heterogeneity (if needed)</a></li>
+  <li><a href="#step-5-check-diagnostics" id="toc-step-5-check-diagnostics" class="nav-link" data-scroll-target="#step-5-check-diagnostics">Step 5: Check Diagnostics</a></li>
+  </ul></li>
+  <li><a href="#interpreting-ergm-coefficients" id="toc-interpreting-ergm-coefficients" class="nav-link" data-scroll-target="#interpreting-ergm-coefficients">5. Interpreting ERGM Coefficients</a>
+  <ul class="collapse">
+  <li><a href="#from-coefficients-to-probabilities" id="toc-from-coefficients-to-probabilities" class="nav-link" data-scroll-target="#from-coefficients-to-probabilities">5.1 From Coefficients to Probabilities</a></li>
+  <li><a href="#understanding-odds-ratios" id="toc-understanding-odds-ratios" class="nav-link" data-scroll-target="#understanding-odds-ratios">5.2 Understanding Odds Ratios</a></li>
+  <li><a href="#combining-effects" id="toc-combining-effects" class="nav-link" data-scroll-target="#combining-effects">5.3 Combining Effects</a></li>
+  </ul></li>
+  <li><a href="#common-pitfalls-and-recommended-practices" id="toc-common-pitfalls-and-recommended-practices" class="nav-link" data-scroll-target="#common-pitfalls-and-recommended-practices">6. Common Pitfalls and Recommended Practices</a>
+  <ul class="collapse">
+  <li><a href="#pitfalls-to-avoid" id="toc-pitfalls-to-avoid" class="nav-link" data-scroll-target="#pitfalls-to-avoid">Pitfalls to Avoid</a></li>
+  <li><a href="#recommended-practices" id="toc-recommended-practices" class="nav-link" data-scroll-target="#recommended-practices">Recommended Practices</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Welcome to Part 4 of our Social Network Analysis tutorial series! In this post, we’ll dive into the theoretical foundations of statistical network models and introduce the powerful <strong>ERGM (Exponential Random Graph Model)</strong> package in R.</p>
+<p><img src="plot1.png" class="img-fluid"> In this tutorial, we’ll cover:</p>
+<ul>
+<li>Basic network models: from simple to complex</li>
+<li>The <code>ergm</code> package and its key functions</li>
+<li>Understanding model comparison and fit statistics</li>
+<li>Theoretical foundations for network modeling</li>
+</ul>
+<p>Let’s get started!</p>
+<section id="understanding-network-models" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-network-models">1. Understanding Network Models</h2>
+<section id="the-null-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-null-model">1.1 The Null Model</h3>
+<p>The <strong>null model</strong> is our baseline assumption: this null hypothesis assumes all possible networks are equally likely. Think of it as the “no information” model where we assume complete randomness.</p>
+<p><span class="math display">\[P(Y = y) = \frac{1}{2^N}\]</span></p>
+<p>where <span class="math inline">\(N\)</span> is the total number of possible ties (for a directed network: <span class="math inline">\(N = n(n-1)\)</span>; for undirected: <span class="math inline">\(N = \frac{n(n-1)}{2}\)</span>).</p>
+<p><strong>Key insight</strong>: The null model provides our reference point for comparison. Any other model should do better than this!</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What does “all possible networks are equally likely” mean? - The null model says every <strong>configuration of the entire network</strong> has the same probability - This is different from saying each <strong>individual tie</strong> has the same probability</p>
+<p>In the null model, each possible network configuration (a complete pattern of who’s connected to whom) is equally probable. But when we look at individual ties within these configurations:</p>
+<ul>
+<li><strong>Individual ties ARE equally likely</strong> - each has a 50% chance of existing</li>
+<li><strong>But</strong> the model makes no assumptions about which specific ties will form</li>
+<li>All <span class="math inline">\(2^N\)</span> possible network structures have equal probability <span class="math inline">\(\frac{1}{2^N}\)</span></li>
+</ul>
+<p>Example:</p>
+<p>Imagine a tiny network with just 3 people (A, B, C) in a directed network:</p>
+<ul>
+<li>Number of possible ties: <span class="math inline">\(N = 3 \times 2 = 6\)</span> (A→B, A→C, B→A, B→C, C→A, C→B)</li>
+<li>Number of possible networks: <span class="math inline">\(2^6 = 64\)</span></li>
+<li>Under the null model: each of these 64 configurations is equally likely (probability = 1/64)</li>
+</ul>
+<p>Some possible configurations:</p>
+<ol type="1">
+<li>No ties at all (empty network)</li>
+<li>Only A→B exists</li>
+<li>All ties exist (complete network)</li>
+<li>A→B and B→C exist</li>
+<li>… (60 more configurations)</li>
+</ol>
+<p>Each of these 64 distinct networks has equal probability!</p>
+<p>Why is this the “null” model?</p>
+<ul>
+<li>It represents <strong>maximum ignorance</strong> - we know nothing about what drives tie formation</li>
+<li>No structure, no preferences, no patterns</li>
+<li>Pure randomness</li>
+<li>It’s our statistical “null hypothesis” - what we compare other models against</li>
+<li>Any real social network that deviates significantly from this is showing us there’s <em>structure</em> we need to explain</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="homogeneous-bernoulli-model-erdős-rényi-model" class="level3">
+<h3 class="anchored" data-anchor-id="homogeneous-bernoulli-model-erdős-rényi-model">1.2 Homogeneous Bernoulli Model (Erdős-Rényi Model)</h3>
+<p>The simplest non-trivial model: each tie has the same probability <span class="math inline">\(p\)</span> of existing, independent of all other ties.</p>
+<section id="mathematical-formulation" class="level4">
+<h4 class="anchored" data-anchor-id="mathematical-formulation">Mathematical Formulation</h4>
+<p><span class="math display">\[P(Y_{ij} = 1) = p \quad \forall i, j = 1, \ldots, n\]</span> Or in log-odds form:</p>
+<p><span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta \quad \forall i, j\]</span> where <span class="math inline">\(\beta = \log\left(\frac{p}{1-p}\right)\)</span>.</p>
+</section>
+<section id="exponential-family-form" class="level4">
+<h4 class="anchored" data-anchor-id="exponential-family-form">Exponential Family Form</h4>
+<p><span class="math display">\[P(Y = y | \beta) = \frac{e^{\beta g(y)}}{\kappa(\beta)}\]</span> where:</p>
+<ul>
+<li><p><span class="math inline">\(g(y) = \sum_{i,j} y_{ij}\)</span> is the number of edges</p></li>
+<li><p><span class="math inline">\(\kappa(\beta) = [1 + \exp(\beta)]^N\)</span> is the normalizing constant</p></li>
+<li><p><strong>Parameter</strong>: <span class="math inline">\(\beta\)</span> (log-odds of a tie)</p></li>
+<li><p><strong>Statistic</strong>: <span class="math inline">\(g(y) = \sum_{i,j} y_{ij}\)</span> Total number of edges. The model is using the count of edges as the key feature to describe the network.</p></li>
+<li><p><strong>Assumption</strong>: All dyads are independent and identically distributed</p></li>
+<li><p><strong>Limitation</strong>: Doesn’t capture real-world network features like clustering or degree heterogeneity</p></li>
+</ul>
+</section>
+</section>
+<section id="modeling-cohesive-subgroups" class="level3">
+<h3 class="anchored" data-anchor-id="modeling-cohesive-subgroups">1.3 Modeling Cohesive Subgroups</h3>
+<p>Real networks often have <strong>communities</strong> or <strong>groups</strong>. People tend to form ties within their groups more than across groups. This is called <strong>homophily</strong>: “birds of a feather flock together.”</p>
+<section id="homophily-model" class="level4">
+<h4 class="anchored" data-anchor-id="homophily-model">Homophily Model</h4>
+<p>Assumes actors have a preference for same-group ties:</p>
+<p><span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_0 + \beta_1 \cdot \mathbb{1}(\text{same group})\]</span></p>
+<p>In <code>ergm</code> syntax:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"attribute"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="differential-homophily-model" class="level4">
+<h4 class="anchored" data-anchor-id="differential-homophily-model">Differential Homophily Model</h4>
+<p>Different groups may have different levels of within-group preference:</p>
+<p><span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_0 + \beta_{\text{group}_i} \cdot \mathbb{1}(\text{group}_i = \text{group}_j)\]</span></p>
+<p>In <code>ergm</code> syntax:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"attribute"</span>, <span class="at">diff =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="full-mixing-model" class="level4">
+<h4 class="anchored" data-anchor-id="full-mixing-model">Full Mixing Model</h4>
+<p>The most flexible: allows different tie probabilities for every group pair combination:</p>
+<p><span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_{ab}\]</span> where <span class="math inline">\(a\)</span> is the group of node <span class="math inline">\(i\)</span> and <span class="math inline">\(b\)</span> is the group of node <span class="math inline">\(j\)</span>.</p>
+<p>In <code>ergm</code> syntax:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ergm</span>(network <span class="sc">~</span> <span class="fu">nodemix</span>(<span class="st">"attribute"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The mixing model doesn’t include a separate <code>edges</code> term because each group-pair has its own baseline.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="the-p_1-model-holland-leinhardt-1981" class="level3">
+<h3 class="anchored" data-anchor-id="the-p_1-model-holland-leinhardt-1981">1.4 The <span class="math inline">\(p_1\)</span> Model (Holland &amp; Leinhardt, 1981)</h3>
+<p>The <strong><span class="math inline">\(p_1\)</span> model</strong> extends the Bernoulli model by allowing for:</p>
+<ol type="1">
+<li><strong>Sender effects</strong>: Some nodes are more likely to form outgoing ties</li>
+<li><strong>Receiver effects</strong>: Some nodes are more likely to receive incoming ties</li>
+<li><strong>Reciprocity</strong>: Mutual ties are more (or less) likely than expected by chance</li>
+</ol>
+<section id="mathematical-form" class="level4">
+<h4 class="anchored" data-anchor-id="mathematical-form">Mathematical Form</h4>
+<p><span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_0 + \alpha_i + \beta_j + \rho \cdot Y_{ji}\]</span> where:</p>
+<ul>
+<li><span class="math inline">\(\beta_0\)</span> is the baseline (edges effect)</li>
+<li><span class="math inline">\(\alpha_i\)</span> is the sender effect for node <span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(\beta_j\)</span> is the receiver effect for node <span class="math inline">\(j\)</span></li>
+<li><span class="math inline">\(\rho\)</span> is the reciprocity parameter</li>
+<li><span class="math inline">\(Y_{ji}\)</span> indicates if there’s a tie from <span class="math inline">\(j\)</span> to <span class="math inline">\(i\)</span></li>
+</ul>
+</section>
+<section id="interpretation" class="level4">
+<h4 class="anchored" data-anchor-id="interpretation">Interpretation</h4>
+<ul>
+<li><strong>Sender coefficients</strong> <span class="math inline">\((\alpha_i)\)</span>: Measure node <strong>centrality</strong> - how active nodes are in forming ties</li>
+<li><strong>Receiver coefficients</strong> <span class="math inline">\((\beta_j)\)</span>: Measure node <strong>prestige</strong> - how popular/attractive nodes are</li>
+<li><strong>Mutual coefficient</strong> <span class="math inline">\((\rho)\)</span>: Measures tendency toward reciprocation</li>
+</ul>
+</section>
+<section id="in-practice" class="level4">
+<h4 class="anchored" data-anchor-id="in-practice">In Practice</h4>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit p1 model with homophily</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fit.p1 <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"sex"</span>) <span class="sc">+</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>               sender <span class="sc">+</span> receiver <span class="sc">+</span> mutual,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">estimate =</span> <span class="st">"MPLE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We typically use MPLE (Maximum Pseudo-Likelihood Estimation) for <span class="math inline">\(p_1\)</span> models because they can be computationally intensive.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="the-ergm-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-ergm-package">2. The ERGM Package:</h2>
+<p>The <code>ergm</code> package is part of the <strong>statnet</strong> suite and provides comprehensive tools for fitting, simulating, and diagnosing exponential random graph models.</p>
+<section id="core-model-fitting-functions" class="level3">
+<h3 class="anchored" data-anchor-id="core-model-fitting-functions">2.1 Core Model Fitting Functions</h3>
+<p>Here’s a comprehensive reference table for the main <code>ergm</code> functions:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 18%">
+<col style="width: 28%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Basic Syntax</th>
+<th>Key Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ergm()</code></td>
+<td>Fit exponential random graph model</td>
+<td><code>ergm(network ~ terms)</code></td>
+<td><code>formula</code>, <code>reference</code>, <code>constraints</code>, <code>control</code></td>
+</tr>
+<tr class="even">
+<td><code>summary.ergm()</code></td>
+<td>Display model results</td>
+<td><code>summary(fit)</code></td>
+<td>Shows coefficients, SEs, p-values, GOF statistics</td>
+</tr>
+<tr class="odd">
+<td><code>simulate.ergm()</code></td>
+<td>Simulate networks from fitted model</td>
+<td><code>simulate(fit, nsim=100)</code></td>
+<td><code>nsim</code>, <code>seed</code>, <code>output</code></td>
+</tr>
+<tr class="even">
+<td><code>gof()</code></td>
+<td>Goodness-of-fit diagnostics</td>
+<td><code>gof(fit)</code></td>
+<td>Tests model fit against observed statistics</td>
+</tr>
+<tr class="odd">
+<td><code>mcmc.diagnostics()</code></td>
+<td>MCMC convergence diagnostics</td>
+<td><code>mcmc.diagnostics(fit)</code></td>
+<td>Checks if MCMC algorithm converged</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="model-comparison-functions" class="level3">
+<h3 class="anchored" data-anchor-id="model-comparison-functions">2.2 Model Comparison Functions</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 26%">
+<col style="width: 20%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Usage</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>anova.ergm()</code></td>
+<td>Compare nested models</td>
+<td><code>anova(fit1, fit2)</code></td>
+<td>Likelihood ratio test, AIC, BIC</td>
+</tr>
+<tr class="even">
+<td><code>AIC()</code></td>
+<td>Akaike Information Criterion</td>
+<td><code>AIC(fit)</code></td>
+<td>Lower is better</td>
+</tr>
+<tr class="odd">
+<td><code>BIC()</code></td>
+<td>Bayesian Information Criterion</td>
+<td><code>BIC(fit)</code></td>
+<td>Lower is better</td>
+</tr>
+<tr class="even">
+<td><code>logLik()</code></td>
+<td>Extract log-likelihood</td>
+<td><code>logLik(fit)</code></td>
+<td>Model log-likelihood value</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="coefficient-extraction-functions" class="level3">
+<h3 class="anchored" data-anchor-id="coefficient-extraction-functions">2.3 Coefficient Extraction Functions</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 25%">
+<col style="width: 20%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Usage</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>coef()</code></td>
+<td>Extract coefficients</td>
+<td><code>coef(fit)</code></td>
+<td>Named vector of estimates</td>
+</tr>
+<tr class="even">
+<td><code>vcov()</code></td>
+<td>Variance-covariance matrix</td>
+<td><code>vcov(fit)</code></td>
+<td>Matrix of variances/covariances</td>
+</tr>
+<tr class="odd">
+<td><code>confint()</code></td>
+<td>Confidence intervals</td>
+<td><code>confint(fit)</code></td>
+<td>95% CIs for parameters</td>
+</tr>
+<tr class="even">
+<td><code>summary()</code></td>
+<td>Full model summary</td>
+<td><code>summary(fit)</code></td>
+<td>Comprehensive output</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-ergm-terms-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="common-ergm-terms-statistics">2.4 Common ERGM Terms (Statistics)</h3>
+<section id="basic-terms" class="level4">
+<h4 class="anchored" data-anchor-id="basic-terms">Basic Terms</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>What It Counts</th>
+<th>Syntax</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>edges</code></td>
+<td>Number of edges</td>
+<td><code>edges</code></td>
+<td>Baseline density</td>
+</tr>
+<tr class="even">
+<td><code>mutual</code></td>
+<td>Reciprocated ties</td>
+<td><code>mutual</code></td>
+<td>Reciprocity tendency</td>
+</tr>
+<tr class="odd">
+<td><code>triangle</code></td>
+<td>Triangles</td>
+<td><code>triangle</code></td>
+<td>Transitivity</td>
+</tr>
+<tr class="even">
+<td><code>isolates</code></td>
+<td>Isolated nodes</td>
+<td><code>isolates</code></td>
+<td>Number with degree 0</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="node-attribute-terms" class="level4">
+<h4 class="anchored" data-anchor-id="node-attribute-terms">Node Attribute Terms</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 40%">
+<col style="width: 20%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>What It Models</th>
+<th>Syntax</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nodematch</code></td>
+<td>Same-category ties</td>
+<td><code>nodematch("attr")</code></td>
+<td>Homophily</td>
+</tr>
+<tr class="even">
+<td><code>nodematch (diff)</code></td>
+<td>Group-specific homophily</td>
+<td><code>nodematch("attr", diff=TRUE)</code></td>
+<td>Different homophily by group</td>
+</tr>
+<tr class="odd">
+<td><code>nodemix</code></td>
+<td>Full mixing matrix</td>
+<td><code>nodemix("attr")</code></td>
+<td>All group-pair combinations</td>
+</tr>
+<tr class="even">
+<td><code>nodecov</code></td>
+<td>Continuous attribute</td>
+<td><code>nodecov("attr")</code></td>
+<td>Effect of node attribute on ties</td>
+</tr>
+<tr class="odd">
+<td><code>nodefactor</code></td>
+<td>Categorical attribute</td>
+<td><code>nodefactor("attr")</code></td>
+<td>Different effects by category</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="degree-terms" class="level4">
+<h4 class="anchored" data-anchor-id="degree-terms">Degree Terms</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 41%">
+<col style="width: 20%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>What It Models</th>
+<th>Syntax</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>degree(k)</code></td>
+<td>Nodes with exactly k ties</td>
+<td><code>degree(k)</code></td>
+<td>Specific degree modeling</td>
+</tr>
+<tr class="even">
+<td><code>gwdegree</code></td>
+<td>Degree distribution</td>
+<td><code>gwdegree(decay, fixed=TRUE)</code></td>
+<td>Prevents degeneracy</td>
+</tr>
+<tr class="odd">
+<td><code>sender</code></td>
+<td>Sender effects (<span class="math inline">\(p_1\)</span>)</td>
+<td><code>sender</code></td>
+<td>Individual out-degree heterogeneity</td>
+</tr>
+<tr class="even">
+<td><code>receiver</code></td>
+<td>Receiver effects (<span class="math inline">\(p_1\)</span>)</td>
+<td><code>receiver</code></td>
+<td>Individual in-degree heterogeneity</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="advanced-terms" class="level4">
+<h4 class="anchored" data-anchor-id="advanced-terms">Advanced Terms</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 41%">
+<col style="width: 20%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>What It Models</th>
+<th>Syntax</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>gwesp</code></td>
+<td>Geometrically weighted ESP</td>
+<td><code>gwesp(decay, fixed=TRUE)</code></td>
+<td>Clustering without degeneracy</td>
+</tr>
+<tr class="even">
+<td><code>gwdsp</code></td>
+<td>Geometrically weighted DSP</td>
+<td><code>gwdsp(decay, fixed=TRUE)</code></td>
+<td>Anti-clustering</td>
+</tr>
+<tr class="odd">
+<td><code>altkstar</code></td>
+<td>Alternating k-stars</td>
+<td><code>altkstar(lambda, fixed=TRUE)</code></td>
+<td>Degree distribution</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="understanding-nodematch-vs-nodemix" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-nodematch-vs-nodemix">2.5 Understanding <code>nodematch</code> vs <code>nodemix</code></h3>
+<p>This is a crucial distinction that often confuses beginners!</p>
+<section id="nodematchattribute" class="level4">
+<h4 class="anchored" data-anchor-id="nodematchattribute"><code>nodematch("attribute")</code></h4>
+<p><strong>What it does</strong>: Tests if same-category ties are more likely than different-category ties</p>
+<p><strong>Model form</strong>: <span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_0 + \beta_1 \cdot (\text{same group})\]</span></p>
+<p><strong>Parameters</strong>: 2 (edges + nodematch)</p>
+<p><strong>Interpretation</strong>: “Do birds of a feather flock together?”</p>
+<p><strong>Example</strong>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"sex"</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests: Are same-sex friendships more likely?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="nodemixattribute" class="level4">
+<h4 class="anchored" data-anchor-id="nodemixattribute"><code>nodemix("attribute")</code></h4>
+<p><strong>What it does</strong>: Estimates a separate probability for each group-pair combination</p>
+<p><strong>Model form</strong>: <span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_{ab}\]</span></p>
+<p><strong>Parameters</strong>: <span class="math inline">\(g^2\)</span> for directed networks (where <span class="math inline">\(g\)</span> is number of groups), or <span class="math inline">\(\frac{g(g+1)}{2}\)</span> for undirected</p>
+<p><strong>Interpretation</strong>: “Who flocks with whom, and how much?”</p>
+<p><strong>Example</strong>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ergm</span>(network <span class="sc">~</span> <span class="fu">nodemix</span>(<span class="st">"sex"</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimates: P(Male→Male), P(Male→Female), P(Female→Male), P(Female→Female)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="quick-reference" class="level4">
+<h4 class="anchored" data-anchor-id="quick-reference">Quick Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 40%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspect</th>
+<th><code>nodematch</code></th>
+<th><code>nodemix</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Question</strong></td>
+<td>Is homophily present?</td>
+<td>What are all the mixing probabilities?</td>
+</tr>
+<tr class="even">
+<td><strong>Parameters</strong></td>
+<td>2 (+ edges)</td>
+<td>Many (<span class="math inline">\(g^2\)</span> or more)</td>
+</tr>
+<tr class="odd">
+<td><strong>Complexity</strong></td>
+<td>Simpler</td>
+<td>More flexible</td>
+</tr>
+<tr class="even">
+<td><strong>Use when</strong></td>
+<td>Testing homophily hypothesis</td>
+<td>Exploring all group interactions</td>
+</tr>
+<tr class="odd">
+<td><strong>Includes edges?</strong></td>
+<td>Needs separate <code>edges</code> term</td>
+<td>No separate <code>edges</code> needed</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+<section id="model-fit-statistics-how-good-is-your-model" class="level2">
+<h2 class="anchored" data-anchor-id="model-fit-statistics-how-good-is-your-model">3. Model Fit Statistics: How Good Is Your Model?</h2>
+<section id="deviance" class="level3">
+<h3 class="anchored" data-anchor-id="deviance">3.1 Deviance</h3>
+<p><strong>Deviance</strong> measures how well the model fits relative to a saturated model:</p>
+<p><span class="math display">\[D = -2[\ell(\hat{\beta}) - \ell(\beta_{\text{saturated}})]\]</span></p>
+<ul>
+<li><strong>Null deviance</strong>: Deviance of the null model (<span class="math inline">\(\beta = 0\)</span>)</li>
+<li><strong>Residual deviance</strong>: Deviance of the fitted model</li>
+<li><strong>Model deviance</strong>: Reduction in deviance = Null deviance - Residual deviance</li>
+</ul>
+<p><strong>Interpretation</strong>: Larger reduction = better model fit</p>
+</section>
+<section id="aic-and-bic" class="level3">
+<h3 class="anchored" data-anchor-id="aic-and-bic">3.2 AIC and BIC</h3>
+<p>Both penalize model complexity:</p>
+<p><span class="math display">\[\text{AIC} = -2\ell(\hat{\beta}) + 2k\]</span> <span class="math display">\[\text{BIC} = -2\ell(\hat{\beta}) + k\log(n)\]</span></p>
+<p>where <span class="math inline">\(k\)</span> is the number of parameters.</p>
+<p><strong>Rule</strong>: Lower is better! But compare models on the same data.</p>
+</section>
+<section id="likelihood-ratio-test" class="level3">
+<h3 class="anchored" data-anchor-id="likelihood-ratio-test">3.3 Likelihood Ratio Test</h3>
+<p>For nested models:</p>
+<p><span class="math display">\[\text{LR} = -2[\ell(\beta_{\text{simpler}}) - \ell(\beta_{\text{complex}})] \sim \chi^2_{\text{df}}\]</span></p>
+<p>where df = difference in number of parameters.</p>
+<p><strong>In R</strong>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit1, fit2, fit3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Interpretation</strong>: Significant p-value means the more complex model fits significantly better.</p>
+</section>
+</section>
+<section id="putting-it-all-together-a-modeling-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="putting-it-all-together-a-modeling-strategy">4. Putting It All Together: A Modeling Strategy</h2>
+<p>Here’s a recommended workflow for network modeling:</p>
+<section id="step-1-start-simple" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-start-simple">Step 1: Start Simple</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Null model baseline</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fit.null <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-2-add-effects" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-add-effects">Step 2: Add Effects</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test homophily</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fit.homo <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Test differential homophily</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>fit.diff.homo <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>, <span class="at">diff =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Explore full mixing</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>fit.mix <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> <span class="fu">nodemix</span>(<span class="st">"group"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-3-compare-models" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-compare-models">Step 3: Compare Models</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit.null, fit.homo, fit.diff.homo, fit.mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-4-add-individual-heterogeneity-if-needed" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-add-individual-heterogeneity-if-needed">Step 4: Add Individual Heterogeneity (if needed)</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p₁ model</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fit.p1 <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>) <span class="sc">+</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>               sender <span class="sc">+</span> receiver <span class="sc">+</span> mutual,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">estimate =</span> <span class="st">"MPLE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-5-check-diagnostics" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-check-diagnostics">Step 5: Check Diagnostics</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Goodness of fit</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gof</span>(fit.homo)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># For MCMC-based fits</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc.diagnostics</span>(fit.homo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="interpreting-ergm-coefficients" class="level2">
+<h2 class="anchored" data-anchor-id="interpreting-ergm-coefficients">5. Interpreting ERGM Coefficients</h2>
+<section id="from-coefficients-to-probabilities" class="level3">
+<h3 class="anchored" data-anchor-id="from-coefficients-to-probabilities">5.1 From Coefficients to Probabilities</h3>
+<p>ERGM coefficients are in <strong>log-odds</strong> form. To convert to probabilities:</p>
+<p><span class="math display">\[P(\text{tie}) = \frac{\exp(\beta)}{1 + \exp(\beta)} = \text{plogis}(\beta)\]</span></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)[<span class="st">"edges"</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Probability</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(beta)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># or equivalently</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>prob <span class="ot">&lt;-</span> <span class="fu">exp</span>(beta) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(beta))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="understanding-odds-ratios" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-odds-ratios">5.2 Understanding Odds Ratios</h3>
+<p>For a term with coefficient <span class="math inline">\(\beta\)</span>:</p>
+<p><span class="math display">\[\text{Odds Ratio} = \exp(\beta)\]</span> <strong>Interpretation</strong>:</p>
+<ul>
+<li>OR = 1: No effect</li>
+<li>OR &gt; 1: Positive association (increases odds of tie)</li>
+<li>OR &lt; 1: Negative association (decreases odds of tie)</li>
+<li>OR = 2: Doubles the odds</li>
+<li>OR = 0.5: Halves the odds</li>
+</ul>
+</section>
+<section id="combining-effects" class="level3">
+<h3 class="anchored" data-anchor-id="combining-effects">5.3 Combining Effects</h3>
+<p>For multiple terms, effects combine <strong>multiplicatively</strong> on the odds scale:</p>
+<p><span class="math display">\[\log\text{odds}(Y_{ij} = 1) = \beta_0 + \beta_1 x_1 + \beta_2 x_2\]</span></p>
+<p><strong>Example</strong>: Probability of same-sex tie in homophily model:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Log-odds</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>log_odds_same <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit)[<span class="st">"nodematch.sex"</span>]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Probability</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>prob_same <span class="ot">&lt;-</span> <span class="fu">plogis</span>(log_odds_same)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="common-pitfalls-and-recommended-practices" class="level2">
+<h2 class="anchored" data-anchor-id="common-pitfalls-and-recommended-practices">6. Common Pitfalls and Recommended Practices</h2>
+<section id="pitfalls-to-avoid" class="level3">
+<h3 class="anchored" data-anchor-id="pitfalls-to-avoid">Pitfalls to Avoid</h3>
+<ol type="1">
+<li><strong>Degeneracy</strong>: Model produces unrealistic extreme networks
+<ul>
+<li>Solution: Use geometrically-weighted terms (GWESP, GWDSP)</li>
+</ul></li>
+<li><strong>Non-convergence</strong>: MCMC doesn’t converge
+<ul>
+<li>Solution: Increase <code>MCMC.burnin</code> and <code>MCMC.interval</code> in control parameters</li>
+</ul></li>
+<li><strong>Near-degeneracy</strong>: Model barely stable
+<ul>
+<li>Solution: Simplify model or use curved exponential family terms</li>
+</ul></li>
+<li><strong>Overfitting</strong>: Too many parameters for network size
+<ul>
+<li>Solution: Use model comparison statistics; prefer simpler models</li>
+</ul></li>
+<li><strong>Misinterpreting significance</strong>: Small p-values doesn’t mean good fit
+<ul>
+<li>Solution: Always check goodness-of-fit diagnostics</li>
+</ul></li>
+</ol>
+</section>
+<section id="recommended-practices" class="level3">
+<h3 class="anchored" data-anchor-id="recommended-practices">Recommended Practices</h3>
+<ol type="1">
+<li><strong>Always start simple</strong>: Begin with edges-only model</li>
+<li><strong>Build up gradually</strong>: Add terms one at a time</li>
+<li><strong>Check convergence</strong>: Use <code>mcmc.diagnostics()</code> for MCMC-based models</li>
+<li><strong>Compare models</strong>: Use <code>anova()</code> to test if added complexity is justified</li>
+<li><strong>Assess fit</strong>: Use <code>gof()</code> to check if model captures key network features</li>
+<li><strong>Visualize</strong>: Plot simulated networks to see if they “look right”</li>
+<li><strong>Report clearly</strong>: State assumptions, show diagnostics, interpret substantively</li>
+</ol>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<ul>
+<li><p>Holland, P. W., &amp; Leinhardt, S. (1981). An exponential family of probability distributions for directed graphs. <em>Journal of the American Statistical Association</em>, 76(373), 33-50.</p></li>
+<li><p>Hunter, D. R., Handcock, M. S., Butts, C. T., Goodreau, S. M., &amp; Morris, M. (2008). ergm: A package to fit, simulate and diagnose exponential-family models for networks. <em>Journal of Statistical Software</em>, 24(3).</p></li>
+</ul>
+<hr>
+<p><em>This tutorial is based on UCLA <a href="https://handcock.github.io/teaching/218/">STATS 218: Social Network Analysis</a> taught by Prof <a href="https://handcock.github.io/">Mark Handcock</a>.</em></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
