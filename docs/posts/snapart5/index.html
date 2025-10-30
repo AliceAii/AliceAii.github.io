@@ -820,25 +820,26 @@ Probabilities:</code></pre>
 <p>Let’s estimate separate probabilities for all four tie types:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co">#fit mixing model</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>fit.mix <span class="ot">&lt;-</span> <span class="fu">ergm</span>(hansell <span class="sc">~</span> <span class="fu">nodemix</span>(<span class="st">"sex"</span>))</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>fit.mix <span class="ot">&lt;-</span> <span class="fu">ergm</span>(hansell <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodemix</span>(<span class="st">"sex"</span>))</span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit.mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Call:
-ergm(formula = hansell ~ nodemix("sex"))
+ergm(formula = hansell ~ edges + nodemix("sex"))
 
 Maximum Likelihood Results:
 
                     Estimate Std. Error MCMC % z value Pr(&gt;|z|)    
-mix.sex.male.female  -1.8374     0.2153      0  -8.533   &lt;1e-04 ***
-mix.sex.female.male  -2.1493     0.2424      0  -8.867   &lt;1e-04 ***
-mix.sex.male.male    -0.9029     0.1767      0  -5.109   &lt;1e-04 ***
+edges                -0.5167     0.1532      0  -3.372 0.000746 ***
+mix.sex.male.female  -1.3207     0.2643      0  -4.997  &lt; 1e-04 ***
+mix.sex.female.male  -1.6326     0.2868      0  -5.693  &lt; 1e-04 ***
+mix.sex.male.male    -0.3862     0.2339      0  -1.651 0.098731 .  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
      Null Deviance: 973.2  on 702  degrees of freedom
- Residual Deviance: 707.2  on 699  degrees of freedom
+ Residual Deviance: 695.5  on 698  degrees of freedom
  
-AIC: 713.2  BIC: 726.9  (Smaller is better. MC Std. Err. = 0)</code></pre>
+AIC: 703.5  BIC: 721.7  (Smaller is better. MC Std. Err. = 0)</code></pre>
 </div>
 </div>
 <section id="interpretation-4" class="level4">
@@ -847,54 +848,59 @@ AIC: 713.2  BIC: 726.9  (Smaller is better. MC Std. Err. = 0)</code></pre>
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract all mixing coefficients</span></span>
 <span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.mix)</span>
 <span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate probabilities for all dyad types</span></span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>prob_FF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>])</span>
-<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>prob_FM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.female.male"</span>])</span>
-<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>prob_MF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.female"</span>])</span>
-<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>prob_MM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.male"</span>])</span>
-<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tie Probabilities:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>coefs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              edges mix.sex.male.female mix.sex.female.male   mix.sex.male.male 
+         -0.5166907          -1.3206792          -1.6326205          -0.3861770 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate probabilities for all dyad types</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>prob_FF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>])</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>prob_FM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.female.male"</span>])</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>prob_MF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.female"</span>])</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>prob_MM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.male"</span>])</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tie Probabilities:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Tie Probabilities:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Female → Female:"</span>, <span class="fu">round</span>(prob_FF, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"From Female to Female:"</span>, <span class="fu">round</span>(prob_FF, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Female → Female: NA </code></pre>
+<pre><code>From Female to Female: 0.374 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Female → Male:"</span>, <span class="fu">round</span>(prob_FM, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"From Female to Male:"</span>, <span class="fu">round</span>(prob_FM, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Female → Male: NA </code></pre>
+<pre><code>From Female to Male: 0.104 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Male → Female:"</span>, <span class="fu">round</span>(prob_MF, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"From Male to Female:"</span>, <span class="fu">round</span>(prob_MF, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Male → Female: NA </code></pre>
+<pre><code>From Male to Female: 0.137 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Male → Male:"</span>, <span class="fu">round</span>(prob_MM, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"From Male to Male:"</span>, <span class="fu">round</span>(prob_MM, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Male → Male: NA </code></pre>
+<pre><code>From Male to Male: 0.288 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate log-odds for specific tie types</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Log-odds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate log-odds for specific tie types</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Log-odds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Log-odds:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Male → Female:"</span>, <span class="fu">round</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.female"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"From Male to Female:"</span>, <span class="fu">round</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.female"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Male → Female: NA </code></pre>
+<pre><code>From Male to Female: -1.837 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Female → Male:"</span>, <span class="fu">round</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.female.male"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"From Female to Male:"</span>, <span class="fu">round</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.female.male"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Female → Male: NA </code></pre>
+<pre><code>From Female to Male: -2.149 </code></pre>
 </div>
 </div>
 </section>
 <section id="comparing-to-empirical-frequencies" class="level4">
 <h4 class="anchored" data-anchor-id="comparing-to-empirical-frequencies">Comparing to Empirical Frequencies</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="co">#step 1: Get empirical mixing matrix</span></span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>emp_mix <span class="ot">&lt;-</span> <span class="fu">mixingmatrix</span>(hansell, <span class="st">"sex"</span>)</span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emp_mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co">#step 1: Get empirical mixing matrix</span></span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>emp_mix <span class="ot">&lt;-</span> <span class="fu">mixingmatrix</span>(hansell, <span class="st">"sex"</span>)</span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emp_mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        To
 From     female male Sum
@@ -902,56 +908,56 @@ From     female male Sum
   male       25   45  70
   Sum        93   64 157</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co">#step 2: Calculate empirical probabilities</span></span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="co">#number of nodes by sex</span></span>
-<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>n_female <span class="ot">&lt;-</span> <span class="fu">sum</span>(hansell <span class="sc">%v%</span> <span class="st">"sex"</span> <span class="sc">==</span> <span class="st">"female"</span>)  <span class="co"># 14</span></span>
-<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>n_male <span class="ot">&lt;-</span> <span class="fu">sum</span>(hansell <span class="sc">%v%</span> <span class="st">"sex"</span> <span class="sc">==</span> <span class="st">"male"</span>)      <span class="co"># 13</span></span>
-<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a><span class="co">#observed counts from mixing matrix</span></span>
-<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>obs_FF <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"female"</span>, <span class="st">"female"</span>]</span>
-<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>obs_FM <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"female"</span>, <span class="st">"male"</span>]</span>
-<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>obs_MF <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"male"</span>, <span class="st">"female"</span>]</span>
-<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>obs_MM <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"male"</span>, <span class="st">"male"</span>]</span>
-<span id="cb96-11"><a href="#cb96-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-12"><a href="#cb96-12" aria-hidden="true" tabindex="-1"></a><span class="co">#possible ties</span></span>
-<span id="cb96-13"><a href="#cb96-13" aria-hidden="true" tabindex="-1"></a>possible_FF <span class="ot">&lt;-</span> n_female <span class="sc">*</span> (n_female <span class="sc">-</span> <span class="dv">1</span>)  <span class="co"># 14 × 13 = 182</span></span>
-<span id="cb96-14"><a href="#cb96-14" aria-hidden="true" tabindex="-1"></a>possible_FM <span class="ot">&lt;-</span> n_female <span class="sc">*</span> n_male          <span class="co"># 14 × 13 = 182</span></span>
-<span id="cb96-15"><a href="#cb96-15" aria-hidden="true" tabindex="-1"></a>possible_MF <span class="ot">&lt;-</span> n_male <span class="sc">*</span> n_female          <span class="co"># 13 × 14 = 182</span></span>
-<span id="cb96-16"><a href="#cb96-16" aria-hidden="true" tabindex="-1"></a>possible_MM <span class="ot">&lt;-</span> n_male <span class="sc">*</span> (n_male <span class="sc">-</span> <span class="dv">1</span>)      <span class="co"># 13 × 12 = 156</span></span>
-<span id="cb96-17"><a href="#cb96-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-18"><a href="#cb96-18" aria-hidden="true" tabindex="-1"></a><span class="co">#empirical probabilities</span></span>
-<span id="cb96-19"><a href="#cb96-19" aria-hidden="true" tabindex="-1"></a>emp_prob_FF <span class="ot">&lt;-</span> obs_FF <span class="sc">/</span> possible_FF</span>
-<span id="cb96-20"><a href="#cb96-20" aria-hidden="true" tabindex="-1"></a>emp_prob_FM <span class="ot">&lt;-</span> obs_FM <span class="sc">/</span> possible_FM</span>
-<span id="cb96-21"><a href="#cb96-21" aria-hidden="true" tabindex="-1"></a>emp_prob_MF <span class="ot">&lt;-</span> obs_MF <span class="sc">/</span> possible_MF</span>
-<span id="cb96-22"><a href="#cb96-22" aria-hidden="true" tabindex="-1"></a>emp_prob_MM <span class="ot">&lt;-</span> obs_MM <span class="sc">/</span> possible_MM</span>
-<span id="cb96-23"><a href="#cb96-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-24"><a href="#cb96-24" aria-hidden="true" tabindex="-1"></a><span class="co">#model-predicted probabilities</span></span>
-<span id="cb96-25"><a href="#cb96-25" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.mix)</span>
-<span id="cb96-26"><a href="#cb96-26" aria-hidden="true" tabindex="-1"></a>model_prob_FF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>])</span>
-<span id="cb96-27"><a href="#cb96-27" aria-hidden="true" tabindex="-1"></a>model_prob_FM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.female.male"</span>])</span>
-<span id="cb96-28"><a href="#cb96-28" aria-hidden="true" tabindex="-1"></a>model_prob_MF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.female"</span>])</span>
-<span id="cb96-29"><a href="#cb96-29" aria-hidden="true" tabindex="-1"></a>model_prob_MM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.male"</span>])</span>
-<span id="cb96-30"><a href="#cb96-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-31"><a href="#cb96-31" aria-hidden="true" tabindex="-1"></a><span class="co">#create comparison table</span></span>
-<span id="cb96-32"><a href="#cb96-32" aria-hidden="true" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb96-33"><a href="#cb96-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">Tie_Type =</span> <span class="fu">c</span>(<span class="st">"Female→Female"</span>, <span class="st">"Female→Male"</span>, <span class="st">"Male→Female"</span>, <span class="st">"Male→Male"</span>),</span>
-<span id="cb96-34"><a href="#cb96-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">Observed =</span> <span class="fu">c</span>(obs_FF, obs_FM, obs_MF, obs_MM),</span>
-<span id="cb96-35"><a href="#cb96-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">Possible =</span> <span class="fu">c</span>(possible_FF, possible_FM, possible_MF, possible_MM),</span>
-<span id="cb96-36"><a href="#cb96-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">Empirical_Prob =</span> <span class="fu">round</span>(<span class="fu">c</span>(emp_prob_FF, emp_prob_FM, emp_prob_MF, emp_prob_MM), <span class="dv">4</span>),</span>
-<span id="cb96-37"><a href="#cb96-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model_Prob =</span> <span class="fu">round</span>(<span class="fu">c</span>(model_prob_FF, model_prob_FM, model_prob_MF, model_prob_MM), <span class="dv">4</span>),</span>
-<span id="cb96-38"><a href="#cb96-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">Difference =</span> <span class="fu">round</span>(<span class="fu">abs</span>(<span class="fu">c</span>(emp_prob_FF <span class="sc">-</span> model_prob_FF,</span>
-<span id="cb96-39"><a href="#cb96-39" aria-hidden="true" tabindex="-1"></a>                           emp_prob_FM <span class="sc">-</span> model_prob_FM,</span>
-<span id="cb96-40"><a href="#cb96-40" aria-hidden="true" tabindex="-1"></a>                           emp_prob_MF <span class="sc">-</span> model_prob_MF,</span>
-<span id="cb96-41"><a href="#cb96-41" aria-hidden="true" tabindex="-1"></a>                           emp_prob_MM <span class="sc">-</span> model_prob_MM)), <span class="dv">6</span>)</span>
-<span id="cb96-42"><a href="#cb96-42" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb96-43"><a href="#cb96-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-44"><a href="#cb96-44" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(comparison)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="co">#step 2: Calculate empirical probabilities</span></span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="co">#number of nodes by sex</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>n_female <span class="ot">&lt;-</span> <span class="fu">sum</span>(hansell <span class="sc">%v%</span> <span class="st">"sex"</span> <span class="sc">==</span> <span class="st">"female"</span>)  <span class="co"># 14</span></span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>n_male <span class="ot">&lt;-</span> <span class="fu">sum</span>(hansell <span class="sc">%v%</span> <span class="st">"sex"</span> <span class="sc">==</span> <span class="st">"male"</span>)      <span class="co"># 13</span></span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a><span class="co">#observed counts from mixing matrix</span></span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>obs_FF <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"female"</span>, <span class="st">"female"</span>]</span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>obs_FM <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"female"</span>, <span class="st">"male"</span>]</span>
+<span id="cb98-9"><a href="#cb98-9" aria-hidden="true" tabindex="-1"></a>obs_MF <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"male"</span>, <span class="st">"female"</span>]</span>
+<span id="cb98-10"><a href="#cb98-10" aria-hidden="true" tabindex="-1"></a>obs_MM <span class="ot">&lt;-</span> emp_mix<span class="sc">$</span>matrix[<span class="st">"male"</span>, <span class="st">"male"</span>]</span>
+<span id="cb98-11"><a href="#cb98-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-12"><a href="#cb98-12" aria-hidden="true" tabindex="-1"></a><span class="co">#possible ties</span></span>
+<span id="cb98-13"><a href="#cb98-13" aria-hidden="true" tabindex="-1"></a>possible_FF <span class="ot">&lt;-</span> n_female <span class="sc">*</span> (n_female <span class="sc">-</span> <span class="dv">1</span>)  <span class="co"># 14 × 13 = 182</span></span>
+<span id="cb98-14"><a href="#cb98-14" aria-hidden="true" tabindex="-1"></a>possible_FM <span class="ot">&lt;-</span> n_female <span class="sc">*</span> n_male          <span class="co"># 14 × 13 = 182</span></span>
+<span id="cb98-15"><a href="#cb98-15" aria-hidden="true" tabindex="-1"></a>possible_MF <span class="ot">&lt;-</span> n_male <span class="sc">*</span> n_female          <span class="co"># 13 × 14 = 182</span></span>
+<span id="cb98-16"><a href="#cb98-16" aria-hidden="true" tabindex="-1"></a>possible_MM <span class="ot">&lt;-</span> n_male <span class="sc">*</span> (n_male <span class="sc">-</span> <span class="dv">1</span>)      <span class="co"># 13 × 12 = 156</span></span>
+<span id="cb98-17"><a href="#cb98-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-18"><a href="#cb98-18" aria-hidden="true" tabindex="-1"></a><span class="co">#empirical probabilities</span></span>
+<span id="cb98-19"><a href="#cb98-19" aria-hidden="true" tabindex="-1"></a>emp_prob_FF <span class="ot">&lt;-</span> obs_FF <span class="sc">/</span> possible_FF</span>
+<span id="cb98-20"><a href="#cb98-20" aria-hidden="true" tabindex="-1"></a>emp_prob_FM <span class="ot">&lt;-</span> obs_FM <span class="sc">/</span> possible_FM</span>
+<span id="cb98-21"><a href="#cb98-21" aria-hidden="true" tabindex="-1"></a>emp_prob_MF <span class="ot">&lt;-</span> obs_MF <span class="sc">/</span> possible_MF</span>
+<span id="cb98-22"><a href="#cb98-22" aria-hidden="true" tabindex="-1"></a>emp_prob_MM <span class="ot">&lt;-</span> obs_MM <span class="sc">/</span> possible_MM</span>
+<span id="cb98-23"><a href="#cb98-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-24"><a href="#cb98-24" aria-hidden="true" tabindex="-1"></a><span class="co">#model-predicted probabilities</span></span>
+<span id="cb98-25"><a href="#cb98-25" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.mix)</span>
+<span id="cb98-26"><a href="#cb98-26" aria-hidden="true" tabindex="-1"></a>model_prob_FF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>])</span>
+<span id="cb98-27"><a href="#cb98-27" aria-hidden="true" tabindex="-1"></a>model_prob_FM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.female.male"</span>])</span>
+<span id="cb98-28"><a href="#cb98-28" aria-hidden="true" tabindex="-1"></a>model_prob_MF <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.female"</span>])</span>
+<span id="cb98-29"><a href="#cb98-29" aria-hidden="true" tabindex="-1"></a>model_prob_MM <span class="ot">&lt;-</span> <span class="fu">plogis</span>(coefs[<span class="st">"edges"</span>] <span class="sc">+</span> coefs[<span class="st">"mix.sex.male.male"</span>])</span>
+<span id="cb98-30"><a href="#cb98-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-31"><a href="#cb98-31" aria-hidden="true" tabindex="-1"></a><span class="co">#create comparison table</span></span>
+<span id="cb98-32"><a href="#cb98-32" aria-hidden="true" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb98-33"><a href="#cb98-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">Tie_Type =</span> <span class="fu">c</span>(<span class="st">"From Female to Female"</span>, <span class="st">"From Female to Male"</span>, <span class="st">"From Male to Female"</span>, <span class="st">"From Male to Male"</span>),</span>
+<span id="cb98-34"><a href="#cb98-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">Observed =</span> <span class="fu">c</span>(obs_FF, obs_FM, obs_MF, obs_MM),</span>
+<span id="cb98-35"><a href="#cb98-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">Possible =</span> <span class="fu">c</span>(possible_FF, possible_FM, possible_MF, possible_MM),</span>
+<span id="cb98-36"><a href="#cb98-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">Empirical_Prob =</span> <span class="fu">round</span>(<span class="fu">c</span>(emp_prob_FF, emp_prob_FM, emp_prob_MF, emp_prob_MM), <span class="dv">4</span>),</span>
+<span id="cb98-37"><a href="#cb98-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model_Prob =</span> <span class="fu">round</span>(<span class="fu">c</span>(model_prob_FF, model_prob_FM, model_prob_MF, model_prob_MM), <span class="dv">4</span>),</span>
+<span id="cb98-38"><a href="#cb98-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">Difference =</span> <span class="fu">round</span>(<span class="fu">abs</span>(<span class="fu">c</span>(emp_prob_FF <span class="sc">-</span> model_prob_FF,</span>
+<span id="cb98-39"><a href="#cb98-39" aria-hidden="true" tabindex="-1"></a>                           emp_prob_FM <span class="sc">-</span> model_prob_FM,</span>
+<span id="cb98-40"><a href="#cb98-40" aria-hidden="true" tabindex="-1"></a>                           emp_prob_MF <span class="sc">-</span> model_prob_MF,</span>
+<span id="cb98-41"><a href="#cb98-41" aria-hidden="true" tabindex="-1"></a>                           emp_prob_MM <span class="sc">-</span> model_prob_MM)), <span class="dv">6</span>)</span>
+<span id="cb98-42"><a href="#cb98-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb98-43"><a href="#cb98-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-44"><a href="#cb98-44" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(comparison)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>       Tie_Type Observed Possible Empirical_Prob Model_Prob Difference
-1 Female→Female       68      182         0.3736         NA         NA
-2   Female→Male       19      182         0.1044         NA         NA
-3   Male→Female       25      182         0.1374         NA         NA
-4     Male→Male       45      156         0.2885         NA         NA</code></pre>
+<pre><code>               Tie_Type Observed Possible Empirical_Prob Model_Prob Difference
+1 From Female to Female       68      182         0.3736     0.3736          0
+2   From Female to Male       19      182         0.1044     0.1044          0
+3   From Male to Female       25      182         0.1374     0.1374          0
+4     From Male to Male       45      156         0.2885     0.2885          0</code></pre>
 </div>
 </div>
 <p><strong>Key Finding</strong>: The mixing model perfectly matches the empirical probabilities! This is because it has enough parameters to exactly reproduce the observed mixing matrix.</p>
@@ -961,20 +967,20 @@ From     female male Sum
 <h3 class="anchored" data-anchor-id="model-comparison">2.7 Model Comparison</h3>
 <p>Let’s formally compare all models:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit.er, fit.homo, fit.diff.homo, fit.mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit.er, fit.homo, fit.diff.homo, fit.mix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Deviance Table
 
 Model 1: hansell ~ edges
 Model 2: hansell ~ edges + nodematch("sex")
 Model 3: hansell ~ edges + nodematch("sex", diff = TRUE)
-Model 4: hansell ~ nodemix("sex")
+Model 4: hansell ~ edges + nodemix("sex")
      Df Deviance Resid. Df Resid. Dev Pr(&gt;|Chisq|)    
 NULL                   702     973.18                 
 1     1  226.974       701     746.20    &lt; 2.2e-16 ***
 2     1   47.067       700     699.14    6.861e-12 ***
 3     1    2.752       699     696.39      0.09711 .  
-4     0  -10.820       699     707.21    &lt; 2.2e-16 ***
+4     1    0.933       698     695.45      0.33402    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
@@ -982,24 +988,24 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="interpretation-5" class="level4">
 <h4 class="anchored" data-anchor-id="interpretation-5">Interpretation</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create summary table</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>model_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Erdős-Rényi"</span>, <span class="st">"Homophily"</span>, <span class="st">"Diff. Homophily"</span>, <span class="st">"Full Mixing"</span>),</span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Df =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
-<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Deviance =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">deviance</span>(fit.er), </span>
-<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">deviance</span>(fit.homo),</span>
-<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">deviance</span>(fit.diff.homo), </span>
-<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">deviance</span>(fit.mix)), <span class="dv">2</span>),</span>
-<span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">AIC</span>(fit.er), <span class="fu">AIC</span>(fit.homo), <span class="fu">AIC</span>(fit.diff.homo), <span class="fu">AIC</span>(fit.mix)), <span class="dv">2</span>)</span>
-<span id="cb100-10"><a href="#cb100-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb100-11"><a href="#cb100-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb100-12"><a href="#cb100-12" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(model_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create summary table</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>model_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Erdős-Rényi"</span>, <span class="st">"Homophily"</span>, <span class="st">"Diff. Homophily"</span>, <span class="st">"Full Mixing"</span>),</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Df =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Deviance =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">deviance</span>(fit.er), </span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">deviance</span>(fit.homo),</span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">deviance</span>(fit.diff.homo), </span>
+<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">deviance</span>(fit.mix)), <span class="dv">2</span>),</span>
+<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">AIC</span>(fit.er), <span class="fu">AIC</span>(fit.homo), <span class="fu">AIC</span>(fit.diff.homo), <span class="fu">AIC</span>(fit.mix)), <span class="dv">2</span>)</span>
+<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb102-11"><a href="#cb102-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-12"><a href="#cb102-12" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(model_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            Model Df Deviance    AIC
 1     Erdős-Rényi  1   746.20 748.20
 2       Homophily  2   699.14 703.14
 3 Diff. Homophily  3   696.39 702.39
-4     Full Mixing  4   707.21 713.21</code></pre>
+4     Full Mixing  4   695.45 703.45</code></pre>
 </div>
 </div>
 <p><strong>Model Selection</strong>:</p>
@@ -1032,11 +1038,11 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="fitting-the-p_1-model" class="level3">
 <h3 class="anchored" data-anchor-id="fitting-the-p_1-model">3.2 Fitting the <span class="math inline">\(p_1\)</span> Model</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co">#fit p1 model with homophily and reciprocity</span></span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>fit.p1 <span class="ot">&lt;-</span> <span class="fu">ergm</span>(hansell <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"sex"</span>) <span class="sc">+</span> </span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>               sender <span class="sc">+</span> receiver <span class="sc">+</span> mutual,</span>
-<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">estimate =</span> <span class="st">"MPLE"</span>)  <span class="co"># Use MPLE for faster fitting</span></span>
-<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit.p1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co">#fit p1 model with homophily and reciprocity</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>fit.p1 <span class="ot">&lt;-</span> <span class="fu">ergm</span>(hansell <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"sex"</span>) <span class="sc">+</span> </span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>               sender <span class="sc">+</span> receiver <span class="sc">+</span> mutual,</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">estimate =</span> <span class="st">"MPLE"</span>)  <span class="co"># Use MPLE for faster fitting</span></span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit.p1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Call:
 ergm(formula = hansell ~ edges + nodematch("sex") + sender + 
@@ -1117,36 +1123,36 @@ AIC: 553.8  BIC: 778.1  (Smaller is better. MC Std. Err. = 0)
 <section id="interpretation-6" class="level4">
 <h4 class="anchored" data-anchor-id="interpretation-6">Interpretation</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract key coefficients</span></span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.p1)</span>
-<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Baseline (edges):"</span>, <span class="fu">round</span>(coefs[<span class="st">"edges"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract key coefficients</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.p1)</span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Baseline (edges):"</span>, <span class="fu">round</span>(coefs[<span class="st">"edges"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Baseline (edges): -2.119 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Homophily effect:"</span>, <span class="fu">round</span>(coefs[<span class="st">"nodematch.sex"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Homophily effect:"</span>, <span class="fu">round</span>(coefs[<span class="st">"nodematch.sex"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Homophily effect: 1.843 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reciprocity effect:"</span>, <span class="fu">round</span>(coefs[<span class="st">"mutual"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reciprocity effect:"</span>, <span class="fu">round</span>(coefs[<span class="st">"mutual"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reciprocity effect: 0.903 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="co">#interpret effects</span></span>
-<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">--- Interpretations ---</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="co">#interpret effects</span></span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">--- Interpretations ---</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 --- Interpretations ---</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Homophily OR:"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"nodematch.sex"</span>]), <span class="dv">2</span>), </span>
-<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"- Same-sex ties are"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"nodematch.sex"</span>]), <span class="dv">1</span>), </span>
-<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"times more likely</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Homophily OR:"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"nodematch.sex"</span>]), <span class="dv">2</span>), </span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"- Same-sex ties are"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"nodematch.sex"</span>]), <span class="dv">1</span>), </span>
+<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"times more likely</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Homophily OR: 6.31 - Same-sex ties are 6.3 times more likely</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reciprocity OR:"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"mutual"</span>]), <span class="dv">2</span>),</span>
-<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"- Reciprocated ties are"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"mutual"</span>]), <span class="dv">1</span>),</span>
-<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"times more likely</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reciprocity OR:"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"mutual"</span>]), <span class="dv">2</span>),</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"- Reciprocated ties are"</span>, <span class="fu">round</span>(<span class="fu">exp</span>(coefs[<span class="st">"mutual"</span>]), <span class="dv">1</span>),</span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"times more likely</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reciprocity OR: 2.47 - Reciprocated ties are 2.5 times more likely</code></pre>
 </div>
@@ -1166,40 +1172,40 @@ AIC: 553.8  BIC: 778.1  (Smaller is better. MC Std. Err. = 0)
 <section id="extract-sender-and-receiver-coefficients" class="level4">
 <h4 class="anchored" data-anchor-id="extract-sender-and-receiver-coefficients">Extract Sender and Receiver Coefficients</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract all coefficients</span></span>
-<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.p1)</span>
-<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a><span class="co">#sender effects (first node is reference = 0)</span></span>
-<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>sender_coefs <span class="ot">&lt;-</span> coefs[<span class="fu">grep</span>(<span class="st">"^sender"</span>, <span class="fu">names</span>(coefs))]</span>
-<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>sender_coefs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, sender_coefs)</span>
-<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a><span class="co">#receiver effects (first node is reference = 0)</span></span>
-<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a>receiver_coefs <span class="ot">&lt;-</span> coefs[<span class="fu">grep</span>(<span class="st">"^receiver"</span>, <span class="fu">names</span>(coefs))]</span>
-<span id="cb116-10"><a href="#cb116-10" aria-hidden="true" tabindex="-1"></a>receiver_coefs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, receiver_coefs)</span>
-<span id="cb116-11"><a href="#cb116-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-12"><a href="#cb116-12" aria-hidden="true" tabindex="-1"></a><span class="co">#summary statistics</span></span>
-<span id="cb116-13"><a href="#cb116-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Sender effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract all coefficients</span></span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit.p1)</span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a><span class="co">#sender effects (first node is reference = 0)</span></span>
+<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>sender_coefs <span class="ot">&lt;-</span> coefs[<span class="fu">grep</span>(<span class="st">"^sender"</span>, <span class="fu">names</span>(coefs))]</span>
+<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>sender_coefs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, sender_coefs)</span>
+<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a><span class="co">#receiver effects (first node is reference = 0)</span></span>
+<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>receiver_coefs <span class="ot">&lt;-</span> coefs[<span class="fu">grep</span>(<span class="st">"^receiver"</span>, <span class="fu">names</span>(coefs))]</span>
+<span id="cb118-10"><a href="#cb118-10" aria-hidden="true" tabindex="-1"></a>receiver_coefs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, receiver_coefs)</span>
+<span id="cb118-11"><a href="#cb118-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-12"><a href="#cb118-12" aria-hidden="true" tabindex="-1"></a><span class="co">#summary statistics</span></span>
+<span id="cb118-13"><a href="#cb118-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Sender effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Sender effects:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Range:"</span>, <span class="fu">range</span>(sender_coefs[<span class="fu">is.finite</span>(sender_coefs)]), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Range:"</span>, <span class="fu">range</span>(sender_coefs[<span class="fu">is.finite</span>(sender_coefs)]), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Range: -2.876386 3.408013 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(sender_coefs[<span class="fu">is.finite</span>(sender_coefs)]), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(sender_coefs[<span class="fu">is.finite</span>(sender_coefs)]), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  SD: 1.435 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Receiver effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Receiver effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Receiver effects:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Range:"</span>, <span class="fu">range</span>(receiver_coefs[<span class="fu">is.finite</span>(receiver_coefs)]), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Range:"</span>, <span class="fu">range</span>(receiver_coefs[<span class="fu">is.finite</span>(receiver_coefs)]), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Range: -3.097952 1.456984 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(receiver_coefs[<span class="fu">is.finite</span>(receiver_coefs)]), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(receiver_coefs[<span class="fu">is.finite</span>(receiver_coefs)]), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  SD: 1.184 </code></pre>
 </div>
@@ -1208,36 +1214,36 @@ Receiver effects:</code></pre>
 <section id="visualize-centrality-vs-prestige" class="level4">
 <h4 class="anchored" data-anchor-id="visualize-centrality-vs-prestige">Visualize Centrality vs Prestige</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create scatter plot</span></span>
-<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(receiver_coefs, sender_coefs,</span>
-<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Prestige (Receiver Effects)"</span>,</span>
-<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Centrality (Sender Effects)"</span>,</span>
-<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Individual Differences in p₁ Model</span><span class="sc">\n</span><span class="st">Centrality vs Prestige"</span>,</span>
-<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">cex =</span> <span class="fl">1.5</span>)</span>
-<span id="cb128-7"><a href="#cb128-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-8"><a href="#cb128-8" aria-hidden="true" tabindex="-1"></a><span class="co">#add labels</span></span>
-<span id="cb128-9"><a href="#cb128-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(receiver_coefs, sender_coefs, </span>
-<span id="cb128-10"><a href="#cb128-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">27</span>, <span class="at">pos =</span> <span class="dv">3</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"darkred"</span>)</span>
-<span id="cb128-11"><a href="#cb128-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-12"><a href="#cb128-12" aria-hidden="true" tabindex="-1"></a><span class="co">#add reference lines</span></span>
-<span id="cb128-13"><a href="#cb128-13" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">v =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"gray50"</span>)</span>
-<span id="cb128-14"><a href="#cb128-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-15"><a href="#cb128-15" aria-hidden="true" tabindex="-1"></a><span class="co">#identify top students</span></span>
-<span id="cb128-16"><a href="#cb128-16" aria-hidden="true" tabindex="-1"></a>top_prestige <span class="ot">&lt;-</span> <span class="fu">order</span>(receiver_coefs, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb128-17"><a href="#cb128-17" aria-hidden="true" tabindex="-1"></a>top_centrality <span class="ot">&lt;-</span> <span class="fu">order</span>(sender_coefs, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb128-18"><a href="#cb128-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-19"><a href="#cb128-19" aria-hidden="true" tabindex="-1"></a><span class="co">#highlight top students</span></span>
-<span id="cb128-20"><a href="#cb128-20" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(receiver_coefs[top_prestige], sender_coefs[top_prestige], </span>
-<span id="cb128-21"><a href="#cb128-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="dv">3</span>)</span>
-<span id="cb128-22"><a href="#cb128-22" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(receiver_coefs[top_centrality], sender_coefs[top_centrality], </span>
-<span id="cb128-23"><a href="#cb128-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"green"</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="dv">3</span>)</span>
-<span id="cb128-24"><a href="#cb128-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-25"><a href="#cb128-25" aria-hidden="true" tabindex="-1"></a><span class="co">#add legend</span></span>
-<span id="cb128-26"><a href="#cb128-26" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>,</span>
-<span id="cb128-27"><a href="#cb128-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Top Prestige"</span>, <span class="st">"Top Centrality"</span>),</span>
-<span id="cb128-28"><a href="#cb128-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"green"</span>),</span>
-<span id="cb128-29"><a href="#cb128-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">19</span>,</span>
-<span id="cb128-30"><a href="#cb128-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">pt.cex =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create scatter plot</span></span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(receiver_coefs, sender_coefs,</span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Prestige (Receiver Effects)"</span>,</span>
+<span id="cb130-4"><a href="#cb130-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Centrality (Sender Effects)"</span>,</span>
+<span id="cb130-5"><a href="#cb130-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Individual Differences in p₁ Model</span><span class="sc">\n</span><span class="st">Centrality vs Prestige"</span>,</span>
+<span id="cb130-6"><a href="#cb130-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">cex =</span> <span class="fl">1.5</span>)</span>
+<span id="cb130-7"><a href="#cb130-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-8"><a href="#cb130-8" aria-hidden="true" tabindex="-1"></a><span class="co">#add labels</span></span>
+<span id="cb130-9"><a href="#cb130-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(receiver_coefs, sender_coefs, </span>
+<span id="cb130-10"><a href="#cb130-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">27</span>, <span class="at">pos =</span> <span class="dv">3</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"darkred"</span>)</span>
+<span id="cb130-11"><a href="#cb130-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-12"><a href="#cb130-12" aria-hidden="true" tabindex="-1"></a><span class="co">#add reference lines</span></span>
+<span id="cb130-13"><a href="#cb130-13" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">v =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"gray50"</span>)</span>
+<span id="cb130-14"><a href="#cb130-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-15"><a href="#cb130-15" aria-hidden="true" tabindex="-1"></a><span class="co">#identify top students</span></span>
+<span id="cb130-16"><a href="#cb130-16" aria-hidden="true" tabindex="-1"></a>top_prestige <span class="ot">&lt;-</span> <span class="fu">order</span>(receiver_coefs, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb130-17"><a href="#cb130-17" aria-hidden="true" tabindex="-1"></a>top_centrality <span class="ot">&lt;-</span> <span class="fu">order</span>(sender_coefs, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb130-18"><a href="#cb130-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-19"><a href="#cb130-19" aria-hidden="true" tabindex="-1"></a><span class="co">#highlight top students</span></span>
+<span id="cb130-20"><a href="#cb130-20" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(receiver_coefs[top_prestige], sender_coefs[top_prestige], </span>
+<span id="cb130-21"><a href="#cb130-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="dv">3</span>)</span>
+<span id="cb130-22"><a href="#cb130-22" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(receiver_coefs[top_centrality], sender_coefs[top_centrality], </span>
+<span id="cb130-23"><a href="#cb130-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"green"</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="dv">3</span>)</span>
+<span id="cb130-24"><a href="#cb130-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-25"><a href="#cb130-25" aria-hidden="true" tabindex="-1"></a><span class="co">#add legend</span></span>
+<span id="cb130-26"><a href="#cb130-26" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>,</span>
+<span id="cb130-27"><a href="#cb130-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Top Prestige"</span>, <span class="st">"Top Centrality"</span>),</span>
+<span id="cb130-28"><a href="#cb130-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"green"</span>),</span>
+<span id="cb130-29"><a href="#cb130-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">19</span>,</span>
+<span id="cb130-30"><a href="#cb130-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">pt.cex =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1245,13 +1251,13 @@ Receiver effects:</code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="co">#print top students</span></span>
-<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Top 2 in Prestige (most liked):"</span>, top_prestige, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="co">#print top students</span></span>
+<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Top 2 in Prestige (most liked):"</span>, top_prestige, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Top 2 in Prestige (most liked): 15 17 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Top 2 in Centrality (like most others):"</span>, top_centrality, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Top 2 in Centrality (like most others):"</span>, top_centrality, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Top 2 in Centrality (like most others): 16 5 </code></pre>
 </div>
@@ -1262,29 +1268,29 @@ Top 2 in Prestige (most liked): 15 17 </code></pre>
 <h3 class="anchored" data-anchor-id="correlation-with-degree-centrality">3.4 Correlation with Degree Centrality</h3>
 <p>How well do p₁ effects capture traditional degree centrality measures?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate degree centrality</span></span>
-<span id="cb133-2"><a href="#cb133-2" aria-hidden="true" tabindex="-1"></a>indeg <span class="ot">&lt;-</span> <span class="fu">degree</span>(hansell, <span class="at">cmode =</span> <span class="st">"indegree"</span>)</span>
-<span id="cb133-3"><a href="#cb133-3" aria-hidden="true" tabindex="-1"></a>outdeg <span class="ot">&lt;-</span> <span class="fu">degree</span>(hansell, <span class="at">cmode =</span> <span class="st">"outdegree"</span>)</span>
-<span id="cb133-4"><a href="#cb133-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb133-5"><a href="#cb133-5" aria-hidden="true" tabindex="-1"></a><span class="co">#filter out infinite/extreme values for correlation</span></span>
-<span id="cb133-6"><a href="#cb133-6" aria-hidden="true" tabindex="-1"></a>finite_indices <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">is.finite</span>(sender_coefs) <span class="sc">&amp;</span> </span>
-<span id="cb133-7"><a href="#cb133-7" aria-hidden="true" tabindex="-1"></a>                        sender_coefs <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">5</span> <span class="sc">&amp;</span> </span>
-<span id="cb133-8"><a href="#cb133-8" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">is.finite</span>(receiver_coefs) <span class="sc">&amp;</span> </span>
-<span id="cb133-9"><a href="#cb133-9" aria-hidden="true" tabindex="-1"></a>                        receiver_coefs <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">5</span>)</span>
-<span id="cb133-10"><a href="#cb133-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb133-11"><a href="#cb133-11" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate correlations</span></span>
-<span id="cb133-12"><a href="#cb133-12" aria-hidden="true" tabindex="-1"></a>cor_prestige <span class="ot">&lt;-</span> <span class="fu">cor</span>(receiver_coefs[finite_indices], indeg[finite_indices])</span>
-<span id="cb133-13"><a href="#cb133-13" aria-hidden="true" tabindex="-1"></a>cor_centrality <span class="ot">&lt;-</span> <span class="fu">cor</span>(sender_coefs[finite_indices], outdeg[finite_indices])</span>
-<span id="cb133-14"><a href="#cb133-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb133-15"><a href="#cb133-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Correlation between:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate degree centrality</span></span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a>indeg <span class="ot">&lt;-</span> <span class="fu">degree</span>(hansell, <span class="at">cmode =</span> <span class="st">"indegree"</span>)</span>
+<span id="cb135-3"><a href="#cb135-3" aria-hidden="true" tabindex="-1"></a>outdeg <span class="ot">&lt;-</span> <span class="fu">degree</span>(hansell, <span class="at">cmode =</span> <span class="st">"outdegree"</span>)</span>
+<span id="cb135-4"><a href="#cb135-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb135-5"><a href="#cb135-5" aria-hidden="true" tabindex="-1"></a><span class="co">#filter out infinite/extreme values for correlation</span></span>
+<span id="cb135-6"><a href="#cb135-6" aria-hidden="true" tabindex="-1"></a>finite_indices <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">is.finite</span>(sender_coefs) <span class="sc">&amp;</span> </span>
+<span id="cb135-7"><a href="#cb135-7" aria-hidden="true" tabindex="-1"></a>                        sender_coefs <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">5</span> <span class="sc">&amp;</span> </span>
+<span id="cb135-8"><a href="#cb135-8" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">is.finite</span>(receiver_coefs) <span class="sc">&amp;</span> </span>
+<span id="cb135-9"><a href="#cb135-9" aria-hidden="true" tabindex="-1"></a>                        receiver_coefs <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">5</span>)</span>
+<span id="cb135-10"><a href="#cb135-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb135-11"><a href="#cb135-11" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate correlations</span></span>
+<span id="cb135-12"><a href="#cb135-12" aria-hidden="true" tabindex="-1"></a>cor_prestige <span class="ot">&lt;-</span> <span class="fu">cor</span>(receiver_coefs[finite_indices], indeg[finite_indices])</span>
+<span id="cb135-13"><a href="#cb135-13" aria-hidden="true" tabindex="-1"></a>cor_centrality <span class="ot">&lt;-</span> <span class="fu">cor</span>(sender_coefs[finite_indices], outdeg[finite_indices])</span>
+<span id="cb135-14"><a href="#cb135-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb135-15"><a href="#cb135-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Correlation between:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Correlation between:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Receiver effects &amp; In-degree:"</span>, <span class="fu">round</span>(cor_prestige, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Receiver effects &amp; In-degree:"</span>, <span class="fu">round</span>(cor_prestige, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Receiver effects &amp; In-degree: 0.9896 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Sender effects &amp; Out-degree:"</span>, <span class="fu">round</span>(cor_centrality, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Sender effects &amp; Out-degree:"</span>, <span class="fu">round</span>(cor_centrality, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Sender effects &amp; Out-degree: 0.9694 </code></pre>
 </div>
@@ -1292,27 +1298,27 @@ Top 2 in Prestige (most liked): 15 17 </code></pre>
 <section id="visualize-correlations" class="level4">
 <h4 class="anchored" data-anchor-id="visualize-correlations">Visualize Correlations</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb139-2"><a href="#cb139-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb139-3"><a href="#cb139-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Receiver vs In-Degree</span></span>
-<span id="cb139-4"><a href="#cb139-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(indeg, receiver_coefs,</span>
-<span id="cb139-5"><a href="#cb139-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"In-Degree"</span>,</span>
-<span id="cb139-6"><a href="#cb139-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Receiver Effect (Prestige)"</span>,</span>
-<span id="cb139-7"><a href="#cb139-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Prestige Correlation</span><span class="sc">\n</span><span class="st">r = "</span>, <span class="fu">round</span>(cor_prestige, <span class="dv">3</span>)),</span>
-<span id="cb139-8"><a href="#cb139-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"dodgerblue"</span>, <span class="at">cex =</span> <span class="fl">1.5</span>)</span>
-<span id="cb139-9"><a href="#cb139-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(indeg, receiver_coefs, <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">27</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.7</span>)</span>
-<span id="cb139-10"><a href="#cb139-10" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="fu">lm</span>(receiver_coefs[finite_indices] <span class="sc">~</span> indeg[finite_indices]), </span>
-<span id="cb139-11"><a href="#cb139-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb139-12"><a href="#cb139-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb139-13"><a href="#cb139-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Sender vs Out-Degree</span></span>
-<span id="cb139-14"><a href="#cb139-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(outdeg, sender_coefs,</span>
-<span id="cb139-15"><a href="#cb139-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Out-Degree"</span>,</span>
-<span id="cb139-16"><a href="#cb139-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Sender Effect (Centrality)"</span>,</span>
-<span id="cb139-17"><a href="#cb139-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Centrality Correlation</span><span class="sc">\n</span><span class="st">r = "</span>, <span class="fu">round</span>(cor_centrality, <span class="dv">3</span>)),</span>
-<span id="cb139-18"><a href="#cb139-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"coral"</span>, <span class="at">cex =</span> <span class="fl">1.5</span>)</span>
-<span id="cb139-19"><a href="#cb139-19" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(outdeg, sender_coefs, <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">27</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.7</span>)</span>
-<span id="cb139-20"><a href="#cb139-20" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="fu">lm</span>(sender_coefs[finite_indices] <span class="sc">~</span> outdeg[finite_indices]), </span>
-<span id="cb139-21"><a href="#cb139-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Receiver vs In-Degree</span></span>
+<span id="cb141-4"><a href="#cb141-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(indeg, receiver_coefs,</span>
+<span id="cb141-5"><a href="#cb141-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"In-Degree"</span>,</span>
+<span id="cb141-6"><a href="#cb141-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Receiver Effect (Prestige)"</span>,</span>
+<span id="cb141-7"><a href="#cb141-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Prestige Correlation</span><span class="sc">\n</span><span class="st">r = "</span>, <span class="fu">round</span>(cor_prestige, <span class="dv">3</span>)),</span>
+<span id="cb141-8"><a href="#cb141-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"dodgerblue"</span>, <span class="at">cex =</span> <span class="fl">1.5</span>)</span>
+<span id="cb141-9"><a href="#cb141-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(indeg, receiver_coefs, <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">27</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.7</span>)</span>
+<span id="cb141-10"><a href="#cb141-10" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="fu">lm</span>(receiver_coefs[finite_indices] <span class="sc">~</span> indeg[finite_indices]), </span>
+<span id="cb141-11"><a href="#cb141-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb141-12"><a href="#cb141-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb141-13"><a href="#cb141-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Sender vs Out-Degree</span></span>
+<span id="cb141-14"><a href="#cb141-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(outdeg, sender_coefs,</span>
+<span id="cb141-15"><a href="#cb141-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Out-Degree"</span>,</span>
+<span id="cb141-16"><a href="#cb141-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Sender Effect (Centrality)"</span>,</span>
+<span id="cb141-17"><a href="#cb141-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Centrality Correlation</span><span class="sc">\n</span><span class="st">r = "</span>, <span class="fu">round</span>(cor_centrality, <span class="dv">3</span>)),</span>
+<span id="cb141-18"><a href="#cb141-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"coral"</span>, <span class="at">cex =</span> <span class="fl">1.5</span>)</span>
+<span id="cb141-19"><a href="#cb141-19" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(outdeg, sender_coefs, <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">27</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.7</span>)</span>
+<span id="cb141-20"><a href="#cb141-20" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="fu">lm</span>(sender_coefs[finite_indices] <span class="sc">~</span> outdeg[finite_indices]), </span>
+<span id="cb141-21"><a href="#cb141-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1320,7 +1326,7 @@ Top 2 in Prestige (most liked): 15 17 </code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Key Finding</strong>: The p₁ model’s sender and receiver effects are <strong>highly correlated</strong> with traditional degree centrality measures (r &gt; 0.96)!</p>
 </section>
@@ -1329,58 +1335,58 @@ Top 2 in Prestige (most liked): 15 17 </code></pre>
 <h3 class="anchored" data-anchor-id="magnitude-of-effects">3.5 Magnitude of Effects</h3>
 <p>How do individual differences compare to structural effects?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="co">#filter finite values</span></span>
-<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a>finite_sender <span class="ot">&lt;-</span> sender_coefs[<span class="fu">is.finite</span>(sender_coefs)]</span>
-<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>finite_receiver <span class="ot">&lt;-</span> receiver_coefs[<span class="fu">is.finite</span>(receiver_coefs)]</span>
-<span id="cb141-4"><a href="#cb141-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb141-5"><a href="#cb141-5" aria-hidden="true" tabindex="-1"></a><span class="co">#summary</span></span>
-<span id="cb141-6"><a href="#cb141-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Individual Effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="co">#filter finite values</span></span>
+<span id="cb143-2"><a href="#cb143-2" aria-hidden="true" tabindex="-1"></a>finite_sender <span class="ot">&lt;-</span> sender_coefs[<span class="fu">is.finite</span>(sender_coefs)]</span>
+<span id="cb143-3"><a href="#cb143-3" aria-hidden="true" tabindex="-1"></a>finite_receiver <span class="ot">&lt;-</span> receiver_coefs[<span class="fu">is.finite</span>(receiver_coefs)]</span>
+<span id="cb143-4"><a href="#cb143-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb143-5"><a href="#cb143-5" aria-hidden="true" tabindex="-1"></a><span class="co">#summary</span></span>
+<span id="cb143-6"><a href="#cb143-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Individual Effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Individual Effects:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Sender effects range:"</span>, <span class="fu">range</span>(finite_sender), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Sender effects range:"</span>, <span class="fu">range</span>(finite_sender), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Sender effects range: -2.876386 3.408013 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Receiver effects range:"</span>, <span class="fu">range</span>(finite_receiver), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb147"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Receiver effects range:"</span>, <span class="fu">range</span>(finite_receiver), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Receiver effects range: -3.097952 1.456984 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb147"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Sender SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(finite_sender), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Sender SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(finite_sender), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Sender SD: 1.435 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Receiver SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(finite_receiver), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Receiver SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(finite_receiver), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Receiver SD: 1.184 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Structural Effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb153"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Structural Effects:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Structural Effects:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb153"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Homophily:"</span>, <span class="fu">round</span>(coefs[<span class="st">"nodematch.sex"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb155"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Homophily:"</span>, <span class="fu">round</span>(coefs[<span class="st">"nodematch.sex"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Homophily: 1.843 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb155"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Reciprocity:"</span>, <span class="fu">round</span>(coefs[<span class="st">"mutual"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Reciprocity:"</span>, <span class="fu">round</span>(coefs[<span class="st">"mutual"</span>], <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Reciprocity: 0.903 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Interpretation:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Interpretation:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Interpretation:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Individual effects have substantial variation (SD ≈ 1.1-1.4)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Individual effects have substantial variation (SD ≈ 1.1-1.4)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Individual effects have substantial variation (SD ≈ 1.1-1.4)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Homophily effect (1.84) is larger than 1 SD</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Homophily effect (1.84) is larger than 1 SD</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Homophily effect (1.84) is larger than 1 SD</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Extreme individuals can override typical homophily patterns</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Extreme individuals can override typical homophily patterns</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Extreme individuals can override typical homophily patterns</code></pre>
 </div>
@@ -1388,36 +1394,36 @@ Interpretation:</code></pre>
 <section id="visualization-of-effect-magnitudes" class="level4">
 <h4 class="anchored" data-anchor-id="visualization-of-effect-magnitudes">Visualization of Effect Magnitudes</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create density plots</span></span>
-<span id="cb165-2"><a href="#cb165-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb165-3"><a href="#cb165-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-4"><a href="#cb165-4" aria-hidden="true" tabindex="-1"></a><span class="co">#sender effects</span></span>
-<span id="cb165-5"><a href="#cb165-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(finite_sender), </span>
-<span id="cb165-6"><a href="#cb165-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Distribution of Individual Effects"</span>,</span>
-<span id="cb165-7"><a href="#cb165-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Effect Size"</span>,</span>
-<span id="cb165-8"><a href="#cb165-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">4</span>),</span>
-<span id="cb165-9"><a href="#cb165-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"coral"</span>)</span>
-<span id="cb165-10"><a href="#cb165-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(finite_receiver), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"dodgerblue"</span>)</span>
-<span id="cb165-11"><a href="#cb165-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-12"><a href="#cb165-12" aria-hidden="true" tabindex="-1"></a><span class="co">#add structural effects</span></span>
-<span id="cb165-13"><a href="#cb165-13" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> coefs[<span class="st">"nodematch.sex"</span>], <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb165-14"><a href="#cb165-14" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> coefs[<span class="st">"mutual"</span>], <span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb165-15"><a href="#cb165-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-16"><a href="#cb165-16" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>,</span>
-<span id="cb165-17"><a href="#cb165-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Sender"</span>, <span class="st">"Receiver"</span>, <span class="st">"Homophily"</span>, <span class="st">"Reciprocity"</span>),</span>
-<span id="cb165-18"><a href="#cb165-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"coral"</span>, <span class="st">"dodgerblue"</span>, <span class="st">"darkgreen"</span>, <span class="st">"purple"</span>),</span>
-<span id="cb165-19"><a href="#cb165-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb165-20"><a href="#cb165-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb165-21"><a href="#cb165-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-22"><a href="#cb165-22" aria-hidden="true" tabindex="-1"></a><span class="co">#boxplot comparison</span></span>
-<span id="cb165-23"><a href="#cb165-23" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(<span class="fu">list</span>(<span class="at">Sender =</span> finite_sender,</span>
-<span id="cb165-24"><a href="#cb165-24" aria-hidden="true" tabindex="-1"></a>             <span class="at">Receiver =</span> finite_receiver),</span>
-<span id="cb165-25"><a href="#cb165-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Individual Effect Variation"</span>,</span>
-<span id="cb165-26"><a href="#cb165-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Effect Size"</span>,</span>
-<span id="cb165-27"><a href="#cb165-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"coral"</span>, <span class="st">"dodgerblue"</span>),</span>
-<span id="cb165-28"><a href="#cb165-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">horizontal =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb165-29"><a href="#cb165-29" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> coefs[<span class="st">"nodematch.sex"</span>], <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb165-30"><a href="#cb165-30" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> coefs[<span class="st">"mutual"</span>], <span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create density plots</span></span>
+<span id="cb167-2"><a href="#cb167-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb167-3"><a href="#cb167-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-4"><a href="#cb167-4" aria-hidden="true" tabindex="-1"></a><span class="co">#sender effects</span></span>
+<span id="cb167-5"><a href="#cb167-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(finite_sender), </span>
+<span id="cb167-6"><a href="#cb167-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Distribution of Individual Effects"</span>,</span>
+<span id="cb167-7"><a href="#cb167-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Effect Size"</span>,</span>
+<span id="cb167-8"><a href="#cb167-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb167-9"><a href="#cb167-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"coral"</span>)</span>
+<span id="cb167-10"><a href="#cb167-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(finite_receiver), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"dodgerblue"</span>)</span>
+<span id="cb167-11"><a href="#cb167-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-12"><a href="#cb167-12" aria-hidden="true" tabindex="-1"></a><span class="co">#add structural effects</span></span>
+<span id="cb167-13"><a href="#cb167-13" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> coefs[<span class="st">"nodematch.sex"</span>], <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb167-14"><a href="#cb167-14" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> coefs[<span class="st">"mutual"</span>], <span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb167-15"><a href="#cb167-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-16"><a href="#cb167-16" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>,</span>
+<span id="cb167-17"><a href="#cb167-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Sender"</span>, <span class="st">"Receiver"</span>, <span class="st">"Homophily"</span>, <span class="st">"Reciprocity"</span>),</span>
+<span id="cb167-18"><a href="#cb167-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"coral"</span>, <span class="st">"dodgerblue"</span>, <span class="st">"darkgreen"</span>, <span class="st">"purple"</span>),</span>
+<span id="cb167-19"><a href="#cb167-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb167-20"><a href="#cb167-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb167-21"><a href="#cb167-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-22"><a href="#cb167-22" aria-hidden="true" tabindex="-1"></a><span class="co">#boxplot comparison</span></span>
+<span id="cb167-23"><a href="#cb167-23" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(<span class="fu">list</span>(<span class="at">Sender =</span> finite_sender,</span>
+<span id="cb167-24"><a href="#cb167-24" aria-hidden="true" tabindex="-1"></a>             <span class="at">Receiver =</span> finite_receiver),</span>
+<span id="cb167-25"><a href="#cb167-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Individual Effect Variation"</span>,</span>
+<span id="cb167-26"><a href="#cb167-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Effect Size"</span>,</span>
+<span id="cb167-27"><a href="#cb167-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"coral"</span>, <span class="st">"dodgerblue"</span>),</span>
+<span id="cb167-28"><a href="#cb167-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">horizontal =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb167-29"><a href="#cb167-29" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> coefs[<span class="st">"nodematch.sex"</span>], <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb167-30"><a href="#cb167-30" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> coefs[<span class="st">"mutual"</span>], <span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1425,7 +1431,7 @@ Interpretation:</code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -1505,33 +1511,33 @@ Interpretation:</code></pre>
 <h3 class="anchored" data-anchor-id="practical-workflow">Practical Workflow</h3>
 <section id="step-1-visualize" class="level4">
 <h4 class="anchored" data-anchor-id="step-1-visualize">Step 1: Visualize</h4>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(network)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(network)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="step-2-start-simple" class="level4">
 <h4 class="anchored" data-anchor-id="step-2-start-simple">Step 2: Start Simple</h4>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a>fit.er <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a>fit.er <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="step-3-add-substantive-terms" class="level4">
 <h4 class="anchored" data-anchor-id="step-3-add-substantive-terms">Step 3: Add Substantive Terms</h4>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>fit.homo <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>))</span>
-<span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a>fit.p1 <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>) <span class="sc">+</span> sender <span class="sc">+</span> receiver <span class="sc">+</span> mutual)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a>fit.homo <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>))</span>
+<span id="cb171-2"><a href="#cb171-2" aria-hidden="true" tabindex="-1"></a>fit.p1 <span class="ot">&lt;-</span> <span class="fu">ergm</span>(network <span class="sc">~</span> edges <span class="sc">+</span> <span class="fu">nodematch</span>(<span class="st">"group"</span>) <span class="sc">+</span> sender <span class="sc">+</span> receiver <span class="sc">+</span> mutual)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="step-4-compare-models" class="level4">
 <h4 class="anchored" data-anchor-id="step-4-compare-models">Step 4: Compare Models</h4>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit.er, fit.homo, fit.p1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit.er, fit.homo, fit.p1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="step-5-interpret-effects" class="level4">
 <h4 class="anchored" data-anchor-id="step-5-interpret-effects">Step 5: Interpret Effects</h4>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficients → Probabilities</span></span>
-<span id="cb171-2"><a href="#cb171-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="fu">coef</span>(fit))</span>
-<span id="cb171-3"><a href="#cb171-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-4"><a href="#cb171-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Odds Ratios</span></span>
-<span id="cb171-5"><a href="#cb171-5" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficients → Probabilities</span></span>
+<span id="cb173-2"><a href="#cb173-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="fu">coef</span>(fit))</span>
+<span id="cb173-3"><a href="#cb173-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb173-4"><a href="#cb173-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Odds Ratios</span></span>
+<span id="cb173-5"><a href="#cb173-5" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="step-6-check-fit" class="level4">
 <h4 class="anchored" data-anchor-id="step-6-check-fit">Step 6: Check Fit</h4>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gof</span>(fit.homo)</span>
-<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc.diagnostics</span>(fit.homo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gof</span>(fit.homo)</span>
+<span id="cb174-2"><a href="#cb174-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc.diagnostics</span>(fit.homo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="common-patterns" class="level3">

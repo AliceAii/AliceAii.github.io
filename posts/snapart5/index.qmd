@@ -341,8 +341,9 @@ Let's estimate separate probabilities for all four tie types:
 
 ```{r, message=FALSE, warning=FALSE}
 #fit mixing model
-fit.mix <- ergm(hansell ~ nodemix("sex"))
+fit.mix <- ergm(hansell ~ edges + nodemix("sex"))
 summary(fit.mix)
+
 ```
 
 #### Interpretation
@@ -351,6 +352,8 @@ summary(fit.mix)
 #extract all mixing coefficients
 coefs <- coef(fit.mix)
 
+coefs
+
 #calculate probabilities for all dyad types
 prob_FF <- plogis(coefs["edges"])
 prob_FM <- plogis(coefs["edges"] + coefs["mix.sex.female.male"])
@@ -358,15 +361,15 @@ prob_MF <- plogis(coefs["edges"] + coefs["mix.sex.male.female"])
 prob_MM <- plogis(coefs["edges"] + coefs["mix.sex.male.male"])
 
 cat("Tie Probabilities:\n")
-cat("Female → Female:", round(prob_FF, 3), "\n")
-cat("Female → Male:", round(prob_FM, 3), "\n")
-cat("Male → Female:", round(prob_MF, 3), "\n")
-cat("Male → Male:", round(prob_MM, 3), "\n")
+cat("From Female to Female:", round(prob_FF, 3), "\n")
+cat("From Female to Male:", round(prob_FM, 3), "\n")
+cat("From Male to Female:", round(prob_MF, 3), "\n")
+cat("From Male to Male:", round(prob_MM, 3), "\n")
 
 #calculate log-odds for specific tie types
 cat("\nLog-odds:\n")
-cat("Male → Female:", round(coefs["edges"] + coefs["mix.sex.male.female"], 3), "\n")
-cat("Female → Male:", round(coefs["edges"] + coefs["mix.sex.female.male"], 3), "\n")
+cat("From Male to Female:", round(coefs["edges"] + coefs["mix.sex.male.female"], 3), "\n")
+cat("From Female to Male:", round(coefs["edges"] + coefs["mix.sex.female.male"], 3), "\n")
 ```
 
 #### Comparing to Empirical Frequencies
@@ -409,7 +412,7 @@ model_prob_MM <- plogis(coefs["edges"] + coefs["mix.sex.male.male"])
 
 #create comparison table
 comparison <- data.frame(
-  Tie_Type = c("Female→Female", "Female→Male", "Male→Female", "Male→Male"),
+  Tie_Type = c("From Female to Female", "From Female to Male", "From Male to Female", "From Male to Male"),
   Observed = c(obs_FF, obs_FM, obs_MF, obs_MM),
   Possible = c(possible_FF, possible_FM, possible_MF, possible_MM),
   Empirical_Prob = round(c(emp_prob_FF, emp_prob_FM, emp_prob_MF, emp_prob_MM), 4),
