@@ -468,7 +468,7 @@ print(model_summary)
 
 
 
-## Example 3: The p₁ Model - Individual Differences
+## Example 3: The $p_1$ Model - Individual Differences
 
 ### 3.1 Motivation
 

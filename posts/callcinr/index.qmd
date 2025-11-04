@@ -1,0 +1,419 @@
+---
+title: "Calling C from R: A Performance Tutorial"
+author: Shuhan (Alice) Ai
+date: "2025-11-03"
+categories: [R, C++]
+toc: true
+toc-depth: 3
+toc-title: "Contents"
+image: "plot1.png"
+---
+
+## Introduction
+
+In data analysis and statistical computing, R is an excellent language for its expressiveness and extensive statistical libraries. However, R can be slow for certain computationally intensive tasks. This is where calling C or C++ from R becomes valuable.
+
+In this tutorial, we'll explore:
+
+1. **Why** we need to call C from R
+2. **When** to use C instead of pure R
+3. **How** to implement C functions using Rcpp
+4. **Real-world examples** with performance comparisons
+
+This tutorial builds on our [previous kernel density estimation post](https://aliceaii.github.io/posts/kerneldensity2/#loading-earthquake-data), where we implemented algorithms in R. Now, we'll see how to accelerate these computations using C.
+
+## Why Call C from R?
+
+### Performance Comparison
+
+R is an interpreted language, which makes it flexible but slower for certain operations. C is a compiled language that runs much closer to the hardware, making it significantly faster for:
+
+- **Loops**: Especially nested loops or loops with millions of iterations
+- **Numerical computations**: Heavy mathematical calculations
+- **Memory-intensive operations**: When you need fine control over memory
+- **Recursive algorithms**: Where function call overhead matters
+
+**Speed gains**: C can be **10x to 1000x faster** than R for loop-heavy computations.
+
+### When to Use C from R
+
+✅ **Use C when:**
+
+- You have loops that iterate millions of times
+- You're performing the same simple operation repeatedly
+- Profiling shows a specific R function is a bottleneck
+- You need numerical precision or memory efficiency
+- Existing R functions are too slow for your application
+
+❌ **Don't use C when:**
+
+- Vectorized R code already runs fast enough
+- You're doing exploratory data analysis
+- The bottleneck is I/O (reading/writing files)
+- The code complexity isn't worth the speedup
+- R packages already provide optimized solutions
+
+## Getting Started with Rcpp
+
+### Installation
+```{r, eval=FALSE}
+# Install Rcpp package
+install.packages("Rcpp")
+```
+
+### Your First C Function in R
+
+Let's start with a simple example: computing the sum of numbers from 1 to n.
+```{r}
+library(Rcpp)
+
+# Pure R version
+sum_r <- function(n) {
+  total <- 0
+  for(i in 1:n) {
+    total <- total + i
+  }
+  return(total)
+}
+
+# C++ version using Rcpp
+Rcpp::cppFunction("
+double sum_cpp(int n) {
+  double total = 0.0;
+  for(int i = 1; i <= n; ++i) {
+    total += i;
+  }
+  return total;
+}
+")
+
+# Test both versions
+n <- 1000000
+system.time(result_r <- sum_r(n))
+system.time(result_cpp <- sum_cpp(n))
+```
+
+**Key differences:**
+
+- C++ requires **type declarations** (`double`, `int`)
+- Array indexing starts at **0 in C**, **1 in R**
+- C++ uses **`++i`** for increment, R uses **`i + 1`**
+
+## Example 1: Alternating Series Convergence
+
+### Problem
+
+Compute the alternating harmonic series: 1 - 1/2 + 1/3 - 1/4 + ... = ln(2)
+
+This is a good example because:
+
+- It requires a loop with millions of iterations
+- Each iteration is a simple calculation
+- It demonstrates convergence visualization
+
+### Implementation
+```{r, message=FALSE, warning=FALSE}
+# C function to compute first n terms
+Rcpp::cppFunction("
+double alt2(int n) {
+  double total = 0.0;
+  for(int i = 1; i <= n; ++i) {
+    total += pow(-1.0, i + 1) / i;
+  }
+  return total;
+}
+")
+
+# Test the function
+cat("alt2(10) =", alt2(10), "\n")
+cat("alt2(100) =", alt2(100), "\n")
+cat("alt2(1000) =", alt2(1000), "\n")
+cat("alt2(1000000) =", alt2(1000000), "\n")
+cat("ln(2) =", log(2), "\n")
+```
+
+### Visualization
+```{r, fig.width=8, fig.height=5}
+# Create sequence of n values
+n <- unique(c(
+  seq(1, 100, by = 1),
+  seq(105, 1000, by = 5),
+  seq(1010, 10000, by = 10),
+  seq(10050, 100000, by = 50),
+  seq(100500, 1000000, by = 500)
+))
+
+# Compute values
+alt2_vals <- sapply(n, alt2)
+ln2 <- log(2)
+
+# Create plot
+par(mar = c(4.5, 6, 3.5, 2))
+plot(n, alt2_vals, 
+     type = "n",
+     xlab = "Number of Terms (N)",
+     ylab = "Sum of Series",
+     main = "Approximation of ln(2) by Alternating Series",
+     xlim = c(0, 1e6),
+     ylim = c(0.6931, 0.6932),
+     las = 0,
+     cex.lab = 1.0,
+     cex.main = 1.1)
+
+# Shaded area shows convergence
+polygon(c(n, rev(n)), 
+        c(alt2_vals, rep(ln2, length(n))),
+        col = rgb(0.5, 0.5, 0.7, 0.5))
+
+lines(n, alt2_vals, col = "darkblue", lwd = 2.5)
+abline(h = ln2, col = "red", lwd = 2, lty = 2)
+
+legend("topright", 
+       legend = c("alt2(n)", "ln(2)"),
+       col = c("darkblue", "red"),
+       lty = c(1, 2),
+       lwd = c(2.5, 2),
+       bg = "white",
+       cex = 0.9)
+```
+
+**Key insight**: The series converges slowly, requiring about 1 million terms to get within 0.0000005 of ln(2). Computing this in pure R would be much slower!
+
+## Example 2: Kernel Density Estimation
+
+### Problem
+
+Compute kernel density estimates for earthquake magnitude data using a Gaussian kernel.
+
+**Why C?** With n=223 data points and m=100 grid points, we perform 22,300 kernel evaluations. For larger datasets (n=10,000, m=500), that's 5 million calculations!
+
+### Loading the Data
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+
+# Load earthquake data
+data <- read.table(file = "SearchResults.txt", sep = "", skip = 2, fill = T)
+colnames(data) <- c("DATE", "TIME", "ET", "GT", "MAG", "M", "LAT", 
+                    "LON", "DEPTH", "Q", "EVID", "NPH", "NGRM")
+
+magnitudes <- data$MAG
+cat("Number of earthquakes:", length(magnitudes), "\n")
+cat("Magnitude range:", sprintf("[%.2f, %.2f]", min(magnitudes), max(magnitudes)), "\n")
+```
+
+### C Implementation
+```{r}
+Rcpp::cppFunction("
+NumericVector kernel_density(NumericVector g, NumericVector x, double h) {
+  int m = g.size();  // number of grid points
+  int n = x.size();  // number of data points
+  NumericVector y(m);  // output density estimates
+  
+  double sqrt_2pi = sqrt(2.0 * M_PI);
+  
+  // For each grid point
+  for(int i = 0; i < m; ++i) {
+    y[i] = 0.0;
+    // Sum contributions from all data points
+    for(int j = 0; j < n; ++j) {
+      double z = (g[i] - x[j]) / h;
+      y[i] += exp(-0.5 * z * z) / (h * sqrt_2pi);
+    }
+    y[i] /= n;  // Normalize
+  }
+  
+  return y;
+}
+")
+```
+
+**C++ features used:**
+
+- `NumericVector`: Rcpp's vector type that interfaces with R
+- `.size()`: Method to get vector length
+- Nested loops: The inner loop runs n times for each of m iterations
+- Mathematical functions: `sqrt()`, `exp()`, `pow()`
+
+### Computing and Plotting
+```{r, fig.width=8, fig.height=5}
+# Calculate bandwidth using Scott's rule
+h <- bw.nrd(magnitudes)
+cat("Bandwidth (Scott's rule):", sprintf("%.4f", h), "\n")
+
+# Create grid
+g <- seq(min(magnitudes), max(magnitudes), length = 100)
+
+# Call C function
+y <- kernel_density(g, magnitudes, h)
+
+# Create plot
+kde_data <- data.frame(Magnitude = g, Density = y)
+
+par(mar = c(4.5, 4.5, 3.5, 2))
+plot(kde_data$Magnitude, kde_data$Density,
+     type = "l", col = "darkblue", lwd = 2.5,
+     xlab = "Magnitude (m)", ylab = "Density f(m)",
+     main = "Kernel Density Estimate of Earthquake Magnitudes",
+     cex.lab = 1.0, cex.main = 1.1,
+     ylim = c(0, max(kde_data$Density) * 1.1))
+
+rug(magnitudes, col = "red", lwd = 0.8, ticksize = 0.03)
+
+legend("topright",
+       legend = c("Kernel Density", "Data Points"),
+       col = c("darkblue", "red"),
+       lty = c(1, NA),
+       pch = c(NA, 124),
+       lwd = c(2.5, 1),
+       bg = "white",
+       cex = 0.9)
+```
+
+### Performance Comparison
+```{r}
+# R version for comparison
+kernel_density_r <- function(g, x, h) {
+  m <- length(g)
+  n <- length(x)
+  y <- numeric(m)
+  sqrt_2pi <- sqrt(2 * pi)
+  
+  for(i in 1:m) {
+    for(j in 1:n) {
+      z <- (g[i] - x[j]) / h
+      y[i] <- y[i] + exp(-0.5 * z^2) / (h * sqrt_2pi)
+    }
+    y[i] <- y[i] / n
+  }
+  return(y)
+}
+
+# Benchmark
+cat("\nPerformance comparison:\n")
+system.time(y_r <- kernel_density_r(g, magnitudes, h))
+system.time(y_cpp <- kernel_density(g, magnitudes, h))
+
+```
+
+## Example 3: Numerical Integration
+
+### Problem
+
+Approximate the integral of a shifted Pareto density:
+
+$$f(x) = (p-1)c^{p-1}(x+c)^{-p}, \quad x \geq 0$$
+
+Using the trapezoidal rule with 1 million grid points.
+
+### Implementation
+```{r}
+Rcpp::cppFunction("
+double paretoint(double xmax, double c, double p) {
+  int n = 1000000;  // 1 million grid points
+  double dx = xmax / (n - 1);
+  double integral = 0.0;
+  
+  // Coefficient: (p-1) * c^(p-1)
+  double coef = (p - 1) * pow(c, p - 1);
+  
+  // Trapezoidal rule
+  double f0 = coef * pow(c, -p);
+  double fn = coef * pow(xmax + c, -p);
+  
+  double sum_middle = 0.0;
+  for(int i = 1; i < n - 1; ++i) {
+    double x = i * dx;
+    double fx = coef * pow(x + c, -p);
+    sum_middle += fx;
+  }
+  
+  integral = dx * (0.5 * f0 + sum_middle + 0.5 * fn);
+  return integral;
+}
+")
+```
+
+### Case 1: c = 3, p = 2
+```{r, fig.width=8, fig.height=5}
+c1 <- 3
+p1 <- 2
+
+xmax_values1 <- c(10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 
+                  600, 700, 800, 900, 1000)
+
+integral_values1 <- sapply(xmax_values1, function(xm) {
+  paretoint(xm, c1, p1)
+})
+
+df1 <- data.frame(xmax = xmax_values1, integral = integral_values1)
+
+par(mar = c(4.5, 4.5, 3.5, 2))
+plot(df1$xmax, df1$integral,
+     type = "b", col = "darkblue", lwd = 2.5, pch = 19, cex = 1.2,
+     xlab = "xmax", ylab = "paretoint(xmax, 3, 2)",
+     main = "Pareto Integral: c = 3, p = 2",
+     las = 1, cex.lab = 1.1, cex.main = 1.2,
+     panel.first = grid(col = "gray90", lty = "solid", lwd = 0.5))
+abline(h = 1, col = "red", lwd = 2, lty = 2)
+```
+
+### Case 2: c = 12, p = 3.5
+```{r, fig.width=8, fig.height=5}
+c2 <- 12
+p2 <- 3.5
+
+xmax_values2 <- c(10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 
+                  600, 700, 800, 900, 1000)
+
+integral_values2 <- sapply(xmax_values2, function(xm) {
+  paretoint(xm, c2, p2)
+})
+
+df2 <- data.frame(xmax = xmax_values2, integral = integral_values2)
+
+par(mar = c(4.5, 4.5, 3.5, 2))
+plot(df2$xmax, df2$integral,
+     type = "b", col = "darkgreen", lwd = 2.5, pch = 19, cex = 1.2,
+     xlab = "xmax", ylab = "paretoint(xmax, 12, 3.5)",
+     main = "Pareto Integral: c = 12, p = 3.5",
+     las = 1, cex.lab = 1.1, cex.main = 1.2,
+     ylim = c(0, max(df2$integral) * 1.1),
+     panel.first = grid(col = "gray90", lty = "solid", lwd = 0.5))
+abline(h = 1, col = "red", lwd = 2, lty = 2)
+```
+
+**Interpretation**: Both integrals converge to 1 (shown by red dashed line), which is expected since we're integrating a probability density function. The convergence is faster for larger c and p values.
+
+## Common Pitfalls
+
+### 1. Array Indexing
+```cpp
+// C++ uses 0-based indexing
+for(int i = 0; i < n; ++i) {  // 0 to n-1
+  x[i] = ...
+}
+
+// R uses 1-based indexing
+for(i in 1:n) {  // 1 to n
+  x[i] <- ...
+}
+```
+
+### 2. Integer Division
+```cpp
+double result = 5 / 2;      // Result: 2.0 (integer division)
+double result = 5.0 / 2.0;  // Result: 2.5 (correct)
+```
+
+### 3. Power Functions
+```cpp
+pow(-1, i)    // Correct
+(-1)^i        // WRONG! ^ is XOR in C++, not exponentiation
+```
+
+## Further Reading
+
+- [Rcpp Gallery](http://gallery.rcpp.org/): More examples
+- [Advanced R - Rcpp Chapter](https://adv-r.hadley.nz/rcpp.html): Hadley Wickham's guide
+
+*This tutorial is based on UCLA [STATS 202A: Statistics Programming](http://www.stat.ucla.edu/~frederic/202a/F25/) taught by Prof [Rick Schoenberg](http://www.stat.ucla.edu/~frederic/). *
