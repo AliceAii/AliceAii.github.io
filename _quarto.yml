@@ -16,8 +16,6 @@ website:
         file: blog_posts.qmd
       - text: "Teaching"
         file: teaching.qmd
-      - text: "Misc"
-        file: misc.qmd
       - text: "CV"
         file: CV.qmd
         
