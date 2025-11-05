@@ -16,8 +16,11 @@ website:
         file: blog_posts.qmd
       - text: "Teaching"
         file: teaching.qmd
+      - text: "Misc"
+        file: misc.qmd
       - text: "CV"
         file: CV.qmd
+        
     right:
       - icon: github
         href: https://github.com/AliceAii

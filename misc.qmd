@@ -1,0 +1,21 @@
+---
+title: "Misc"
+format: 
+  html:
+    css: styles.css
+---
+
+
+
+### **All Creatures Great and Small**
+
+
+
+
+### **All Things Bright and Beautiful**
+
+
+
+
+
+### **All Things Wise and Wonderful**
