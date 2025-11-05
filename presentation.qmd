@@ -30,7 +30,7 @@ format:
 
 ### 2024
 
-**Ai, S.**, Rios, M., Olivares, J., & Jiang, T. (2024). *Can Community Cultural Wealth Guide Undergraduate Women of Color Toward STEM Careers? Examining HERI Data.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. [<a href="slides/2024ASHE_CCW WOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.**, Rios, M., Olivares, J., & Jiang, T. (2024). *Can Community Cultural Wealth Guide Undergraduate Women of Color Toward STEM Careers? Examining HERI Data.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. [<a href="slides/2024ASHE_CCW WOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"} [<a href="slides/2024ASHE_paperCCW WOC.pdf" class="slides-btn"> [Conference Paper]</a>]{style="white-space: nowrap;"}
 
 Ramos, H., Eagan, K., & **Ai, S.** (2024). *BUILDing Science Identity: Exploring the Efficacy and Moderation Effects of a Nationally Funded Intervention.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. [<a href="slides/2024ASHE_BUILDingSciid.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
