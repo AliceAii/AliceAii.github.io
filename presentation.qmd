@@ -15,6 +15,9 @@ format:
 <div class="hanging">
 
 ### 2025
+
+**Ai, S.** (2025). *Can Community Service Foster Commitment to Social Responsibility Among First-year STEM Major Aspirants?*  Dissertation Proposal Defense. [<a href="slides/2025.12PreliOralDefense.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+
 **Ai, S.**, Eagan, K., & Wu, J. (2025). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. Paper presentation at the annual meeting of the Association for the Study of Higher Education, Denver, CO. 
 
 **Ai, S.**, & Eagan, K. (2025). *What Factors Promote High School Students’ Development of Science Identity and STEM Major Aspiration? An Analysis of HSLS:09 Data.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO. [<a href="slides/2025AERA_STEMmajor.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
