@@ -31,7 +31,7 @@ $$P(Y = y) = \frac{1}{2^N}$$
 
 where $N$ is the total number of possible ties (for a directed network: $N = n(n-1)$; for undirected: $N = \frac{n(n-1)}{2}$).
 
-**Key insight**: The null model provides our reference point for comparison. Any other model should do better than this!
+**Key insight**: The null model provides our reference point for comparison. Any other model should do better than this.
 
 ::: {.callout-note}
 What does "all possible networks are equally likely" mean?
@@ -41,7 +41,7 @@ What does "all possible networks are equally likely" mean?
 
 In the null model, each possible network configuration (a complete pattern of who's connected to whom) is equally probable. But when we look at individual ties within these configurations:
 
-- **Individual ties ARE equally likely** - each has a 50% chance of existing
+- Individual ties ARE equally likely: each has a 50% chance of existing
 - **But** the model makes no assumptions about which specific ties will form
 - All $2^N$ possible network structures have equal probability $\frac{1}{2^N}$
 
@@ -61,7 +61,7 @@ Some possible configurations:
 4. A→B and B→C exist
 5. ... (60 more configurations)
 
-Each of these 64 distinct networks has equal probability!
+Each of these 64 distinct networks has equal probability.
 
  Why is this the "null" model?
 

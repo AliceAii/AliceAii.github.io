@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-11-11">
+
+<title>Social Network Analysis R Tutorial Part 6: ERGM Inference, Simulation, and Diagnostics – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Social Network Analysis R Tutorial Part 6: ERGM Inference, Simulation, and Diagnostics</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">SNA</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 11, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#maximum-likelihood-estimation-for-ergms" id="toc-maximum-likelihood-estimation-for-ergms" class="nav-link active" data-scroll-target="#maximum-likelihood-estimation-for-ergms">1. Maximum Likelihood Estimation for ERGMs</a>
+  <ul class="collapse">
+  <li><a href="#the-likelihood-function" id="toc-the-likelihood-function" class="nav-link" data-scroll-target="#the-likelihood-function">1.1 The Likelihood Function</a></li>
+  <li><a href="#the-computational-challenge" id="toc-the-computational-challenge" class="nav-link" data-scroll-target="#the-computational-challenge">1.2 The Computational Challenge</a></li>
+  <li><a href="#two-estimation-strategies" id="toc-two-estimation-strategies" class="nav-link" data-scroll-target="#two-estimation-strategies">1.3 Two Estimation Strategies</a></li>
+  <li><a href="#the-mle-as-moment-matching" id="toc-the-mle-as-moment-matching" class="nav-link" data-scroll-target="#the-mle-as-moment-matching">1.4 The MLE as Moment Matching</a></li>
+  </ul></li>
+  <li><a href="#markov-chain-monte-carlo-methods" id="toc-markov-chain-monte-carlo-methods" class="nav-link" data-scroll-target="#markov-chain-monte-carlo-methods">2. Markov Chain Monte Carlo Methods</a>
+  <ul class="collapse">
+  <li><a href="#the-mcmc-strategy" id="toc-the-mcmc-strategy" class="nav-link" data-scroll-target="#the-mcmc-strategy">2.1 The MCMC Strategy</a></li>
+  <li><a href="#the-metropolis-hastings-algorithm" id="toc-the-metropolis-hastings-algorithm" class="nav-link" data-scroll-target="#the-metropolis-hastings-algorithm">2.2 The Metropolis-Hastings Algorithm</a></li>
+  <li><a href="#mcmc-in-practice" id="toc-mcmc-in-practice" class="nav-link" data-scroll-target="#mcmc-in-practice">2.3 MCMC in Practice</a></li>
+  <li><a href="#convergence-assessment" id="toc-convergence-assessment" class="nav-link" data-scroll-target="#convergence-assessment">2.4 Convergence Assessment</a></li>
+  </ul></li>
+  <li><a href="#simulation-from-fitted-models" id="toc-simulation-from-fitted-models" class="nav-link" data-scroll-target="#simulation-from-fitted-models">3. Simulation from Fitted Models</a>
+  <ul class="collapse">
+  <li><a href="#why-simulate-networks" id="toc-why-simulate-networks" class="nav-link" data-scroll-target="#why-simulate-networks">3.1 Why Simulate Networks?</a></li>
+  <li><a href="#the-simulation-process" id="toc-the-simulation-process" class="nav-link" data-scroll-target="#the-simulation-process">3.2 The Simulation Process</a></li>
+  <li><a href="#properties-of-simulated-networks" id="toc-properties-of-simulated-networks" class="nav-link" data-scroll-target="#properties-of-simulated-networks">3.3 Properties of Simulated Networks</a></li>
+  </ul></li>
+  <li><a href="#goodness-of-fit-testing" id="toc-goodness-of-fit-testing" class="nav-link" data-scroll-target="#goodness-of-fit-testing">4. Goodness-of-Fit Testing</a>
+  <ul class="collapse">
+  <li><a href="#the-gof-philosophy" id="toc-the-gof-philosophy" class="nav-link" data-scroll-target="#the-gof-philosophy">4.1 The GOF Philosophy</a></li>
+  <li><a href="#standard-gof-statistics" id="toc-standard-gof-statistics" class="nav-link" data-scroll-target="#standard-gof-statistics">4.2 Standard GOF Statistics</a></li>
+  <li><a href="#interpreting-gof-output" id="toc-interpreting-gof-output" class="nav-link" data-scroll-target="#interpreting-gof-output">4.3 Interpreting GOF Output</a></li>
+  <li><a href="#what-to-do-when-gof-fails" id="toc-what-to-do-when-gof-fails" class="nav-link" data-scroll-target="#what-to-do-when-gof-fails">4.4 What to Do When GOF Fails</a></li>
+  <li><a href="#gof-for-model-comparison" id="toc-gof-for-model-comparison" class="nav-link" data-scroll-target="#gof-for-model-comparison">4.5 GOF for Model Comparison</a></li>
+  </ul></li>
+  <li><a href="#model-degeneracy" id="toc-model-degeneracy" class="nav-link" data-scroll-target="#model-degeneracy">5. Model Degeneracy</a>
+  <ul class="collapse">
+  <li><a href="#what-is-model-degeneracy" id="toc-what-is-model-degeneracy" class="nav-link" data-scroll-target="#what-is-model-degeneracy">5.1 What is Model Degeneracy?</a></li>
+  <li><a href="#why-degeneracy-occurs" id="toc-why-degeneracy-occurs" class="nav-link" data-scroll-target="#why-degeneracy-occurs">5.2 Why Degeneracy Occurs</a></li>
+  <li><a href="#detecting-degeneracy" id="toc-detecting-degeneracy" class="nav-link" data-scroll-target="#detecting-degeneracy">5.3 Detecting Degeneracy</a></li>
+  <li><a href="#degenerate-vs-near-degenerate" id="toc-degenerate-vs-near-degenerate" class="nav-link" data-scroll-target="#degenerate-vs-near-degenerate">5.4 Degenerate vs Near-Degenerate</a></li>
+  <li><a href="#common-degenerate-specifications" id="toc-common-degenerate-specifications" class="nav-link" data-scroll-target="#common-degenerate-specifications">5.5 Common Degenerate Specifications</a></li>
+  </ul></li>
+  <li><a href="#solutions-to-degeneracy-geometrically-weighted-terms" id="toc-solutions-to-degeneracy-geometrically-weighted-terms" class="nav-link" data-scroll-target="#solutions-to-degeneracy-geometrically-weighted-terms">6. Solutions to Degeneracy: Geometrically-Weighted Terms</a>
+  <ul class="collapse">
+  <li><a href="#the-key-insight" id="toc-the-key-insight" class="nav-link" data-scroll-target="#the-key-insight">6.1 The Key Insight</a></li>
+  <li><a href="#edgewise-shared-partners-esp-1" id="toc-edgewise-shared-partners-esp-1" class="nav-link" data-scroll-target="#edgewise-shared-partners-esp-1">6.2 Edgewise Shared Partners (ESP)</a></li>
+  <li><a href="#geometrically-weighted-esp-gwesp" id="toc-geometrically-weighted-esp-gwesp" class="nav-link" data-scroll-target="#geometrically-weighted-esp-gwesp">6.3 Geometrically-Weighted ESP (GWESP)</a></li>
+  <li><a href="#why-gwesp-works" id="toc-why-gwesp-works" class="nav-link" data-scroll-target="#why-gwesp-works">6.4 Why GWESP Works</a></li>
+  <li><a href="#the-decay-parameter-alpha" id="toc-the-decay-parameter-alpha" class="nav-link" data-scroll-target="#the-decay-parameter-alpha">6.5 The Decay Parameter <span class="math inline">\(\alpha\)</span></a></li>
+  <li><a href="#other-geometrically-weighted-terms" id="toc-other-geometrically-weighted-terms" class="nav-link" data-scroll-target="#other-geometrically-weighted-terms">6.6 Other Geometrically-Weighted Terms</a></li>
+  <li><a href="#the-curved-exponential-family" id="toc-the-curved-exponential-family" class="nav-link" data-scroll-target="#the-curved-exponential-family">6.7 The Curved Exponential Family</a></li>
+  </ul></li>
+  <li><a href="#more-readings" id="toc-more-readings" class="nav-link" data-scroll-target="#more-readings">More readings:</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>In this post, we’ll continue to explore the theoretical foundations of ERGM estimation, the computational methods used to fit these models, and the diagnostic tools for evaluating model quality. Following plot is an exmaple of how <code>mcmc.diagnostics(fit)</code> looks.</p>
+<p><img src="plot1.png" class="img-fluid"></p>
+<p>In this tutorial, we’ll cover:</p>
+<ul>
+<li>Maximum Likelihood Estimation for ERGMs</li>
+<li>Markov Chain Monte Carlo (MCMC) Methods<br>
+</li>
+<li>Model Simulation and Network Generation</li>
+<li>Goodness-of-Fit Assessment</li>
+<li>Model Degeneracy: Causes and Solutions</li>
+<li>Geometrically-Weighted Terms and the Curved Exponential Family</li>
+</ul>
+<section id="maximum-likelihood-estimation-for-ergms" class="level2">
+<h2 class="anchored" data-anchor-id="maximum-likelihood-estimation-for-ergms">1. Maximum Likelihood Estimation for ERGMs</h2>
+<section id="the-likelihood-function" class="level3">
+<h3 class="anchored" data-anchor-id="the-likelihood-function">1.1 The Likelihood Function</h3>
+<p>Recall that an ERGM has the general form:</p>
+<p><span class="math display">\[P_{\theta}(Y = y) = \frac{\exp\{\theta \cdot g(y)\}}{\kappa(\theta)}\]</span></p>
+<p>where: - <span class="math inline">\(\theta\)</span> is the vector of parameters - <span class="math inline">\(g(y)\)</span> is the vector of sufficient statistics - <span class="math inline">\(\kappa(\theta) = \sum_{z \in \mathcal{Y}} \exp\{\theta \cdot g(z)\}\)</span> is the normalizing constant</p>
+<p>The <strong>likelihood</strong> for observed network <span class="math inline">\(y_{\text{obs}}\)</span> is simply:</p>
+<p><span class="math display">\[L(\theta \mid y_{\text{obs}}) = P_{\theta}(Y = y_{\text{obs}}) = \frac{\exp\{\theta \cdot g(y_{\text{obs}})\}}{\kappa(\theta)}\]</span></p>
+<p>The <strong>log-likelihood</strong> is:</p>
+<p><span class="math display">\[\ell(\theta) = \theta \cdot g(y_{\text{obs}}) - \log \kappa(\theta)\]</span></p>
+<p><strong>Goal:</strong> Find <span class="math inline">\(\hat{\theta}\)</span> that maximizes <span class="math inline">\(\ell(\theta)\)</span>.</p>
+</section>
+<section id="the-computational-challenge" class="level3">
+<h3 class="anchored" data-anchor-id="the-computational-challenge">1.2 The Computational Challenge</h3>
+<p>Taking the derivative of the log-likelihood:</p>
+<p><span class="math display">\[\frac{\partial \ell(\theta)}{\partial \theta} = g(y_{\text{obs}}) - E_{\theta}[g(Y)]\]</span></p>
+<p>where <span class="math inline">\(E_{\theta}[g(Y)]\)</span> is the expected value of <span class="math inline">\(g(Y)\)</span> under the model with parameter <span class="math inline">\(\theta\)</span>.</p>
+<p><strong>The Problem:</strong> Computing <span class="math inline">\(E_{\theta}[g(Y)]\)</span> requires summing over all possible networks:</p>
+<p><span class="math display">\[E_{\theta}[g(Y)] = \sum_{z \in \mathcal{Y}} g(z) P_{\theta}(Y = z) = \frac{\sum_{z \in \mathcal{Y}} g(z) \exp\{\theta \cdot g(z)\}}{\kappa(\theta)}\]</span></p>
+<p>For a network with <span class="math inline">\(n\)</span> nodes: - Undirected: <span class="math inline">\(|\mathcal{Y}| = 2^{n(n-1)/2}\)</span> possible networks - Directed: <span class="math inline">\(|\mathcal{Y}| = 2^{n(n-1)}\)</span> possible networks</p>
+<p><strong>Example:</strong> A network with just 20 nodes has <span class="math inline">\(2^{190} \approx 1.6 \times 10^{57}\)</span> possible undirected networks.</p>
+<p><strong>Implication:</strong> Direct computation is impossible for all but the smallest networks.</p>
+</section>
+<section id="two-estimation-strategies" class="level3">
+<h3 class="anchored" data-anchor-id="two-estimation-strategies">1.3 Two Estimation Strategies</h3>
+<p>Depending on the model specification, we use different estimation approaches:</p>
+<section id="strategy-1-maximum-pseudo-likelihood-estimation-mple" class="level4">
+<h4 class="anchored" data-anchor-id="strategy-1-maximum-pseudo-likelihood-estimation-mple"><strong>Strategy 1: Maximum Pseudo-Likelihood Estimation (MPLE)</strong></h4>
+<p><strong>When applicable:</strong> Models with <strong>dyad independent</strong> terms only</p>
+<p><strong>Key insight:</strong> For dyad independent models: <span class="math display">\[P(Y_{ij} = y_{ij} \mid Y^c_{ij} = y^c_{ij}) = P(Y_{ij} = y_{ij})\]</span></p>
+<p>The conditional probability of each dyad doesn’t depend on the rest of the network.</p>
+<p><strong>The MPLE approach:</strong></p>
+<ol type="1">
+<li>Treat each dyad as an independent observation</li>
+<li>The conditional log-odds becomes: <span class="math display">\[\operatorname{logit} P(Y_{ij} = 1) = \theta \cdot \delta_{ij}(y)\]</span> where <span class="math inline">\(\delta_{ij}(y)\)</span> is the change statistic</li>
+<li>Estimate using standard logistic regression</li>
+</ol>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Exact for dyad independent models</li>
+<li>Fast computation (standard GLM algorithms)</li>
+<li>No simulation required</li>
+<li>Provides good starting values for MCMLE</li>
+</ul>
+<p><strong>Examples of dyad independent terms:</strong></p>
+<ul>
+<li><code>edges</code>: All dyads have same baseline probability</li>
+<li><code>nodecov</code>: Covariate effects don’t depend on other ties</li>
+<li><code>nodematch</code>: Homophily doesn’t depend on network structure</li>
+<li><code>nodefactor</code>: Group main effects are dyad independent</li>
+</ul>
+</section>
+<section id="strategy-2-monte-carlo-maximum-likelihood-estimation-mcmle" class="level4">
+<h4 class="anchored" data-anchor-id="strategy-2-monte-carlo-maximum-likelihood-estimation-mcmle"><strong>Strategy 2: Monte Carlo Maximum Likelihood Estimation (MCMLE)</strong></h4>
+<p><strong>When necessary:</strong> Models with <strong>any dyad dependent</strong> terms</p>
+<p><strong>Why MPLE fails:</strong> For dyad dependent models: <span class="math display">\[P(Y_{ij} = 1 \mid Y^c_{ij}) \neq P(Y_{ij} = 1)\]</span></p>
+<p>The probability of a tie depends on the status of other ties in the network.</p>
+<p><strong>The MCMLE approach:</strong> Use simulation to approximate <span class="math inline">\(E_{\theta}[g(Y)]\)</span></p>
+<p><strong>Examples of dyad dependent terms:</strong></p>
+<ul>
+<li><code>triangle</code>, <code>gwesp</code>: Transitivity depends on existing ties</li>
+<li><code>mutual</code>: Reciprocity creates dependencies</li>
+<li><code>degree(k)</code>, <code>gwdegree</code>: Degree distributions involve multiple dyads</li>
+<li><code>kstar(k)</code>: Star configurations span multiple dyads</li>
+</ul>
+</section>
+</section>
+<section id="the-mle-as-moment-matching" class="level3">
+<h3 class="anchored" data-anchor-id="the-mle-as-moment-matching">1.4 The MLE as Moment Matching</h3>
+<p>The first-order condition for MLE can be rewritten as:</p>
+<p><span class="math display">\[E_{\theta}[g(Y)] = g(y_{\text{obs}})\]</span></p>
+<p><strong>Interpretation:</strong> At the MLE, the expected statistics under the model equal the observed statistics.</p>
+<p>This is a <strong>moment-matching</strong> condition: we’re finding parameters such that simulated networks have the same average features as the observed network.</p>
+<p><strong>Important implication:</strong> If your model can’t generate networks with features similar to your observed network, the MLE may not exist or may be on the boundary of the parameter space.</p>
+</section>
+</section>
+<section id="markov-chain-monte-carlo-methods" class="level2">
+<h2 class="anchored" data-anchor-id="markov-chain-monte-carlo-methods">2. Markov Chain Monte Carlo Methods</h2>
+<section id="the-mcmc-strategy" class="level3">
+<h3 class="anchored" data-anchor-id="the-mcmc-strategy">2.1 The MCMC Strategy</h3>
+<p>When MPLE is insufficient (dyad dependent models), we need MCMC to:</p>
+<ol type="1">
+<li><strong>Approximate expectations:</strong> Estimate <span class="math inline">\(E_{\theta}[g(Y)]\)</span> by simulation</li>
+<li><strong>Implement Newton-Raphson:</strong> Use simulated statistics to update parameters</li>
+<li><strong>Iterate:</strong> Repeat until convergence</li>
+</ol>
+<p><strong>The Geyer-Thompson approximation:</strong></p>
+<p>Instead of computing <span class="math inline">\(\kappa(\theta)\)</span> directly, we approximate:</p>
+<p><span class="math display">\[\ell(\theta) \approx \theta \cdot g(y_{\text{obs}}) - \theta \cdot \bar{g}_{\theta_0} + \ell(\theta_0)\]</span></p>
+<p>where <span class="math inline">\(\bar{g}_{\theta_0}\)</span> is the sample mean of statistics from networks simulated at <span class="math inline">\(\theta_0\)</span>.</p>
+</section>
+<section id="the-metropolis-hastings-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="the-metropolis-hastings-algorithm">2.2 The Metropolis-Hastings Algorithm</h3>
+<p>To sample networks from <span class="math inline">\(P_{\theta}(Y = y)\)</span>, <code>ergm</code> uses Metropolis-Hastings:</p>
+<p><strong>Algorithm:</strong></p>
+<ol type="1">
+<li><p><strong>Initialize:</strong> Start with network <span class="math inline">\(y^{(0)}\)</span> (often the observed network)</p></li>
+<li><p><strong>For <span class="math inline">\(t = 1, 2, \ldots, T\)</span>:</strong></p>
+<ol type="a">
+<li><p><strong>Propose:</strong> Randomly select dyad <span class="math inline">\((i,j)\)</span> and propose toggling <span class="math inline">\(y^{(t-1)}_{ij}\)</span></p>
+<ul>
+<li>If <span class="math inline">\(y^{(t-1)}_{ij} = 0\)</span>, propose <span class="math inline">\(y^{*}_{ij} = 1\)</span></li>
+<li>If <span class="math inline">\(y^{(t-1)}_{ij} = 1\)</span>, propose <span class="math inline">\(y^{*}_{ij} = 0\)</span></li>
+</ul></li>
+<li><p><strong>Compute acceptance ratio:</strong> <span class="math display">\[r = \frac{P_{\theta}(Y = y^*)}{P_{\theta}(Y = y^{(t-1)})} = \exp\{\theta \cdot [g(y^*) - g(y^{(t-1)})]\} = \exp\{\theta \cdot \delta_{ij}(y^{(t-1)})\}\]</span></p></li>
+<li><p><strong>Accept/Reject:</strong></p>
+<ul>
+<li>With probability <span class="math inline">\(\min(r, 1)\)</span>: set <span class="math inline">\(y^{(t)} = y^*\)</span> (accept)</li>
+<li>Otherwise: set <span class="math inline">\(y^{(t)} = y^{(t-1)}\)</span> (reject)</li>
+</ul></li>
+</ol></li>
+<li><p><strong>Result:</strong> The sequence <span class="math inline">\(\{y^{(1)}, y^{(2)}, \ldots, y^{(T)}\}\)</span> forms a Markov chain whose stationary distribution is <span class="math inline">\(P_{\theta}(Y = y)\)</span></p></li>
+</ol>
+<p><strong>Key properties:</strong></p>
+<ul>
+<li><strong>Markov property:</strong> Next state depends only on current state</li>
+<li><strong>Detailed balance:</strong> Ensures correct stationary distribution<br>
+</li>
+<li><strong>Ergodicity:</strong> Chain eventually forgets initial state</li>
+<li><strong>No normalizing constant needed:</strong> The <span class="math inline">\(\kappa(\theta)\)</span> cancels in the ratio.</li>
+</ul>
+</section>
+<section id="mcmc-in-practice" class="level3">
+<h3 class="anchored" data-anchor-id="mcmc-in-practice">2.3 MCMC in Practice</h3>
+<p><strong>Burn-in period:</strong> - Discard initial samples before chain reaches stationarity - Default: <code>MCMC.burnin = 16384</code> iterations</p>
+<p><strong>Thinning:</strong> - Keep every <span class="math inline">\(k\)</span>-th sample to reduce autocorrelation - Default: <code>MCMC.interval = 1024</code> - Only these “thinned” samples are used for inference</p>
+<p><strong>Sample size:</strong> - Number of samples to collect (after burn-in and thinning) - Default: <code>MCMC.samplesize = 1024</code></p>
+<p><strong>The MCMLE iteration:</strong></p>
+<ol type="1">
+<li><p>Start with <span class="math inline">\(\theta^{(0)}\)</span> from MPLE</p></li>
+<li><p>For <span class="math inline">\(k = 0, 1, 2, \ldots\)</span> until convergence:</p>
+<ul>
+<li>Run MCMC at <span class="math inline">\(\theta^{(k)}\)</span> to get sample <span class="math inline">\(\{y_1, \ldots, y_M\}\)</span></li>
+<li>Compute <span class="math inline">\(\bar{g}_k = \frac{1}{M}\sum_{m=1}^M g(y_m)\)</span></li>
+<li>Update: <span class="math inline">\(\theta^{(k+1)} = \theta^{(k)} + \alpha_k \cdot (g(y_{\text{obs}}) - \bar{g}_k)\)</span></li>
+<li>Check if <span class="math inline">\(\|g(y_{\text{obs}}) - \bar{g}_k\|\)</span> is sufficiently small</li>
+</ul></li>
+</ol>
+</section>
+<section id="convergence-assessment" class="level3">
+<h3 class="anchored" data-anchor-id="convergence-assessment">2.4 Convergence Assessment</h3>
+<p><strong>What to check:</strong></p>
+<ol type="1">
+<li><strong>Trace plots:</strong> Statistics should fluctuate randomly around observed values</li>
+<li><strong>Effective sample size:</strong> Should be sufficiently large (typically &gt; 100)<br>
+</li>
+<li><strong>Auto-correlation:</strong> Should decay quickly</li>
+<li><strong>Geweke diagnostic:</strong> Tests if early and late parts of chain agree</li>
+</ol>
+<p><strong>Red flags:</strong></p>
+<ul>
+<li>Trace plots show trends or drift</li>
+<li>Statistics far from observed values</li>
+<li>High autocorrelation persists</li>
+<li>Multiple runs give very different results</li>
+</ul>
+<p>These often indicate <strong>model degeneracy</strong> (see Section 5).</p>
+</section>
+</section>
+<section id="simulation-from-fitted-models" class="level2">
+<h2 class="anchored" data-anchor-id="simulation-from-fitted-models">3. Simulation from Fitted Models</h2>
+<section id="why-simulate-networks" class="level3">
+<h3 class="anchored" data-anchor-id="why-simulate-networks">3.1 Why Simulate Networks?</h3>
+<p>Once we have <span class="math inline">\(\hat{\theta}\)</span>, we can generate new networks from <span class="math inline">\(P_{\hat{\theta}}(Y = y)\)</span>. This is useful for:</p>
+<ol type="1">
+<li><strong>Goodness-of-fit assessment:</strong> Do simulated networks resemble the observed network?</li>
+<li><strong>Uncertainty quantification:</strong> Understanding the variability implied by the model</li>
+<li><strong>Prediction:</strong> Generating plausible networks for counterfactual scenarios</li>
+<li><strong>Network imputation:</strong> Filling in missing ties</li>
+</ol>
+</section>
+<section id="the-simulation-process" class="level3">
+<h3 class="anchored" data-anchor-id="the-simulation-process">3.2 The Simulation Process</h3>
+<p><strong>Method:</strong> Use the same Metropolis-Hastings algorithm as in estimation</p>
+<p><strong>Key difference:</strong> Now <span class="math inline">\(\theta\)</span> is fixed at <span class="math inline">\(\hat{\theta}\)</span> (the MLE)</p>
+<p><strong>Steps:</strong></p>
+<ol type="1">
+<li>Initialize with observed network <span class="math inline">\(y_{\text{obs}}\)</span> (or a random network)</li>
+<li>Run Metropolis-Hastings for burn-in period</li>
+<li>Collect samples at specified intervals</li>
+<li>Each sample is an independent draw from <span class="math inline">\(P_{\hat{\theta}}(Y = y)\)</span></li>
+</ol>
+<p><strong>In R:</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sim_networks <span class="ot">&lt;-</span> <span class="fu">simulate</span>(fitted_model, <span class="at">nsim =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="properties-of-simulated-networks" class="level3">
+<h3 class="anchored" data-anchor-id="properties-of-simulated-networks">3.3 Properties of Simulated Networks</h3>
+<p><strong>Theoretical guarantee:</strong> As simulation length increases, the distribution of simulated networks approaches <span class="math inline">\(P_{\hat{\theta}}(Y = y)\)</span></p>
+<p><strong>What this means:</strong></p>
+<ul>
+<li>Sample mean of <span class="math inline">\(g(y)\)</span> across simulations <span class="math inline">\(\approx E_{\hat{\theta}}[g(Y)] = g(y_{\text{obs}})\)</span></li>
+<li>Variability across simulations reflects uncertainty in the model</li>
+<li>Features not explicitly modeled should still emerge if model is correctly specified</li>
+</ul>
+<p><strong>Example interpretation:</strong></p>
+<p>If your model includes <code>edges</code> and <code>nodematch("sex")</code>, but not degree terms, simulations will still produce some degree distribution. If this distribution matches the observed one, it suggests your model has captured the mechanisms generating degree heterogeneity, even though you didn’t model it explicitly.</p>
+</section>
+</section>
+<section id="goodness-of-fit-testing" class="level2">
+<h2 class="anchored" data-anchor-id="goodness-of-fit-testing">4. Goodness-of-Fit Testing</h2>
+<section id="the-gof-philosophy" class="level3">
+<h3 class="anchored" data-anchor-id="the-gof-philosophy">4.1 The GOF Philosophy</h3>
+<p><strong>Central question:</strong> Does our model generate networks that look like the observed network?</p>
+<p><strong>Key insight:</strong> We assess fit using statistics <strong>not explicitly in the model</strong>.</p>
+<p><strong>Why?</strong></p>
+<ul>
+<li>Statistics in the model are fit by construction (moment-matching)</li>
+<li>The real test is whether the model produces realistic networks overall</li>
+<li>Good models should reproduce unmodeled features</li>
+</ul>
+<p><strong>Analogy:</strong> Like checking regression residuals for patterns, even though we minimized squared residuals by design.</p>
+</section>
+<section id="standard-gof-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="standard-gof-statistics">4.2 Standard GOF Statistics</h3>
+<p><code>ergm</code> checks three key network features by default:</p>
+<section id="degree-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="degree-distribution">Degree Distribution</h4>
+<p><strong>Statistic:</strong> $d_k = $ number of nodes with degree <span class="math inline">\(k\)</span></p>
+<p><strong>Why important:</strong></p>
+<ul>
+<li>Degree is fundamental to network structure</li>
+<li>Many social processes depend on degree (preferential attachment, activity levels)</li>
+<li>Real networks often have right-skewed degree distributions</li>
+</ul>
+<p><strong>GOF test:</strong> Compare observed <span class="math inline">\(\{d_0, d_1, d_2, \ldots\}\)</span> to distributions from simulated networks</p>
+</section>
+<section id="edgewise-shared-partners-esp" class="level4">
+<h4 class="anchored" data-anchor-id="edgewise-shared-partners-esp">Edgewise Shared Partners (ESP)</h4>
+<p><strong>Statistic:</strong> $_k = $ number of edges whose endpoints have exactly <span class="math inline">\(k\)</span> shared partners</p>
+<p><strong>Why important:</strong></p>
+<ul>
+<li>Measures local clustering around edges</li>
+<li>Captures triadic closure beyond global triangle counts</li>
+<li>Indicates level of community structure</li>
+</ul>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>High <span class="math inline">\(\text{ESP}_0\)</span>: Many edges with no shared partners (sparse bridges)</li>
+<li>High <span class="math inline">\(\text{ESP}_k\)</span> for <span class="math inline">\(k &gt; 0\)</span>: Edges embedded in dense local neighborhoods</li>
+</ul>
+</section>
+<section id="geodesic-distance-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="geodesic-distance-distribution">Geodesic Distance Distribution</h4>
+<p><strong>Statistic:</strong> Distribution of shortest path lengths between all dyad pairs</p>
+<p><strong>Why important:</strong></p>
+<ul>
+<li>Indicates overall connectivity and reachability</li>
+<li>Related to “small world” properties</li>
+<li>Captures global structure</li>
+</ul>
+<p><strong>Typical pattern in social networks:</strong></p>
+<ul>
+<li>Most connected dyads are 2-3 steps apart</li>
+<li>Few very long paths</li>
+<li>Some unreachable pairs (disconnected components)</li>
+</ul>
+</section>
+</section>
+<section id="interpreting-gof-output" class="level3">
+<h3 class="anchored" data-anchor-id="interpreting-gof-output">4.3 Interpreting GOF Output</h3>
+<p>For each statistic, <code>gof()</code> reports:</p>
+<ul>
+<li><strong>obs:</strong> Observed count in your data</li>
+<li><strong>min, max:</strong> Range across simulated networks<br>
+</li>
+<li><strong>mean:</strong> Average across simulations</li>
+<li><strong>MC p-value:</strong> Proportion of simulations more extreme than observed</li>
+</ul>
+<p><strong>Good fit indicators:</strong></p>
+<ul>
+<li>Observed value near the mean of simulations</li>
+<li>P-values not too extreme (say, between 0.05 and 0.95)</li>
+<li>Observed within inter-quartile range of simulations</li>
+</ul>
+<p><strong>Poor fit indicators:</strong></p>
+<ul>
+<li>Observed far in tails of simulated distribution</li>
+<li>P-values very close to 0 or 1</li>
+<li>Systematic deviations (e.g., always underestimating)</li>
+</ul>
+<p><strong>Visual assessment:</strong> GOF plots show observed (black line) overlaid on boxplots of simulations. Good fit means the black line runs through the “middle” of the boxes.</p>
+</section>
+<section id="what-to-do-when-gof-fails" class="level3">
+<h3 class="anchored" data-anchor-id="what-to-do-when-gof-fails">4.4 What to Do When GOF Fails</h3>
+<p><strong>Diagnosis:</strong> Which statistics show poor fit?</p>
+<ul>
+<li><strong>Degree distribution:</strong> Add degree-related terms (<code>gwdegree</code>, <code>degree(k)</code>)</li>
+<li><strong>ESP distribution:</strong> Add clustering terms (<code>gwesp</code>, <code>triangle</code>)</li>
+<li><strong>Geodesic distances:</strong> May need to reduce transitivity or add bridging mechanisms</li>
+</ul>
+<p><strong>Strategy:</strong></p>
+<ol type="1">
+<li>Identify which aspect of structure is mis-specified</li>
+<li>Add appropriate terms to model that feature</li>
+<li>Re-estimate and check GOF again</li>
+<li>Iterate until acceptable fit</li>
+</ol>
+<p><strong>Warning:</strong> Don’t overfit. Adding too many terms can lead to:</p>
+<ul>
+<li>Model degeneracy</li>
+<li>Poor out-of-sample prediction</li>
+<li>Difficulty of interpretation</li>
+</ul>
+</section>
+<section id="gof-for-model-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="gof-for-model-comparison">4.5 GOF for Model Comparison</h3>
+<p><strong>Use case:</strong> Comparing nested models</p>
+<p><strong>Method:</strong></p>
+<ol type="1">
+<li>Fit Model A (simple) and Model B (A + additional terms)</li>
+<li>Compare GOF for both models</li>
+<li>Does added complexity improve fit?</li>
+</ol>
+<p><strong>Trade-off:</strong></p>
+<ul>
+<li>More complex models usually fit better</li>
+<li>But simpler models are more interpretable and parsimonious</li>
+<li>Use AIC/BIC along with GOF for model selection</li>
+</ul>
+</section>
+</section>
+<section id="model-degeneracy" class="level2">
+<h2 class="anchored" data-anchor-id="model-degeneracy">5. Model Degeneracy</h2>
+<section id="what-is-model-degeneracy" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-model-degeneracy">5.1 What is Model Degeneracy?</h3>
+<p><strong>Formal definition:</strong> A model is <em>near degenerate</em> if it places almost all its probability mass on a small subset of extreme networks (typically empty or complete graphs).</p>
+<p><strong>Mathematical statement:</strong></p>
+<p>For a degenerate model, as <span class="math inline">\(\theta\)</span> varies in reasonable ranges:</p>
+<p><span class="math display">\[P_{\theta}(Y = y) \approx \begin{cases}
+1 &amp; \text{if } y \text{ is empty or complete} \\
+0 &amp; \text{otherwise}
+\end{cases}\]</span></p>
+<p><strong>Practical consequences:</strong></p>
+<ol type="1">
+<li><strong>MCMC failure:</strong> Simulations produce unrealistic networks</li>
+<li><strong>Non-convergence:</strong> Algorithm can’t find stable parameter estimates</li>
+<li><strong>Extreme estimates:</strong> Coefficients become very large or have huge SEs</li>
+<li><strong>Poor fit:</strong> Model doesn’t resemble observed network at all</li>
+</ol>
+</section>
+<section id="why-degeneracy-occurs" class="level3">
+<h3 class="anchored" data-anchor-id="why-degeneracy-occurs">5.2 Why Degeneracy Occurs</h3>
+<p><strong>Root cause:</strong> Positive feedback loops in the model specification</p>
+<p><strong>Classic example:</strong> The <code>edges + triangle</code> model</p>
+<p><strong>The feedback mechanism:</strong></p>
+<ol type="1">
+<li>Suppose <span class="math inline">\(\beta_{\text{triangle}} &gt; 0\)</span> (positive clustering effect)</li>
+<li>Adding an edge that creates <span class="math inline">\(k\)</span> triangles contributes: <span class="math display">\[\Delta \ell = \beta_{\text{edges}} + k \cdot \beta_{\text{triangle}}\]</span></li>
+<li>As the network gets denser, <span class="math inline">\(k\)</span> increases for new edges</li>
+<li>This makes edges that create many triangles exponentially more likely</li>
+<li>Network “runs away” toward complete graph</li>
+</ol>
+<p><strong>Mathematical intuition:</strong></p>
+<p>The conditional log-odds for edge <span class="math inline">\((i,j)\)</span> is:</p>
+<p><span class="math display">\[\operatorname{logit} P(Y_{ij} = 1 \mid Y^c_{ij}) = \beta_{\text{edges}} + \beta_{\text{triangle}} \cdot t_{ij}\]</span></p>
+<p>where <span class="math inline">\(t_{ij}\)</span> = number of triangles created by adding edge <span class="math inline">\((i,j)\)</span>.</p>
+<p>If <span class="math inline">\(\beta_{\text{triangle}} &gt; 0\)</span>:</p>
+<ul>
+<li>High-degree nodes become magnets for new edges</li>
+<li>Creates “rich get richer” dynamic</li>
+<li>No mechanism to slow this process</li>
+<li>System collapses to extreme states</li>
+</ul>
+</section>
+<section id="detecting-degeneracy" class="level3">
+<h3 class="anchored" data-anchor-id="detecting-degeneracy">5.3 Detecting Degeneracy</h3>
+<p><strong>Estimation stage signs:</strong></p>
+<ol type="1">
+<li>Algorithm fails with message about density guard</li>
+<li>Many iterations without convergence</li>
+<li>Coefficients become very large (|β| &gt; 10)</li>
+<li>Standard errors are huge relative to estimates</li>
+</ol>
+<p><strong>MCMC diagnostic signs:</strong></p>
+<ol type="1">
+<li><strong>Trace plots:</strong> Strong upward or downward trends</li>
+<li><strong>Sample statistics:</strong> Far from observed, with large drift</li>
+<li><strong>Autocorrelation:</strong> Extremely high, doesn’t decay</li>
+<li><strong>Network visuals:</strong> Simulated networks look nothing like observed</li>
+</ol>
+<p><strong>Example diagnostics for degenerate model:</strong></p>
+<pre><code>Sample statistics summary:
+                Mean    SD    
+edges          1547   2314    # Observed: 203.
+triangle      14329  52891    # Observed: 23.</code></pre>
+<p>The simulated networks are orders of magnitude denser than observed.</p>
+</section>
+<section id="degenerate-vs-near-degenerate" class="level3">
+<h3 class="anchored" data-anchor-id="degenerate-vs-near-degenerate">5.4 Degenerate vs Near-Degenerate</h3>
+<p><strong>Fully degenerate:</strong></p>
+<ul>
+<li>Model literally assigns near-zero probability to realistic networks</li>
+<li>Estimation completely fails</li>
+<li>No useful inference possible</li>
+</ul>
+<p><strong>Near-degenerate:</strong></p>
+<ul>
+<li>Model has very little probability mass near observed network</li>
+<li>Estimation struggles but may technically converge</li>
+<li>Results are highly unstable and unreliable</li>
+<li>Small changes in specification lead to large changes in estimates</li>
+</ul>
+<p><strong>Practical impact:</strong> Both require model re-specification.</p>
+</section>
+<section id="common-degenerate-specifications" class="level3">
+<h3 class="anchored" data-anchor-id="common-degenerate-specifications">5.5 Common Degenerate Specifications</h3>
+<p><strong>Known problematic terms:</strong></p>
+<ol type="1">
+<li><strong><code>triangle</code> alone:</strong> Classic example, especially in larger networks</li>
+<li><strong><code>kstar(k)</code> for large k:</strong> Creates similar positive feedback with stars</li>
+<li><strong>Multiple simple structural terms:</strong> e.g., <code>triangle + kstar(3) + twopath</code></li>
+</ol>
+<p><strong>Why these fail:</strong></p>
+<p>They create <strong>unregulated positive feedback</strong>:</p>
+<ul>
+<li>Each configuration makes similar configurations more likely</li>
+<li>No diminishing returns</li>
+<li>System spirals to extremes</li>
+</ul>
+<p><strong>Counterintuitive result:</strong></p>
+<p>Adding more terms doesn’t necessarily improve the model. Sometimes simpler is better.</p>
+</section>
+</section>
+<section id="solutions-to-degeneracy-geometrically-weighted-terms" class="level2">
+<h2 class="anchored" data-anchor-id="solutions-to-degeneracy-geometrically-weighted-terms">6. Solutions to Degeneracy: Geometrically-Weighted Terms</h2>
+<section id="the-key-insight" class="level3">
+<h3 class="anchored" data-anchor-id="the-key-insight">6.1 The Key Insight</h3>
+<p><strong>Problem:</strong> Simple count statistics (triangles, k-stars) have no diminishing returns</p>
+<p><strong>Solution:</strong> Weight counts so additional configurations matter less</p>
+<p><strong>Mechanism:</strong> Geometrically-weighted statistics provide <strong>diminishing marginal contribution</strong> for each additional configuration</p>
+</section>
+<section id="edgewise-shared-partners-esp-1" class="level3">
+<h3 class="anchored" data-anchor-id="edgewise-shared-partners-esp-1">6.2 Edgewise Shared Partners (ESP)</h3>
+<p>Before introducing GWESP, we need to understand ESP:</p>
+<p><strong>Definition:</strong> For an edge <span class="math inline">\((i,j)\)</span>, an <em>edgewise shared partner</em> is a node <span class="math inline">\(k\)</span> such that both <span class="math inline">\(i\)</span>-<span class="math inline">\(k\)</span> and <span class="math inline">\(j\)</span>-<span class="math inline">\(k\)</span> edges exist.</p>
+<p><strong>ESP distribution:</strong> <span class="math display">\[\text{ESP}_k(y) = \#\{\text{edges with exactly } k \text{ shared partners}\}\]</span></p>
+<p><strong>Relationship to triangles:</strong></p>
+<ul>
+<li>Each shared partner on an edge corresponds to a triangle</li>
+<li>Total triangles <span class="math inline">\(= \frac{1}{3} \sum_{k=1}^{n-2} k \cdot \text{ESP}_k(y)\)</span></li>
+<li>But ESP preserves more information than just the triangle count</li>
+</ul>
+</section>
+<section id="geometrically-weighted-esp-gwesp" class="level3">
+<h3 class="anchored" data-anchor-id="geometrically-weighted-esp-gwesp">6.3 Geometrically-Weighted ESP (GWESP)</h3>
+<p><strong>Formula:</strong></p>
+<p><span class="math display">\[\text{GWESP}_{\alpha}(y) = e^{\alpha} \sum_{k=1}^{n-2} \left\{1 - (1-e^{-\alpha})^k\right\} \cdot \text{ESP}_k(y)\]</span></p>
+<p><strong>Weights for each <span class="math inline">\(k\)</span>:</strong></p>
+<p><span class="math display">\[w_k = e^{\alpha}\left\{1 - (1-e^{-\alpha})^k\right\}\]</span></p>
+<p><strong>Key property:</strong> <span class="math inline">\(w_k\)</span> increases with <span class="math inline">\(k\)</span>, but at a decreasing rate.</p>
+<p><strong>Example weights</strong> (for <span class="math inline">\(\alpha = 0.5\)</span>):</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(k\)</span></th>
+<th><span class="math inline">\(w_k\)</span></th>
+<th>Marginal increase</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0.649</td>
+<td>–</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1.038</td>
+<td>0.389</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>1.288</td>
+<td>0.250</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>1.448</td>
+<td>0.160</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>1.550</td>
+<td>0.103</td>
+</tr>
+</tbody>
+</table>
+<p>Notice how the marginal increase gets smaller.</p>
+</section>
+<section id="why-gwesp-works" class="level3">
+<h3 class="anchored" data-anchor-id="why-gwesp-works">6.4 Why GWESP Works</h3>
+<p><strong>Intuition:</strong> An edge with 5 shared partners is only <em>slightly</em> more valuable than one with 4 shared partners.</p>
+<p><strong>Mathematical effect:</strong></p>
+<p>Conditional log-odds for edge <span class="math inline">\((i,j)\)</span>:</p>
+<p><span class="math display">\[\operatorname{logit} P(Y_{ij}=1 \mid Y^c_{ij}) = \beta_{\text{edges}} + \theta_{\text{GWESP}} \cdot \Delta\text{GWESP}_{ij}\]</span></p>
+<p>where <span class="math inline">\(\Delta\text{GWESP}_{ij}\)</span> is the change in GWESP from adding edge <span class="math inline">\((i,j)\)</span>.</p>
+<p><strong>Crucial difference from triangle:</strong></p>
+<ul>
+<li><span class="math inline">\(\Delta\text{triangle}_{ij} = s_{ij}\)</span> (number of shared partners)</li>
+<li><span class="math inline">\(\Delta\text{GWESP}_{ij} \approx w_{s_{ij}} - w_{s_{ij}-1}\)</span> (diminishing)</li>
+</ul>
+<p><strong>Result:</strong> No runaway feedback loop.</p>
+</section>
+<section id="the-decay-parameter-alpha" class="level3">
+<h3 class="anchored" data-anchor-id="the-decay-parameter-alpha">6.5 The Decay Parameter <span class="math inline">\(\alpha\)</span></h3>
+<p><strong>Role:</strong> Controls the rate of diminishing returns</p>
+<p><strong>Small <span class="math inline">\(\alpha\)</span> (e.g., 0.1-0.3):</strong></p>
+<ul>
+<li>Strong diminishing returns</li>
+<li>First few shared partners matter a lot</li>
+<li>Additional ones barely count</li>
+<li>Appropriate for: Large networks, weak clustering</li>
+</ul>
+<p><strong>Medium <span class="math inline">\(\alpha\)</span> (e.g., 0.4-0.6):</strong></p>
+<ul>
+<li>Moderate diminishing returns</li>
+<li>Balanced weighting</li>
+<li>Appropriate for: Most empirical networks</li>
+</ul>
+<p><strong>Large <span class="math inline">\(\alpha\)</span> (e.g., 0.7-1.0):</strong></p>
+<ul>
+<li>Weak diminishing returns</li>
+<li>Approaches linear counting (like triangles)</li>
+<li>Can risk degeneracy if too large.</li>
+<li>Appropriate for: Small networks, very strong clustering</li>
+</ul>
+<p><strong>Practical advice:</strong> Start with <span class="math inline">\(\alpha = 0.25\)</span> or <span class="math inline">\(0.5\)</span> and use <code>fixed=TRUE</code></p>
+</section>
+<section id="other-geometrically-weighted-terms" class="level3">
+<h3 class="anchored" data-anchor-id="other-geometrically-weighted-terms">6.6 Other Geometrically-Weighted Terms</h3>
+<p><strong>For degree distributions: gwdegree</strong></p>
+<p><span class="math display">\[\text{GWD}_{\alpha}(y) = e^{\alpha} \sum_{k=1}^{n-1} \left\{1 - (1-e^{-\alpha})^k\right\} \cdot N_k(y)\]</span></p>
+<p>where <span class="math inline">\(N_k(y)\)</span> is the number of nodes with degree <span class="math inline">\(k\)</span>.</p>
+<p><strong>Prevents:</strong></p>
+<ul>
+<li>Formation of extreme hubs</li>
+<li>Unrealistic degree heterogeneity</li>
+<li>Degeneracy from <code>kstar</code> terms</li>
+</ul>
+<p><strong>For two-paths: gwdsp</strong></p>
+<p><strong>Formula:</strong></p>
+<p><span class="math display">\[\text{GWDSP}_{\alpha}(y) = e^{\alpha} \sum_{k=1}^{n-2} \left\{1 - (1-e^{-\alpha})^k\right\} \cdot \text{DSP}_k(y)\]</span></p>
+<p>where <span class="math inline">\(\text{DSP}_k(y)\)</span> is the number of dyads (node pairs) with exactly <span class="math inline">\(k\)</span> shared partners.</p>
+<p><strong>Use case:</strong></p>
+<ul>
+<li>Modeling “structural holes” (dyads with shared partners but no direct tie)</li>
+<li>Often has <strong>negative</strong> coefficient (closure reduces structural holes)</li>
+<li>Complements GWESP</li>
+</ul>
+</section>
+<section id="the-curved-exponential-family" class="level3">
+<h3 class="anchored" data-anchor-id="the-curved-exponential-family">6.7 The Curved Exponential Family</h3>
+<p><strong>Standard ERGM:</strong> <span class="math display">\[P_{\theta}(Y=y) = \frac{\exp\{\theta \cdot g(y)\}}{\kappa(\theta)}\]</span></p>
+<p><strong>Curved exponential family:</strong> <span class="math display">\[P_{\theta, \alpha}(Y=y) = \frac{\exp\{\theta \cdot g_{\alpha}(y)\}}{\kappa(\theta, \alpha)}\]</span></p>
+<p>where <span class="math inline">\(\alpha\)</span> is a <strong>curvature parameter</strong> that affects the form of <span class="math inline">\(g_{\alpha}(y)\)</span>.</p>
+<p><strong>In geometrically-weighted terms:</strong> - <span class="math inline">\(\alpha\)</span> determines the weights in the statistic - Can be fixed (specified by user) or estimated from data - Estimating <span class="math inline">\(\alpha\)</span> is computationally harder but more flexible</p>
+<p><strong>Trade-off:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Fixed <span class="math inline">\(\alpha\)</span></th>
+<th>Estimated <span class="math inline">\(\alpha\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Faster estimation</td>
+<td>Slower estimation</td>
+</tr>
+<tr class="even">
+<td>User must choose value</td>
+<td>Data-driven choice</td>
+</tr>
+<tr class="odd">
+<td>Less flexible</td>
+<td>More flexible</td>
+</tr>
+<tr class="even">
+<td>Easier interpretation</td>
+<td>Harder interpretation</td>
+</tr>
+<tr class="odd">
+<td><code>fixed=TRUE</code></td>
+<td><code>fixed=FALSE</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation:</strong> Start with fixed values; only estimate if you have strong justification and large sample size.</p>
+</section>
+</section>
+<section id="more-readings" class="level2">
+<h2 class="anchored" data-anchor-id="more-readings">More readings:</h2>
+<p><strong>ERGM Theory:</strong></p>
+<ul>
+<li><p>Hunter, D. R., Handcock, M. S., Butts, C. T., Goodreau, S. M., &amp; Morris, M. (2008). ergm: A package to fit, simulate and diagnose exponential-family models for networks. <em>Journal of Statistical Software, 24</em>(3).</p></li>
+<li><p>Snijders, T. A., Pattison, P. E., Robins, G. L., &amp; Handcock, M. S. (2006). New specifications for exponential random graph models. <em>Sociological Methodology, 36</em>(1), 99-153.</p></li>
+</ul>
+<p><strong>Degeneracy:</strong></p>
+<ul>
+<li>Schweinberger, M. (2011). Instability, sensitivity, and degeneracy of discrete exponential families. <em>Journal of the American Statistical Association, 106</em>(496), 1361-1370.</li>
+</ul>
+<p><strong>Curved Exponential Family:</strong></p>
+<ul>
+<li>Hunter, D. R., &amp; Handcock, M. S. (2006). Inference in curved exponential family models for networks. <em>Journal of Computational and Graphical Statistics, 15</em>(3), 565-583.</li>
+</ul>
+<p><strong>Goodness-of-Fit:</strong></p>
+<ul>
+<li>Hunter, D. R., Goodreau, S. M., &amp; Handcock, M. S. (2008). Goodness of fit of social network models. <em>Journal of the American Statistical Association, 103</em>(481), 248-258.</li>
+</ul>
+<hr>
+<p><em>This tutorial is based on UCLA <a href="https://handcock.github.io/teaching/218/">STATS 218: Social Network Analysis</a> taught by Prof <a href="https://handcock.github.io/">Mark Handcock</a>.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

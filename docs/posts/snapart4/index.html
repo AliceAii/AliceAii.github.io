@@ -311,7 +311,7 @@ window.Quarto = {
 <p>The <strong>null model</strong> is our baseline assumption: this null hypothesis assumes all possible networks are equally likely. Think of it as the “no information” model where we assume complete randomness.</p>
 <p><span class="math display">\[P(Y = y) = \frac{1}{2^N}\]</span></p>
 <p>where <span class="math inline">\(N\)</span> is the total number of possible ties (for a directed network: <span class="math inline">\(N = n(n-1)\)</span>; for undirected: <span class="math inline">\(N = \frac{n(n-1)}{2}\)</span>).</p>
-<p><strong>Key insight</strong>: The null model provides our reference point for comparison. Any other model should do better than this!</p>
+<p><strong>Key insight</strong>: The null model provides our reference point for comparison. Any other model should do better than this.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -325,7 +325,7 @@ Note
 <p>What does “all possible networks are equally likely” mean? - The null model says every <strong>configuration of the entire network</strong> has the same probability - This is different from saying each <strong>individual tie</strong> has the same probability</p>
 <p>In the null model, each possible network configuration (a complete pattern of who’s connected to whom) is equally probable. But when we look at individual ties within these configurations:</p>
 <ul>
-<li><strong>Individual ties ARE equally likely</strong> - each has a 50% chance of existing</li>
+<li>Individual ties ARE equally likely: each has a 50% chance of existing</li>
 <li><strong>But</strong> the model makes no assumptions about which specific ties will form</li>
 <li>All <span class="math inline">\(2^N\)</span> possible network structures have equal probability <span class="math inline">\(\frac{1}{2^N}\)</span></li>
 </ul>
@@ -344,7 +344,7 @@ Note
 <li>A→B and B→C exist</li>
 <li>… (60 more configurations)</li>
 </ol>
-<p>Each of these 64 distinct networks has equal probability!</p>
+<p>Each of these 64 distinct networks has equal probability.</p>
 <p>Why is this the “null” model?</p>
 <ul>
 <li>It represents <strong>maximum ignorance</strong> - we know nothing about what drives tie formation</li>

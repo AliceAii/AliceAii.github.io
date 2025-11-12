@@ -9,7 +9,7 @@ toc-title: "Contents"
 image: "plot1.png"
 ---
 
-Welcome to Part 5 of our Social Network Analysis tutorial! In this hands-on session, we'll work through three real-world examples of network modeling using ERGM. 
+Welcome to Part 5 of our Social Network Analysis tutorial. In this hands-on session, we'll work through three real-world examples of network modeling using ERGM. 
 
 ![](plot1.png)
 In this tutorial, we'll cover:
@@ -296,7 +296,7 @@ cat("Interpretation: Same-sex ties are", round(OR, 1),
 - *Significant homophily** (p < 0.001)  
 - Same-sex tie probability: **0.785**  
 - Different-sex tie probability: **0.334**  
-- Odds ratio = **3.65**: Same-sex friendships are 3.65× more likely!  
+- Odds ratio = **3.65**: Same-sex friendships are 3.65× more likely. 
 - Deviance reduced by 274 from null model
 
 ### 2.5 Model 3: Differential Homophily
@@ -426,7 +426,7 @@ comparison <- data.frame(
 print(comparison)
 ```
 
-**Key Finding**: The mixing model perfectly matches the empirical probabilities! This is because it has enough parameters to exactly reproduce the observed mixing matrix.
+**Key Finding**: The mixing model perfectly matches the empirical probabilities. This is because it has enough parameters to exactly reproduce the observed mixing matrix.
 
 ### 2.7 Model Comparison
 
@@ -478,7 +478,7 @@ The homophily model assumes all students have equal propensity to form ties. But
 - Some students are more **popular** (high prestige)
 - Some friendships are **mutual**
 
-The **p₁ model** accounts for these individual differences!
+The **p₁ model** accounts for these individual differences.
 
 ### 3.2 Fitting the $p_1$  Model
 
@@ -633,7 +633,7 @@ abline(lm(sender_coefs[finite_indices] ~ outdeg[finite_indices]),
 par(mfrow = c(1, 1))
 ```
 
-**Key Finding**: The p₁ model's sender and receiver effects are **highly correlated** with traditional degree centrality measures (r > 0.96)!
+**Key Finding**: The p₁ model's sender and receiver effects are **highly correlated** with traditional degree centrality measures (r > 0.96).
 
 ### 3.5 Magnitude of Effects
 
