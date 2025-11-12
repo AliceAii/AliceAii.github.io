@@ -319,7 +319,12 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="the-likelihood-function">1.1 The Likelihood Function</h3>
 <p>Recall that an ERGM has the general form:</p>
 <p><span class="math display">\[P_{\theta}(Y = y) = \frac{\exp\{\theta \cdot g(y)\}}{\kappa(\theta)}\]</span></p>
-<p>where: - <span class="math inline">\(\theta\)</span> is the vector of parameters - <span class="math inline">\(g(y)\)</span> is the vector of sufficient statistics - <span class="math inline">\(\kappa(\theta) = \sum_{z \in \mathcal{Y}} \exp\{\theta \cdot g(z)\}\)</span> is the normalizing constant</p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\theta\)</span> is the vector of parameters</li>
+<li><span class="math inline">\(g(y)\)</span> is the vector of sufficient statistics</li>
+<li><span class="math inline">\(\kappa(\theta) = \sum_{z \in \mathcal{Y}} \exp\{\theta \cdot g(z)\}\)</span> is the normalizing constant</li>
+</ul>
 <p>The <strong>likelihood</strong> for observed network <span class="math inline">\(y_{\text{obs}}\)</span> is simply:</p>
 <p><span class="math display">\[L(\theta \mid y_{\text{obs}}) = P_{\theta}(Y = y_{\text{obs}}) = \frac{\exp\{\theta \cdot g(y_{\text{obs}})\}}{\kappa(\theta)}\]</span></p>
 <p>The <strong>log-likelihood</strong> is:</p>
@@ -333,7 +338,11 @@ window.Quarto = {
 <p>where <span class="math inline">\(E_{\theta}[g(Y)]\)</span> is the expected value of <span class="math inline">\(g(Y)\)</span> under the model with parameter <span class="math inline">\(\theta\)</span>.</p>
 <p><strong>The Problem:</strong> Computing <span class="math inline">\(E_{\theta}[g(Y)]\)</span> requires summing over all possible networks:</p>
 <p><span class="math display">\[E_{\theta}[g(Y)] = \sum_{z \in \mathcal{Y}} g(z) P_{\theta}(Y = z) = \frac{\sum_{z \in \mathcal{Y}} g(z) \exp\{\theta \cdot g(z)\}}{\kappa(\theta)}\]</span></p>
-<p>For a network with <span class="math inline">\(n\)</span> nodes: - Undirected: <span class="math inline">\(|\mathcal{Y}| = 2^{n(n-1)/2}\)</span> possible networks - Directed: <span class="math inline">\(|\mathcal{Y}| = 2^{n(n-1)}\)</span> possible networks</p>
+<p>For a network with <span class="math inline">\(n\)</span> nodes:</p>
+<ul>
+<li>Undirected: <span class="math inline">\(|\mathcal{Y}| = 2^{n(n-1)/2}\)</span> possible networks</li>
+<li>Directed: <span class="math inline">\(|\mathcal{Y}| = 2^{n(n-1)}\)</span> possible networks</li>
+</ul>
 <p><strong>Example:</strong> A network with just 20 nodes has <span class="math inline">\(2^{190} \approx 1.6 \times 10^{57}\)</span> possible undirected networks.</p>
 <p><strong>Implication:</strong> Direct computation is impossible for all but the smallest networks.</p>
 </section>
@@ -438,8 +447,17 @@ window.Quarto = {
 </section>
 <section id="mcmc-in-practice" class="level3">
 <h3 class="anchored" data-anchor-id="mcmc-in-practice">2.3 MCMC in Practice</h3>
-<p><strong>Burn-in period:</strong> - Discard initial samples before chain reaches stationarity - Default: <code>MCMC.burnin = 16384</code> iterations</p>
-<p><strong>Thinning:</strong> - Keep every <span class="math inline">\(k\)</span>-th sample to reduce autocorrelation - Default: <code>MCMC.interval = 1024</code> - Only these “thinned” samples are used for inference</p>
+<p><strong>Burn-in period:</strong></p>
+<ul>
+<li>Discard initial samples before chain reaches stationarity</li>
+<li>Default: <code>MCMC.burnin = 16384</code> iterations</li>
+</ul>
+<p><strong>Thinning:</strong></p>
+<ul>
+<li>Keep every <span class="math inline">\(k\)</span>-th sample to reduce autocorrelation</li>
+<li>Default: <code>MCMC.interval = 1024</code></li>
+<li>Only these “thinned” samples are used for inference</li>
+</ul>
 <p><strong>Sample size:</strong> - Number of samples to collect (after burn-in and thinning) - Default: <code>MCMC.samplesize = 1024</code></p>
 <p><strong>The MCMLE iteration:</strong></p>
 <ol type="1">
@@ -530,8 +548,8 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="standard-gof-statistics">4.2 Standard GOF Statistics</h3>
 <p><code>ergm</code> checks three key network features by default:</p>
 <section id="degree-distribution" class="level4">
-<h4 class="anchored" data-anchor-id="degree-distribution">Degree Distribution</h4>
-<p><strong>Statistic:</strong> $d_k = $ number of nodes with degree <span class="math inline">\(k\)</span></p>
+<h4 class="anchored" data-anchor-id="degree-distribution"><strong>Degree Distribution</strong></h4>
+<p><strong>Statistic:</strong> <span class="math inline">\({d_k}\)</span> number of nodes with degree <span class="math inline">\(k\)</span></p>
 <p><strong>Why important:</strong></p>
 <ul>
 <li>Degree is fundamental to network structure</li>
@@ -541,8 +559,8 @@ window.Quarto = {
 <p><strong>GOF test:</strong> Compare observed <span class="math inline">\(\{d_0, d_1, d_2, \ldots\}\)</span> to distributions from simulated networks</p>
 </section>
 <section id="edgewise-shared-partners-esp" class="level4">
-<h4 class="anchored" data-anchor-id="edgewise-shared-partners-esp">Edgewise Shared Partners (ESP)</h4>
-<p><strong>Statistic:</strong> $_k = $ number of edges whose endpoints have exactly <span class="math inline">\(k\)</span> shared partners</p>
+<h4 class="anchored" data-anchor-id="edgewise-shared-partners-esp"><strong>Edgewise Shared Partners (ESP)</strong></h4>
+<p><strong>Statistic:</strong> <span class="math inline">\(\text{ESP}_k\)</span> number of edges whose endpoints have exactly <span class="math inline">\(k\)</span> shared partners</p>
 <p><strong>Why important:</strong></p>
 <ul>
 <li>Measures local clustering around edges</li>
@@ -556,7 +574,7 @@ window.Quarto = {
 </ul>
 </section>
 <section id="geodesic-distance-distribution" class="level4">
-<h4 class="anchored" data-anchor-id="geodesic-distance-distribution">Geodesic Distance Distribution</h4>
+<h4 class="anchored" data-anchor-id="geodesic-distance-distribution"><strong>Geodesic Distance Distribution</strong></h4>
 <p><strong>Statistic:</strong> Distribution of shortest path lengths between all dyad pairs</p>
 <p><strong>Why important:</strong></p>
 <ul>

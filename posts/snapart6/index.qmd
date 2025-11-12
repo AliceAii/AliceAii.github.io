@@ -31,6 +31,7 @@ Recall that an ERGM has the general form:
 $$P_{\theta}(Y = y) = \frac{\exp\{\theta \cdot g(y)\}}{\kappa(\theta)}$$
 
 where:
+
 - $\theta$ is the vector of parameters
 - $g(y)$ is the vector of sufficient statistics
 - $\kappa(\theta) = \sum_{z \in \mathcal{Y}} \exp\{\theta \cdot g(z)\}$ is the normalizing constant
@@ -58,6 +59,7 @@ where $E_{\theta}[g(Y)]$ is the expected value of $g(Y)$ under the model with pa
 $$E_{\theta}[g(Y)] = \sum_{z \in \mathcal{Y}} g(z) P_{\theta}(Y = z) = \frac{\sum_{z \in \mathcal{Y}} g(z) \exp\{\theta \cdot g(z)\}}{\kappa(\theta)}$$
 
 For a network with $n$ nodes:
+
 - Undirected: $|\mathcal{Y}| = 2^{n(n-1)/2}$ possible networks
 - Directed: $|\mathcal{Y}| = 2^{n(n-1)}$ possible networks
 
@@ -181,10 +183,12 @@ To sample networks from $P_{\theta}(Y = y)$, `ergm` uses Metropolis-Hastings:
 ### 2.3 MCMC in Practice
 
 **Burn-in period:**
+
 - Discard initial samples before chain reaches stationarity
 - Default: `MCMC.burnin = 16384` iterations
 
 **Thinning:**
+
 - Keep every $k$-th sample to reduce autocorrelation
 - Default: `MCMC.interval = 1024`
 - Only these "thinned" samples are used for inference
@@ -284,9 +288,9 @@ If your model includes `edges` and `nodematch("sex")`, but not degree terms, sim
 
 `ergm` checks three key network features by default:
 
-#### Degree Distribution
+#### **Degree Distribution**
 
-**Statistic:** $d_k = $ number of nodes with degree $k$
+**Statistic:** ${d_k}$ number of nodes with degree $k$
 
 **Why important:**
 
@@ -296,9 +300,9 @@ If your model includes `edges` and `nodematch("sex")`, but not degree terms, sim
 
 **GOF test:** Compare observed $\{d_0, d_1, d_2, \ldots\}$ to distributions from simulated networks
 
-#### Edgewise Shared Partners (ESP)
+#### **Edgewise Shared Partners (ESP)**
 
-**Statistic:** $\text{ESP}_k = $ number of edges whose endpoints have exactly $k$ shared partners
+**Statistic:** $\text{ESP}_k$ number of edges whose endpoints have exactly $k$ shared partners
 
 **Why important:**
 
@@ -311,7 +315,7 @@ If your model includes `edges` and `nodematch("sex")`, but not degree terms, sim
 - High $\text{ESP}_0$: Many edges with no shared partners (sparse bridges)
 - High $\text{ESP}_k$ for $k > 0$: Edges embedded in dense local neighborhoods
 
-#### Geodesic Distance Distribution
+#### **Geodesic Distance Distribution**
 
 **Statistic:** Distribution of shortest path lengths between all dyad pairs
 
