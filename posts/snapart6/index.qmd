@@ -2,7 +2,7 @@
 title: "Social Network Analysis R Tutorial Part 6: ERGM Inference, Simulation, and Diagnostics"
 author: Shuhan (Alice) Ai
 date: "2025-11-11"
-categories: [R, SNA]
+categories: [SNA]
 toc: true
 toc-depth: 3
 toc-title: "Contents"

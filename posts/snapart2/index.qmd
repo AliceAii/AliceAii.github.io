@@ -2,7 +2,7 @@
 title: "Social Network Analysis R Tutorial Part 2: Mathematical and Statistical Foundations"
 author: Shuhan (Alice) Ai
 date: "2025-10-22"
-categories: [R, SNA]
+categories: [SNA]
 toc: true
 toc-depth: 3
 toc-title: "Contents"
