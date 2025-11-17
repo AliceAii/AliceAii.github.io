@@ -615,7 +615,7 @@ where $N_k(y)$ is the number of nodes with degree $k$.
 - Unrealistic degree heterogeneity
 - Degeneracy from `kstar` terms
 
-**For two-paths: gwdsp**
+**For two-paths: gwdsp (geometrically weighted dyadwise shared partners)**
 
 **Formula:**
 
