@@ -5,10 +5,15 @@ date: "2025-11-17"
 categories: [R, SNA]
 toc: true
 toc-depth: 3
+toc-title: "Contents"
 code-fold: show
 code-tools: true
-toc-title: "Contents"
+self-contained: true
 image: "figure1.png"
+execute:
+     freeze: false
+     cache: false
+     keep-md: false
 ---
 
 Welcome to Part 7 of our Social Network Analysis R Tutorial series! In our [previous tutorial (Part 6)](https://aliceaii.github.io/posts/snapart6/), we explored the theoretical foundations of ERGMs, understanding the mathematical framework behind these powerful models. We covered the exponential family form, sufficient statistics, and the challenges of model degeneracy.
@@ -86,10 +91,142 @@ The decay parameter (α) in geometrically weighted terms controls how quickly th
 Start with α = 0.5 as a default and adjust based on model diagnostics.
 :::
 
+## 2. Tapered ERGM: Solving the Degeneracy Problem
 
-## 2. Case Study 1 - The French Financial Elite Network
+### 2.1 Why We Need Tapered ERGM
 
-### 2.1 The French Financial Elite Network Basic Information
+One of the most frustrating challenges in ERGM modeling is **model degeneracy** (or near-degeneracy). This occurs when a model places almost all its probability mass on extreme network configurations—like empty graphs, complete graphs, or other boundary cases. 
+
+#### 2.1.1 The Triangle Problem
+
+A classic example is the triangle model:
+
+$$P_\eta(Y = y) = \frac{\exp\{\eta_1\text{edge}(y) + \eta_2\text{triangle}(y)\}}{c(\eta_1, \eta_2)}$$
+
+This model is near-degenerate for most values of $\eta_2 > 0$. When we try to include theoretically meaningful terms like triangles, GWESP, or other clustering measures, the model often becomes unstable and produces unreliable results.
+
+#### 2.1.2 Practical Constraints
+
+Near-degeneracy has constrained practical ERGM modeling:
+
+- **Limited term selection**: Many intuitive or theory-driven terms (like triangles) often cannot be used.
+- **Model instability**: MCMC algorithms fail to converge or produce degenerate samples.
+- **Multimodality**: The distribution over network statistics becomes bimodal or multimodal, making inference unreliable.
+
+This is why we've had to be so careful about model specification in previous tutorials—we've been working around the degeneracy problem rather than solving it directly.
+
+
+### 2.2 How Tapered ERGM Works
+
+#### 2.2.1 The Model Specification
+
+The Tapered ERGM has the form:
+
+$$q(y|\theta, \tau) = \frac{1}{Z(\theta, \tau)} \exp\left\{\sum_k \theta_k g_k(y) - \sum_k \tau_k(\mu_k(\theta, \tau) - g_k(y))^2\right\}$$
+
+where:
+
+- $\theta$ = standard ERGM parameters (same interpretation as before)
+- $\tau$ = tapering parameters (hyperparameters that control stability)
+- $\mu(\theta, \tau) = E_q[g(Y)]$ = mean value parameters
+- The second term $-\sum_k \tau_k(\mu_k - g_k(y))^2$ is the **tapering term**
+
+The tapering term acts as a **soft constraint** that penalizes network configurations far from the mean $\mu$. Think of it as:
+
+- An "attractive force" pulling the distribution toward its mode
+- The strength of this force is controlled by $\tau_k$
+- When $\tau = 0$, we recover the standard ERGM
+- As $\tau$ increases, the model becomes more stable but potentially more biased
+
+#### 2.2.2 Maximum Entropy Interpretation
+
+The tapering term has a beautiful theoretical interpretation. The Tapered ERGM arises from a **constrained maximum entropy** problem:
+
+$$\begin{align}
+\text{maximize}_q &\quad -\sum_y q(y)\log(q(y)) \\
+\text{subject to} &\quad E_q[g_i(Y,X)] = \mu_i \\
+&\quad E_q[(\mu_i - g_i(Y,X))^2] \leq \sigma^2_i, \quad \forall i
+\end{align}$$
+
+In other words, we're finding the distribution that:
+1. Has maximum entropy (is least constrained)
+2. Matches expected network statistics
+3. **Also constrains the variance** of those statistics to be at most $\sigma^2_i$
+
+This variance constraint is what prevents degeneracy.
+
+
+### 2.3 Choosing the Tapering Parameters
+
+#### 2.3.1 Parameter Interpretation
+
+**When Tapering is Zero ($\tau = 0$)**
+
+The model reduces to standard ERGM, and $\theta_k$ represents conditional log-odds as usual.
+
+**When Tapering is Non-Zero ($\tau > 0$)**
+
+The interpretation changes slightly. The conditional log-odds of a tie becomes:
+
+$$\log\left(\frac{P(Y_{ij}=1|Y^c_{ij})}{P(Y_{ij}=0|Y^c_{ij})}\right) = \sum_k \Delta t_k(Y_{ij})[\theta_k + \tau_k \delta_{kij}]$$
+
+The term $\tau_k \delta_{kij}$ represents a **bias** introduced by tapering. However, this bias:
+
+- Is typically small when the model is well-specified
+- Ensures computational stability
+- Is a worthwhile trade-off for being able to use meaningful network terms
+
+#### 2.3.2 Choosing the Tapering Parameters
+
+How do we determine $\tau$? The lecture materials suggest using **kurtosis** as a measure of potential degeneracy:
+
+$$\text{Kurt}[g(Y)] = \frac{\mu_4}{\mu_2^2} = E[Z^4] \text{ where } Z \text{ is standardized}$$
+
+Key facts about kurtosis:
+- $\text{Kurt}[g(Y)] \geq 1$ always
+- Gaussian: $\text{Kurt} = 3$
+- Uniform: $\text{Kurt} = 1.8$
+- Higher kurtosis suggests bimodality/degeneracy
+
+The tapering is determined by constraining variance:
+
+$$V(\theta, \tau) = Var_q(g(Y)) = \sigma^2$$
+
+The `ergm.tapered` package automatically estimates appropriate $\tau$ values based on:
+1. The observed network statistics
+2. Desired variance constraints
+3. Ensuring non-degeneracy
+
+Automatic Selection: in practice, the package `ergm.tapered()` will
+
+- Usually choose standard ERGM ($\tau = 0$) when justified
+- Only add tapering when needed for stability
+- Balance bias-variance trade-off automatically
+
+### 2.4 Summary: When to Use Tapered ERGM
+
+**Use Tapered ERGM when:**
+- You want to include theoretically important but potentially problematic terms (triangles, GWESP, etc.)
+- Standard ERGM shows convergence issues or degeneracy warnings
+- You need guaranteed computational stability
+- You're modeling larger networks where degeneracy is more likely
+
+**Advantages:**
+- Theoretical guarantee of non-degeneracy
+- Minimal bias when standard ERGM would work
+- Interpretable as constrained maximum entropy
+- Available in user-friendly software (`ergm.tapered` package)
+
+**Trade-offs:**
+- Slight bias in parameter estimates (usually small)
+- Additional hyperparameters ($\tau$) to consider
+- Need to understand what tapering means for interpretation
+
+The Tapered ERGM represents a major breakthrough in network modeling, finally allowing us to use the full richness of ERGM specifications without worrying too much about the degeneracy. 
+
+## 3. Case Study 1 - The French Financial Elite Network
+
+### 3.1 The French Financial Elite Network Basic Information
 
 We'll work with a network collected by Charles Kadushin (1995) of 28 members of the French financial elite. This network captures friendship ties and includes rich vertex attributes that allow us to explore multiple dimensions of homophily.
 
@@ -130,7 +267,7 @@ plot(ffef, vertex.col = vertex_colors,
 2.  **Centrality patterns**: ENA graduates appear more concentrated in the network core, while non-ENA graduates are more dispersed around the periphery
 3.  **Cross-group ties exist**: While there's clear same-status clustering, we also observe connections between ENA and non-ENA graduates
 
-### 2.2 Building a Sophisticated ERGM Model
+### 3.2 Building a Sophisticated ERGM Model
 
 ```{r french-ergm, message=FALSE, warning=FALSE}
 #using ergm.tapered() for better handling of strong dependencies
@@ -149,7 +286,7 @@ summary(fit_elite)
 ```
 
 
-### 2.3 Interpreting Model Coefficients
+### 3.3 Interpreting Model Coefficients
 
 ```{r interpretation, message=FALSE}
 coef_table <- data.frame(
@@ -206,7 +343,7 @@ Summary:
 | **Degree terms** | `gwdegree()`, `degree()`, `idegree()`, `odegree()` | NO | Depends on node's position in network |
 :::
 
-### 2.4 MCMC Diagnostics - Ensuring Model Reliability
+### 3.4 MCMC Diagnostics - Ensuring Model Reliability
 
 ```{r mcmc-diagnostics, fig.width=12, fig.height=10, message=FALSE, warning=FALSE}
 mcmc_diag <- mcmc.diagnostics(fit_elite, vars.per.page = 6)
@@ -233,11 +370,11 @@ plot(gof_elite)
 
 From the sample statistics vs. observed values, the statistics show good agreement between simulated and observed values. All terms have p-value \> 0.05, The overall chi-squared test p = 0.022, indicating the model successfully reproduces the observed network statistics. The trace plots show relatively good mixing, fluctuating randomly around zero, which means MCMC chains are exploring the parameter space well and not getting trapped in any particular region. All the density plots are approximately centered near zeor, and no extreme skewness and multinodality (multiple peaks), indicating the sampling stable parameter estimation. Moreover, for the Geweke Diagnostic (Burn-in Test), all p-values are well above 0.05, indicating no evidence of non-convergence. The joint p-value of 0.820 indicates good overall convergence. Overall, the model successfully converged and the parameter estimates are reliable for inference.
 
-## 3. Case Study 2 - Balance Theory in Hansell Classroom Friendships
+## 4. Case Study 2 - Balance Theory in Hansell Classroom Friendships
 
 Now let's examine balance theory using directed friendship nominations in a sixth-grade classroom, we've used this dataset in the [previous tutorial (Part 5)](https://aliceaii.github.io/posts/snapart5/):
 
-### 3.1 Is the friendship network balanced in Heider’s definition of balance?
+### 4.1 Is the friendship network balanced in Heider’s definition of balance?
 
 ::: {.callout-tip}
 
@@ -267,7 +404,7 @@ triads[10]   # 030C
 ```
 
 
-### 3.2 Fit the model
+### 4.2 Fit the model
 
 ```{r balance-ergm, message=FALSE, warning=FALSE, cache=TRUE}
 fit_balance <- ergm.tapered(
@@ -309,7 +446,7 @@ This pattern suggests the classroom network organizes into balanced, sex-segrega
 -   **Cyclic ties (ctriple):** $\beta = -0.40$, the coefficient measures the tendency for cyclic triadic structures in the network, where: $A→B→C→A$ forms a cycle, but without the full transitive closure. The negative and highly significant coefficient (p \< 0.001) indicates a strong avoidance of cyclic triadic structures. $OR = 0.67$ means that cyclic triple configurations decrease the odds of the network configuration by 33%. The negative coefficient shows that cyclic patterns are less common than would be expected in a random network.
 
 
-### 3.3 Model Comparison and Selection
+### 4.3 Model Comparison and Selection
 
 ```{r model-comparison, message=FALSE, warning=FALSE}
 # Fit alternative model for French elite network
