@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2025-11-17">
+
+<title>Social Network Analysis R Tutorial Part 7: dvanced ERGM Modeling with Structural Terms, and MCMC Diagnostics – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <div class="quarto-title-block"><div><h1 class="title">Social Network Analysis R Tutorial Part 7: dvanced ERGM Modeling with Structural Terms, and MCMC Diagnostics</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">SNA</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 17, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction-for-advanced-structural-terms-in-ergms" id="toc-introduction-for-advanced-structural-terms-in-ergms" class="nav-link active" data-scroll-target="#introduction-for-advanced-structural-terms-in-ergms">1. Introduction for Advanced Structural Terms in ERGMs</a>
+  <ul class="collapse">
+  <li><a href="#understanding-geometrically-weighted-statistics" id="toc-understanding-geometrically-weighted-statistics" class="nav-link" data-scroll-target="#understanding-geometrically-weighted-statistics">1.1 Understanding Geometrically Weighted Statistics</a></li>
+  <li><a href="#comprehensive-function-reference-table" id="toc-comprehensive-function-reference-table" class="nav-link" data-scroll-target="#comprehensive-function-reference-table">1.2 Comprehensive Function Reference Table</a></li>
+  </ul></li>
+  <li><a href="#case-study-1---the-french-financial-elite-network" id="toc-case-study-1---the-french-financial-elite-network" class="nav-link" data-scroll-target="#case-study-1---the-french-financial-elite-network">2. Case Study 1 - The French Financial Elite Network</a>
+  <ul class="collapse">
+  <li><a href="#the-french-financial-elite-network-basic-information" id="toc-the-french-financial-elite-network-basic-information" class="nav-link" data-scroll-target="#the-french-financial-elite-network-basic-information">2.1 The French Financial Elite Network Basic Information</a></li>
+  <li><a href="#building-a-sophisticated-ergm-model" id="toc-building-a-sophisticated-ergm-model" class="nav-link" data-scroll-target="#building-a-sophisticated-ergm-model">2.2 Building a Sophisticated ERGM Model</a></li>
+  <li><a href="#interpreting-model-coefficients" id="toc-interpreting-model-coefficients" class="nav-link" data-scroll-target="#interpreting-model-coefficients">2.3 Interpreting Model Coefficients</a></li>
+  <li><a href="#mcmc-diagnostics---ensuring-model-reliability" id="toc-mcmc-diagnostics---ensuring-model-reliability" class="nav-link" data-scroll-target="#mcmc-diagnostics---ensuring-model-reliability">2.4 MCMC Diagnostics - Ensuring Model Reliability</a></li>
+  </ul></li>
+  <li><a href="#case-study-2---balance-theory-in-hansell-classroom-friendships" id="toc-case-study-2---balance-theory-in-hansell-classroom-friendships" class="nav-link" data-scroll-target="#case-study-2---balance-theory-in-hansell-classroom-friendships">3. Case Study 2 - Balance Theory in Hansell Classroom Friendships</a>
+  <ul class="collapse">
+  <li><a href="#is-the-friendship-network-balanced-in-heiders-definition-of-balance" id="toc-is-the-friendship-network-balanced-in-heiders-definition-of-balance" class="nav-link" data-scroll-target="#is-the-friendship-network-balanced-in-heiders-definition-of-balance">3.1 Is the friendship network balanced in Heider’s definition of balance?</a></li>
+  <li><a href="#fit-the-model" id="toc-fit-the-model" class="nav-link" data-scroll-target="#fit-the-model">3.2 Fit the model</a></li>
+  <li><a href="#model-comparison-and-selection" id="toc-model-comparison-and-selection" class="nav-link" data-scroll-target="#model-comparison-and-selection">3.3 Model Comparison and Selection</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Welcome to Part 7 of our Social Network Analysis R Tutorial series! In our <a href="https://aliceaii.github.io/posts/snapart6/">previous tutorial (Part 6)</a>, we explored the theoretical foundations of ERGMs, understanding the mathematical framework behind these powerful models. We covered the exponential family form, sufficient statistics, and the challenges of model degeneracy.</p>
+<p>In this post, we will advance into <strong>sophisticated ERGM modeling</strong> by incorporating complex structural terms that capture network dependencies beyond simple dyadic relationships. We’ll explore geometrically weighted statistics, perform comprehensive MCMC diagnostics, and learn to interpret results in meaningful sociological contexts.</p>
+<p><img src="figure1.png" class="img-fluid"></p>
+<p>After completing this tutorial, you will be able to:</p>
+<ul>
+<li>Implement advanced structural terms in ERGM models (GWESP, GWDSP, triadic structures)</li>
+<li>Perform and interpret MCMC convergence diagnostics</li>
+<li>Compare nested models and assess model fit</li>
+<li>Interpret complex ERGM results in substantive terms</li>
+<li>Handle model degeneracy using tapered ERGMs</li>
+</ul>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(network)        <span class="co"># Network object manipulation</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ergm)           <span class="co"># ERGM fitting</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkdata)    <span class="co"># Network datasets</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sna)           <span class="co"># Social network analysis tools</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ergm.tapered)  <span class="co"># Tapered ERGM for handling degeneracy</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Install ergm.tapered if needed</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># devtools::install_github("statnet/ergm", ref="tapered")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Why ergm.tapered?</strong></p>
+<p>The <code>ergm.tapered</code> package provides an alternative estimation method that better handles models with strong dependence between terms. When you include multiple structural terms (like gwesp and gwdsp), standard ERGM estimation can struggle with convergence. Tapered ERGM adds a “tapering” mechanism that helps stabilize estimation.</p>
+<p>Software available on GitHub as ergm.tapered: https://github.com/statnet/ergm.tapered</p>
+</div>
+</div>
+<section id="introduction-for-advanced-structural-terms-in-ergms" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-for-advanced-structural-terms-in-ergms">1. Introduction for Advanced Structural Terms in ERGMs</h2>
+<section id="understanding-geometrically-weighted-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-geometrically-weighted-statistics">1.1 Understanding Geometrically Weighted Statistics</h3>
+<p>Before diving into applications, let’s understand the sophisticated structural terms available in ERGMs. These terms capture complex network dependencies while avoiding the degeneracy issues that plague simpler specifications.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Why Geometrically Weighted Terms?</strong> Traditional count statistics (like triangle counts) can lead to model degeneracy because they treat all configurations equally. Geometrically weighted terms apply <strong>diminishing returns</strong> - the first few shared partners matter more than additional ones, making the model more stable and interpretable.</p>
+</div>
+</div>
+</section>
+<section id="comprehensive-function-reference-table" class="level3">
+<h3 class="anchored" data-anchor-id="comprehensive-function-reference-table">1.2 Comprehensive Function Reference Table</h3>
+<p>Here’s a detailed reference table for advanced ERGM structural terms:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 14%">
+<col style="width: 21%">
+<col style="width: 26%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Syntax</th>
+<th>Description</th>
+<th>Interpretation</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>istar(k)</strong></td>
+<td><code>istar(2)</code></td>
+<td>k-in-stars: counts nodes with exactly k incoming edges</td>
+<td>Popularity effects in directed networks</td>
+<td>Testing for preferential attachment to popular nodes</td>
+</tr>
+<tr class="even">
+<td><strong>ostar(k)</strong></td>
+<td><code>ostar(2)</code></td>
+<td>k-out-stars: counts nodes with exactly k outgoing edges</td>
+<td>Activity effects in directed networks</td>
+<td>Testing for variation in node activity levels</td>
+</tr>
+<tr class="odd">
+<td><strong>gwodegree(decay)</strong></td>
+<td><code>gwodegree(0.5, fixed=TRUE)</code></td>
+<td>Geometrically weighted out-degree distribution</td>
+<td>Controls out-degree heterogeneity with diminishing returns</td>
+<td>Modeling sender activity patterns without degeneracy</td>
+</tr>
+<tr class="even">
+<td><strong>gwidegree(decay)</strong></td>
+<td><code>gwidegree(0.5, fixed=TRUE)</code></td>
+<td>Geometrically weighted in-degree distribution</td>
+<td>Controls in-degree heterogeneity with diminishing returns</td>
+<td>Modeling popularity/receiver effects without degeneracy</td>
+</tr>
+<tr class="odd">
+<td><strong>gwesp(decay)</strong></td>
+<td><code>gwesp(0.5, fixed=TRUE)</code></td>
+<td>Geometrically weighted edgewise shared partners</td>
+<td>Transitivity: “friend of friend is friend” with diminishing returns</td>
+<td>Capturing clustering while avoiding degeneracy</td>
+</tr>
+<tr class="even">
+<td><strong>gwdsp(decay)</strong></td>
+<td><code>gwdsp(0.5, fixed=TRUE)</code></td>
+<td>Geometrically weighted dyadwise shared partners</td>
+<td>Shared partners between any dyad (connected or not)</td>
+<td>Modeling local clustering and “small world” effects</td>
+</tr>
+<tr class="odd">
+<td><strong>ctriple</strong></td>
+<td><code>ctriple</code> or <code>ctriad</code></td>
+<td>Cyclic triples: A→B→C→A patterns</td>
+<td>Non-hierarchical, cyclic relationships</td>
+<td>Testing for cyclic vs hierarchical structures</td>
+</tr>
+<tr class="even">
+<td><strong>ttriple</strong></td>
+<td><code>ttriple</code> or <code>ttriad</code></td>
+<td>Transitive triples: A→B→C with A→C</td>
+<td>Hierarchical, transitive closure</td>
+<td>Testing for transitivity and balance theory</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Choosing Decay Parameters The decay parameter (α) in geometrically weighted terms controls how quickly the weight diminishes:</p>
+<ul>
+<li><strong>α = 0</strong>: Only the first shared partner matters</li>
+<li><strong>α = 0.5</strong>: Moderate decay (common choice)</li>
+<li><strong>α = 1.0</strong>: Slower decay, more weight on higher numbers</li>
+<li><strong>α → ∞</strong>: Approaches regular count statistics</li>
+</ul>
+<p>Start with α = 0.5 as a default and adjust based on model diagnostics.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="case-study-1---the-french-financial-elite-network" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-1---the-french-financial-elite-network">2. Case Study 1 - The French Financial Elite Network</h2>
+<section id="the-french-financial-elite-network-basic-information" class="level3">
+<h3 class="anchored" data-anchor-id="the-french-financial-elite-network-basic-information">2.1 The French Financial Elite Network Basic Information</h3>
+<p>We’ll work with a network collected by Charles Kadushin (1995) of 28 members of the French financial elite. This network captures friendship ties and includes rich vertex attributes that allow us to explore multiple dimensions of homophily.</p>
+<p><strong>Data Source:</strong></p>
+<p>Kadushin, C. 1995. Friendship among the French financial elite. <em>American Sociological Review</em> 60:202-221.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(ffef)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(ffef)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">network.size</span>(ffef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 28</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">network.edgecount</span>(ffef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 66</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gden</span>(ffef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1746032</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.vertex.attributes</span>(ffef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "birthdate"    "birthplace"   "cabinet"      "clubs"        "eliteprom"   
+ [6] "elitevote"    "ena"          "enayear"      "fathers-lev"  "finance-min" 
+[11] "igyear"       "inspec-gen"   "masons"       "na"           "normal-sch"  
+[16] "party"        "polytech"     "polyyear"     "prestige"     "religion"    
+[21] "sciencepoly"  "socialreg"    "topboards"    "university"   "vertex.names"
+[26] "zipcode"     </code></pre>
+</div>
+</div>
+<p>The network includes several important vertex covariates:</p>
+<ul>
+<li><strong>prestige</strong>: 0 (neither particule nor social register), 1 (either), or 2 (both)</li>
+<li><strong>party</strong>: Political party membership (11 parties)</li>
+<li><strong>ena</strong>: Graduated from ENA (École nationale d’administration)? 1=yes, 2=no</li>
+<li><strong>masons</strong>: Mason membership</li>
+<li><strong>religion</strong>: Religious affiliation</li>
+<li><strong>topboards</strong>: Number of top corporate boards</li>
+</ul>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ena_status <span class="ot">&lt;-</span> ffef <span class="sc">%v%</span> <span class="st">"ena"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>vertex_colors <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ena_status <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"coral"</span>, <span class="st">"skyblue"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ffef, <span class="at">vertex.col =</span> vertex_colors, </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"French Financial Elite Network Colored by ENA Status"</span>, </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="fl">1.5</span>, <span class="at">edge.col =</span> <span class="st">"gray70"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Observations:</strong></p>
+<ol type="1">
+<li><strong>Visible clustering by ENA attendance</strong>: Individuals who graduated from ENA tend to form connections with other ENA graduates, suggesting strong educational homophily</li>
+<li><strong>Centrality patterns</strong>: ENA graduates appear more concentrated in the network core, while non-ENA graduates are more dispersed around the periphery</li>
+<li><strong>Cross-group ties exist</strong>: While there’s clear same-status clustering, we also observe connections between ENA and non-ENA graduates</li>
+</ol>
+</section>
+<section id="building-a-sophisticated-ergm-model" class="level3">
+<h3 class="anchored" data-anchor-id="building-a-sophisticated-ergm-model">2.2 Building a Sophisticated ERGM Model</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#using ergm.tapered() for better handling of strong dependencies</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fit_elite <span class="ot">&lt;-</span> <span class="fu">ergm.tapered</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  ffef <span class="sc">~</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    edges <span class="sc">+</span>                           <span class="co"># Baseline density</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"ena"</span>) <span class="sc">+</span>               <span class="co"># ENA homophily</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"prestige"</span>) <span class="sc">+</span>          <span class="co"># Prestige homophily</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"party"</span>) <span class="sc">+</span>             <span class="co"># Political party homophily</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwesp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>       <span class="co"># Transitive closure (clustering)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwdsp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>),        <span class="co"># Shared partners</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_elite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> Results:
+
+                   Estimate Std. Error MCMC % z value Pr(&gt;|z|)    
+edges              -4.68593    0.51223      0  -9.148  &lt; 1e-04 ***
+nodematch.ena       1.56649    0.36041      0   4.346  &lt; 1e-04 ***
+nodematch.prestige  0.70744    0.28252      0   2.504 0.012279 *  
+nodematch.party     1.22757    0.37359      0   3.286 0.001017 ** 
+gwesp.fixed.0.5     0.45725    0.18018      0   2.538 0.011159 *  
+gwdsp.fixed.0.5     0.18363    0.05446      1   3.372 0.000747 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+The estimated tapering scaling factor is 2.
+
+     Null Deviance: 524  on 378  degrees of freedom
+ Residual Deviance: 302  on 372  degrees of freedom
+ 
+AIC: 314  BIC: 337.6  (Smaller is better. MC Std. Err. = 0)</code></pre>
+</div>
+</div>
+</section>
+<section id="interpreting-model-coefficients" class="level3">
+<h3 class="anchored" data-anchor-id="interpreting-model-coefficients">2.3 Interpreting Model Coefficients</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Term =</span> <span class="fu">names</span>(<span class="fu">coef</span>(fit_elite)),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Coefficient =</span> <span class="fu">round</span>(<span class="fu">coef</span>(fit_elite), <span class="dv">3</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">SE =</span> <span class="fu">round</span>(<span class="fu">summary</span>(fit_elite)<span class="sc">$</span>coefficients[, <span class="st">"Std. Error"</span>], <span class="dv">3</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR =</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">coef</span>(fit_elite)), <span class="dv">3</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> <span class="fu">round</span>(<span class="fu">summary</span>(fit_elite)<span class="sc">$</span>coefficients[, <span class="st">"Pr(&gt;|z|)"</span>], <span class="dv">4</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(coef_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                 Term Coefficient    SE    OR p_value
+edges                           edges      -4.686 0.512 0.009  0.0000
+nodematch.ena           nodematch.ena       1.566 0.360 4.790  0.0000
+nodematch.prestige nodematch.prestige       0.707 0.283 2.029  0.0123
+nodematch.party       nodematch.party       1.228 0.374 3.413  0.0010
+gwesp.fixed.0.5       gwesp.fixed.0.5       0.457 0.180 1.580  0.0112
+gwdsp.fixed.0.5       gwdsp.fixed.0.5       0.184 0.054 1.202  0.0007</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>baseline_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>])</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>ena_match_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_elite)[<span class="st">"nodematch.ena"</span>])</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>prestige_match_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_elite)[<span class="st">"nodematch.prestige"</span>])</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>party_match_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_elite)[<span class="st">"nodematch.party"</span>])</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Baseline (no matches):"</span>, <span class="fu">round</span>(baseline_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Baseline (no matches): 0.0091 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Same ENA status:"</span>, <span class="fu">round</span>(ena_match_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Same ENA status: 0.0423 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Same prestige level:"</span>, <span class="fu">round</span>(prestige_match_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Same prestige level: 0.0184 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Same party affiliation:"</span>, <span class="fu">round</span>(party_match_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Same party affiliation: 0.0305 </code></pre>
+</div>
+</div>
+<ul>
+<li><p><strong>Edges:</strong> <span class="math inline">\(\beta = -4.63\)</span> represent the baseline log-odds of a friendship tie existing between any two randomly selected individuals in the networks, while controlling other predictors. The strong negative coefficient indicates this is a very sparse network. The <span class="math inline">\(OR = 0.010\)</span> means the baseline odds of a tie is about 1.0%. The baseline robability of friendship is approximately 0.96%.</p></li>
+<li><p><strong>nodematch.ena:</strong> <span class="math inline">\(\beta = 1.57\)</span> measures homophily on ENA attendance. The <span class="math inline">\(OR = 4.79\)</span> means that two individuals who share ENA status (both graduate from ENA or both did not) have 4.79 times higher odds of being friends compared to two individuals with different ENA status. The coefficient is strong and highly significant. And the probability of a friendship tie between two individuals who share the same ENA status is 4.45%.</p></li>
+<li><p><strong>nodematch.prestige:</strong> <span class="math inline">\(\beta = 0.68\)</span> measures homophily on prestige level (having particule and/or social register listing).The coefficient is moderate and significant (p = 0.015). The <span class="math inline">\(OR = 1.97\)</span> mean that two individuals with the same prestige level have 1.97 times higher odds of being friends compared to those with different prestige levels. The probability of a friendship tie between two individuals who share the same prestige level is 1.88%.</p></li>
+<li><p><strong>nodematch.party:</strong> <span class="math inline">\(\beta = 1.25\)</span> measures homophily on political party affiliation. The coefficient is strong and highly significant (p &lt; 0.001).The <span class="math inline">\(OR = 3.49\)</span> means that two individuals from the same political party have 3.49 times higher odds of being friends compared to those from different parties. The probability of a friendship tie between two individuals who share the same party affiliation is 3.28%.</p></li>
+<li><p><strong>GWESP(0.5):</strong> <span class="math inline">\(\beta = 0.43\)</span> measures transitivity and clustering through Geometrically Weighted Edgewise Shared Partners. This term captures the “friend of a friend is a friend” phenomenon. The coefficient is moderate and significant (p = 0.013). The <span class="math inline">\(OR = 1.53\)</span> indicates that networks with more shared partners (triangles) are more probable. The French financial elite network exhibits strong transitivity. If person A is friends with person B, and person B is friends with person C, then A and C are significantly more likely to also be friends.</p></li>
+<li><p><strong>GWDSP(0.5):</strong> <span class="math inline">\(\beta = 0.19\)</span> measures local network structure through Geometrically Weighted Dyadwise Shared Partners. This term captures the tendency for dyads (pairs) to share partners, even if they’re not directly connected. The coefficient is modest but significant (p = 0.003). The <span class="math inline">\(OR = 1.21\)</span> indicates preference for configurations where individuals share common friends. Beyond direct transitivity, there’s a tendency for individuals to be embedded in overlapping social circles. This creates a “small world” structure where even if two people aren’t direct friends, they’re likely to share mutual acquaintances.</p></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<pre><code>plogis(coef["edges"] + coef["gwesp.fixed.0.5"])</code></pre>
+<p><strong>This does NOT work because:</strong></p>
+<ul>
+<li>GWESP is not a 0/1 indicator variable</li>
+<li>GWESP is a <strong>count statistic</strong> that depends on the entire network structure</li>
+<li>GWESP uses a <strong>geometrically weighted</strong> function: <span class="math inline">\(\sum_{k=1}^{n-2} \{1 - (1-e^{-\alpha})^k\} \cdot EP_k\)</span></li>
+</ul>
+<p>Summary:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term Type</th>
+<th>Example Terms</th>
+<th>Can use <code>plogis(edges + term)</code>?</th>
+<th>Why/Why not?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Node attributes</strong></td>
+<td><code>nodematch()</code>, <code>nodecov()</code>, <code>absdiff()</code></td>
+<td>YES</td>
+<td>Binary 0/1 or known numeric covariate values</td>
+</tr>
+<tr class="even">
+<td><strong>Dyad attributes</strong></td>
+<td><code>edgecov()</code>, <code>dyadcov()</code></td>
+<td>YES (with care)</td>
+<td>Known covariate value for specific dyad</td>
+</tr>
+<tr class="odd">
+<td><strong>Structural terms</strong></td>
+<td><code>gwesp()</code>, <code>gwdsp()</code>, <code>triangle</code>, <code>ttriad</code>, <code>ctriad</code></td>
+<td>NO</td>
+<td>Value depends on entire network configuration</td>
+</tr>
+<tr class="even">
+<td><strong>Degree terms</strong></td>
+<td><code>gwdegree()</code>, <code>degree()</code>, <code>idegree()</code>, <code>odegree()</code></td>
+<td>NO</td>
+<td>Depends on node’s position in network</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="mcmc-diagnostics---ensuring-model-reliability" class="level3">
+<h3 class="anchored" data-anchor-id="mcmc-diagnostics---ensuring-model-reliability">2.4 MCMC Diagnostics - Ensuring Model Reliability</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mcmc_diag <span class="ot">&lt;-</span> <span class="fu">mcmc.diagnostics</span>(fit_elite, <span class="at">vars.per.page =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sample statistics summary:
+
+Iterations = 9984:197120
+Thinning interval = 256 
+Number of chains = 1 
+Sample size per chain = 732 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+                       Mean     SD Naive SE Time-series SE
+edges              -0.37842  3.722  0.13758         0.1644
+nodematch.ena      -0.25000  3.973  0.14684         0.1748
+nodematch.prestige -0.29235  3.273  0.12098         0.1831
+nodematch.party    -0.02322  2.174  0.08035         0.1291
+gwesp.fixed.0.5    -0.19374  6.637  0.24532         0.2453
+gwdsp.fixed.0.5     2.50133 18.332  0.67756         0.7931
+
+2. Quantiles for each variable:
+
+                      2.5%     25%     50%    75%  97.5%
+edges               -7.725  -3.000  0.0000  2.000  6.725
+nodematch.ena       -8.000  -3.000  0.0000  3.000  8.000
+nodematch.prestige  -6.000  -2.250  0.0000  2.000  6.000
+nodematch.party     -4.000  -2.000  0.0000  1.000  4.000
+gwesp.fixed.0.5    -11.875  -4.982 -0.3306  4.575 12.947
+gwdsp.fixed.0.5    -30.923 -10.000  1.9447 14.795 38.260
+
+
+Are sample statistics significantly different from observed?
+                edges nodematch.ena nodematch.prestige nodematch.party
+diff.      -0.3784153    -0.2500000         -0.2923497     -0.02322404
+test stat. -2.3020120    -1.4300338         -1.5964703     -0.17995146
+P-val.      0.0213345     0.1527073          0.1103838      0.85719067
+           gwesp.fixed.0.5 gwdsp.fixed.0.5 Overall (Chi^2)
+diff.           -0.1937426     2.501327124              NA
+test stat.      -0.7897416     3.153789509    20.667899611
+P-val.           0.4296787     0.001611653     0.002732234
+
+Sample statistics cross-correlations:
+                       edges nodematch.ena nodematch.prestige nodematch.party
+edges              1.0000000    0.70831695         0.38636757      0.17473251
+nodematch.ena      0.7083169    1.00000000         0.20351520      0.08771288
+nodematch.prestige 0.3863676    0.20351520         1.00000000      0.02346102
+nodematch.party    0.1747325    0.08771288         0.02346102      1.00000000
+gwesp.fixed.0.5    0.6485533    0.53125096         0.16732228      0.08451040
+gwdsp.fixed.0.5    0.5912691    0.25880435         0.19755469      0.09857144
+                   gwesp.fixed.0.5 gwdsp.fixed.0.5
+edges                    0.6485533      0.59126909
+nodematch.ena            0.5312510      0.25880435
+nodematch.prestige       0.1673223      0.19755469
+nodematch.party          0.0845104      0.09857144
+gwesp.fixed.0.5          1.0000000      0.54387391
+gwdsp.fixed.0.5          0.5438739      1.00000000
+
+Sample statistics auto-correlation:
+Chain 1 
+               edges nodematch.ena nodematch.prestige nodematch.party
+Lag 0     1.00000000   1.000000000         1.00000000       1.0000000
+Lag 256   0.17549198   0.172024313         0.28672574       0.4407665
+Lag 512   0.07861936   0.044085462         0.11872718       0.2268692
+Lag 768   0.04693548   0.007762898         0.11514094       0.1602980
+Lag 1024 -0.02103196  -0.051723764         0.04807089       0.1281802
+Lag 1280 -0.02029358  -0.099292509        -0.01649838       0.1258441
+         gwesp.fixed.0.5 gwdsp.fixed.0.5
+Lag 0        1.000000000      1.00000000
+Lag 256      0.014344672      0.04082106
+Lag 512      0.018225222      0.05753242
+Lag 768      0.007010241      0.06270653
+Lag 1024    -0.038911261     -0.00166690
+Lag 1280    -0.058851029      0.02978338
+
+Sample statistics burn-in diagnostic (Geweke):
+Chain 1 
+
+Fraction in 1st window = 0.1
+Fraction in 2nd window = 0.5 
+
+             edges      nodematch.ena nodematch.prestige    nodematch.party 
+            1.1828             0.2123             1.2710            -0.4160 
+   gwesp.fixed.0.5    gwdsp.fixed.0.5 
+            0.3638            -0.2401 
+
+Individual P-values (lower = worse):
+             edges      nodematch.ena nodematch.prestige    nodematch.party 
+         0.2369010          0.8319044          0.2037202          0.6774413 
+   gwesp.fixed.0.5    gwdsp.fixed.0.5 
+         0.7160131          0.8102226 
+Joint P-value (lower = worse):  0.8553903 .</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/mcmc-diagnostics-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+MCMC diagnostics shown here are from the last round of simulation, prior to computation of final parameter estimates. Because the final estimates are refinements of those used for this simulation run, these diagnostics may understate model performance. To directly assess the performance of the final model on in-model statistics, please use the GOF command: gof(ergmFitObject, GOF=~model).</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>MCMC Diagnostic Components Explained:</p>
+<ul>
+<li><strong>Sample Statistics vs.&nbsp;Observed</strong>: Compares simulated network statistics to observed values. Good fit shows statistics centered around zero.</li>
+<li><strong>Trace Plots</strong>: Show MCMC chain values over iterations. Good mixing looks like “fuzzy caterpillar” around zero.</li>
+<li><strong>Density Plots</strong>: Distribution of sampled statistics. Should be approximately normal and centered near zero.</li>
+<li><strong>Autocorrelation Function (ACF)</strong>: Measures correlation between successive samples. Should decay quickly to near zero.</li>
+<li><strong>Geweke Diagnostic</strong>: Tests whether early and late parts of chain come from same distribution (burn-in test).</li>
+</ul>
+</div>
+</div>
+<p>Let’s extract some key diagnostic statistics:</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gof_elite <span class="ot">&lt;-</span> <span class="fu">gof</span>(fit_elite, <span class="at">GOF =</span> <span class="sc">~</span>degree <span class="sc">+</span> esp <span class="sc">+</span> dsp <span class="sc">+</span> triadcensus, </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(gof_elite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/diagnostic-summary-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/diagnostic-summary-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/diagnostic-summary-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/diagnostic-summary-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/diagnostic-summary-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the sample statistics vs.&nbsp;observed values, the statistics show good agreement between simulated and observed values. All terms have p-value &gt; 0.05, The overall chi-squared test p = 0.022, indicating the model successfully reproduces the observed network statistics. The trace plots show relatively good mixing, fluctuating randomly around zero, which means MCMC chains are exploring the parameter space well and not getting trapped in any particular region. All the density plots are approximately centered near zeor, and no extreme skewness and multinodality (multiple peaks), indicating the sampling stable parameter estimation. Moreover, for the Geweke Diagnostic (Burn-in Test), all p-values are well above 0.05, indicating no evidence of non-convergence. The joint p-value of 0.820 indicates good overall convergence. Overall, the model successfully converged and the parameter estimates are reliable for inference.</p>
+</section>
+</section>
+<section id="case-study-2---balance-theory-in-hansell-classroom-friendships" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-2---balance-theory-in-hansell-classroom-friendships">3. Case Study 2 - Balance Theory in Hansell Classroom Friendships</h2>
+<p>Now let’s examine balance theory using directed friendship nominations in a sixth-grade classroom, we’ve used this dataset in the <a href="https://aliceaii.github.io/posts/snapart5/">previous tutorial (Part 5)</a>:</p>
+<section id="is-the-friendship-network-balanced-in-heiders-definition-of-balance" class="level3">
+<h3 class="anchored" data-anchor-id="is-the-friendship-network-balanced-in-heiders-definition-of-balance">3.1 Is the friendship network balanced in Heider’s definition of balance?</h3>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Heider’s Balance Theory</strong> In a balanced network:</p>
+<ul>
+<li><strong>Transitive triads</strong> (A→B→C implies A→C): “Friend of friend is friend”</li>
+<li><strong>Avoided cyclic triads</strong> (A→B→C→A without A→C): Creates tension</li>
+</ul>
+<p>Balanced networks have positive transitive triad coefficients and negative cyclic triad coefficients.</p>
+</div>
+</div>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkdata)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(hansell)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(hansell)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(hansell)</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(hansell <span class="sc">%v%</span> <span class="st">"sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+female   male 
+    14     13 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">triad.census</span>(hansell)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     003 012 102 021D 021U 021C 111D 111U 030T 030C 201 120D 120U 120C 210 300
+[1,] 771 982 248  234  115  150   68   97  126    2  13   32   32   20  28   7</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">#transitive triads</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>triads <span class="ot">&lt;-</span> <span class="fu">triad.census</span>(hansell)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>triads[<span class="dv">9</span>]  <span class="co"># 030T</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 126</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#cyclic triads</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>triads[<span class="dv">10</span>]   <span class="co"># 030C    </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+</section>
+<section id="fit-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="fit-the-model">3.2 Fit the model</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fit_balance <span class="ot">&lt;-</span> <span class="fu">ergm.tapered</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  hansell <span class="sc">~</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    edges <span class="sc">+</span>                          <span class="co"># Baseline density</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    mutual <span class="sc">+</span>                         <span class="co"># Reciprocity</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"sex"</span>, <span class="at">diff =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>  <span class="co"># Sex homophily (differentiated)</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    ttriple <span class="sc">+</span>                        <span class="co"># Transitive triples</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    ctriple,                         <span class="co"># Cyclic triples</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_balance)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> Results:
+
+                     Estimate Std. Error MCMC % z value Pr(&gt;|z|)    
+edges                -3.06147    0.12542      0 -24.410   &lt;1e-04 ***
+mutual                0.25919    0.36783      0   0.705    0.481    
+nodematch.sex.female  0.85847    0.11493      0   7.469   &lt;1e-04 ***
+nodematch.sex.male    1.07967    0.15051      0   7.173   &lt;1e-04 ***
+ttriple               0.32888    0.01787      0  18.404   &lt;1e-04 ***
+ctriple              -0.40036    0.07597      0  -5.270   &lt;1e-04 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+The estimated tapering scaling factor is 2.
+
+     Null Deviance: 973.2  on 702  degrees of freedom
+ Residual Deviance: 633.2  on 696  degrees of freedom
+ 
+AIC: 645.2  BIC: 672.5  (Smaller is better. MC Std. Err. = 0)</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>balance_coef <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Term =</span> <span class="fu">c</span>(<span class="st">"Edges"</span>, <span class="st">"Mutual"</span>, <span class="st">"Same Sex (Female)"</span>, <span class="st">"Same Sex (Male)"</span>, </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Transitive Triples"</span>, <span class="st">"Cyclic Triples"</span>),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Coefficient =</span> <span class="fu">round</span>(<span class="fu">coef</span>(fit_balance), <span class="dv">3</span>),</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR =</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">coef</span>(fit_balance)), <span class="dv">3</span>))</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(balance_coef, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Term Coefficient    OR
+              Edges      -3.061 0.047
+             Mutual       0.259 1.296
+  Same Sex (Female)       0.858 2.360
+    Same Sex (Male)       1.080 2.944
+ Transitive Triples       0.329 1.389
+     Cyclic Triples      -0.400 0.670</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Evidence for Balance model</p>
+<p>The model provides strong evidence for balance theory:</p>
+<ul>
+<li><strong>Positive transitivity</strong> (β = 0.33, p &lt; 0.05): Transitive closure is preferred</li>
+<li><strong>Negative cyclicity</strong> (β = -0.40, p &lt; 0.001): Cyclic patterns are avoided</li>
+<li><strong>Strong sex homophily</strong>: Both boys and girls prefer same-sex friendships</li>
+<li><strong>No reciprocity effect</strong>: Friendships aren’t necessarily mutual at this age</li>
+</ul>
+<p>This pattern suggests the classroom network organizes into balanced, sex-segregated friendship groups with clear hierarchical structures rather than cyclic patterns.</p>
+</div>
+</div>
+<ul>
+<li><p><strong>Transitive ties (ttriple):</strong> <span class="math inline">\(\beta = 0.33\)</span>, the coefficient measures the tendency for transitive triadic closure in the network, it’s significant. The <span class="math inline">\(OR = 1.39\)</span> means that for each additional transitive triple configuration, the odds of the network configuration increased by 39%. When student A nominates student B as a friend, and B nominates C, there is a significantly higher-than-random probability that A will also nominate C. This creates cohesive friendship groups with closed triadic structures.</p></li>
+<li><p><strong>Cyclic ties (ctriple):</strong> <span class="math inline">\(\beta = -0.40\)</span>, the coefficient measures the tendency for cyclic triadic structures in the network, where: <span class="math inline">\(A→B→C→A\)</span> forms a cycle, but without the full transitive closure. The negative and highly significant coefficient (p &lt; 0.001) indicates a strong avoidance of cyclic triadic structures. <span class="math inline">\(OR = 0.67\)</span> means that cyclic triple configurations decrease the odds of the network configuration by 33%. The negative coefficient shows that cyclic patterns are less common than would be expected in a random network.</p></li>
+</ul>
+</section>
+<section id="model-comparison-and-selection" class="level3">
+<h3 class="anchored" data-anchor-id="model-comparison-and-selection">3.3 Model Comparison and Selection</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit alternative model for French elite network</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>fit_elite_extended <span class="ot">&lt;-</span> <span class="fu">ergm.tapered</span>(</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  ffef <span class="sc">~</span> </span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    edges <span class="sc">+</span> </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"ena"</span>) <span class="sc">+</span> </span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"prestige"</span>) <span class="sc">+</span> </span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"party"</span>) <span class="sc">+</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"masons"</span>) <span class="sc">+</span>           <span class="co"># Add Masonic membership</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"religion"</span>) <span class="sc">+</span>          <span class="co"># Add religion</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodecov</span>(<span class="st">"topboards"</span>) <span class="sc">+</span>           <span class="co"># Board memberships as covariate</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">absdiff</span>(<span class="st">"topboards"</span>) <span class="sc">+</span>           <span class="co"># Difference in board memberships</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwesp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> </span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwdsp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Model comparison</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>anova_result <span class="ot">&lt;-</span> <span class="fu">anova</span>(fit_elite, fit_elite_extended)</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(anova_result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Model 1: ffef ~ Taper(~edges + nodematch("ena") + nodematch("prestige") + 
+    nodematch("party") + gwesp(0.5, fixed = TRUE) + gwdsp(0.5, 
+    fixed = TRUE), coef = .taper.coef, m = .taper.center)
+Model 2: ffef ~ Taper(~edges + nodematch("ena") + nodematch("prestige") + 
+    nodematch("party") + nodematch("masons") + nodematch("religion") + 
+    nodecov("topboards") + absdiff("topboards") + gwesp(0.5, 
+    fixed = TRUE) + gwdsp(0.5, fixed = TRUE), coef = .taper.coef, 
+    m = .taper.center)
+     Df Deviance Resid. Df Resid. Dev Pr(&gt;|Chisq|)    
+NULL                   378     524.02                 
+1     6    222.0       372     302.02       &lt;2e-16 ***
+2     4     -0.1       368     302.11       0.9988    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC comparison</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>aic_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Base"</span>, <span class="st">"Extended"</span>),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">c</span>(<span class="fu">AIC</span>(fit_elite), <span class="fu">AIC</span>(fit_elite_extended)),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">BIC =</span> <span class="fu">c</span>(<span class="fu">BIC</span>(fit_elite), <span class="fu">BIC</span>(fit_elite_extended)),</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameters =</span> <span class="fu">c</span>(<span class="fu">length</span>(<span class="fu">coef</span>(fit_elite)), <span class="fu">length</span>(<span class="fu">coef</span>(fit_elite_extended)))</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(aic_comparison)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Model      AIC      BIC Parameters
+1     Base 314.0151 337.6245          6
+2 Extended 322.1149 361.4638         10</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Model Selection Guidelines</p>
+<ul>
+<li><strong>Lower AIC/BIC</strong> indicates better model fit accounting for complexity</li>
+<li><strong>ANOVA p-value &gt; 0.05</strong> suggests additional terms don’t significantly improve fit</li>
+<li><strong>Check MCMC diagnostics</strong> for both models - better convergence often trumps marginal fit improvements</li>
+<li><strong>Substantive interpretation</strong> matters - include terms that make theoretical sense</li>
+</ul>
+<p>In our case, the simpler model is preferred: lower AIC, similar fit, better convergence.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li><p>Hansell, S. (1984). “Cooperative groups, weak ties, and the integration of peer friendships.” <em>Social Psychology Quarterly</em>, 47(4), 316-328.</p></li>
+<li><p>Kadushin, C. (1995). “Friendship among the French financial elite.” <em>American Sociological Review</em>, 60, 202-221.</p></li>
+<li><p>Snijders, T.A.B., Pattison, P.E., Robins, G.L., &amp; Handcock, M.S. (2006). “New specifications for exponential random graph models.” <em>Sociological Methodology</em>, 36(1), 99-153.</p></li>
+<li><p>Hunter, D.R., &amp; Handcock, M.S. (2006). “Inference in curved exponential family models for networks.” <em>Journal of Computational and Graphical Statistics</em>, 15(3), 565-583.</p></li>
+</ul>
+<hr>
+<p><em>This tutorial is based on UCLA <a href="https://handcock.github.io/teaching/218/">STATS 218: Social Network Analysis</a> taught by Prof <a href="https://handcock.github.io/">Mark Handcock</a>.</em></p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb44" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Social Network Analysis R Tutorial Part 7: dvanced ERGM Modeling with Structural Terms, and MCMC Diagnostics"</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> Shuhan (Alice) Ai</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2025-11-17"</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [R, SNA]</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="an">toc-depth:</span><span class="co"> 3</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="an">code-fold:</span><span class="co"> show</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="an">code-tools:</span><span class="co"> true</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="an">toc-title:</span><span class="co"> "Contents"</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="an">image:</span><span class="co"> "figure1.png"</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>Welcome to Part 7 of our Social Network Analysis R Tutorial series! In our <span class="co">[</span><span class="ot">previous tutorial (Part 6)</span><span class="co">](https://aliceaii.github.io/posts/snapart6/)</span>, we explored the theoretical foundations of ERGMs, understanding the mathematical framework behind these powerful models. We covered the exponential family form, sufficient statistics, and the challenges of model degeneracy.</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>In this post, we will advance into **sophisticated ERGM modeling** by incorporating complex structural terms that capture network dependencies beyond simple dyadic relationships. We'll explore geometrically weighted statistics, perform comprehensive MCMC diagnostics, and learn to interpret results in meaningful sociological contexts.</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="al">![](figure1.png)</span></span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>After completing this tutorial, you will be able to:</span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Implement advanced structural terms in ERGM models (GWESP, GWDSP, triadic structures)</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Perform and interpret MCMC convergence diagnostics</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Compare nested models and assess model fit</span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Interpret complex ERGM results in substantive terms</span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Handle model degeneracy using tapered ERGMs</span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup, message=FALSE, warning=FALSE}</span></span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(network)        <span class="co"># Network object manipulation</span></span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ergm)           <span class="co"># ERGM fitting</span></span>
+<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkdata)    <span class="co"># Network datasets</span></span>
+<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sna)           <span class="co"># Social network analysis tools</span></span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ergm.tapered)  <span class="co"># Tapered ERGM for handling degeneracy</span></span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Install ergm.tapered if needed</span></span>
+<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a><span class="co"># devtools::install_github("statnet/ergm", ref="tapered")</span></span>
+<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a>::: callout-note</span>
+<span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a>**Why ergm.tapered?**</span>
+<span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>The <span class="in">`ergm.tapered`</span> package provides an alternative estimation method that better handles models with strong dependence between terms. When you include multiple structural terms (like gwesp and gwdsp), standard ERGM estimation can struggle with convergence. Tapered ERGM adds a "tapering" mechanism that helps stabilize estimation.</span>
+<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a>Software available on GitHub as ergm.tapered: https://github.com/statnet/ergm.tapered</span>
+<span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-50"><a href="#cb44-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-51"><a href="#cb44-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Introduction for Advanced Structural Terms in ERGMs</span></span>
+<span id="cb44-52"><a href="#cb44-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-53"><a href="#cb44-53" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1.1 Understanding Geometrically Weighted Statistics</span></span>
+<span id="cb44-54"><a href="#cb44-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-55"><a href="#cb44-55" aria-hidden="true" tabindex="-1"></a>Before diving into applications, let's understand the sophisticated structural terms available in ERGMs. These terms capture complex network dependencies while avoiding the degeneracy issues that plague simpler specifications.</span>
+<span id="cb44-56"><a href="#cb44-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-57"><a href="#cb44-57" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb44-58"><a href="#cb44-58" aria-hidden="true" tabindex="-1"></a>**Why Geometrically Weighted Terms?**</span>
+<span id="cb44-59"><a href="#cb44-59" aria-hidden="true" tabindex="-1"></a>Traditional count statistics (like triangle counts) can lead to model degeneracy because they treat all configurations equally. Geometrically weighted terms apply **diminishing returns** - the first few shared partners matter more than additional ones, making the model more stable and interpretable.</span>
+<span id="cb44-60"><a href="#cb44-60" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-61"><a href="#cb44-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-62"><a href="#cb44-62" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1.2 Comprehensive Function Reference Table</span></span>
+<span id="cb44-63"><a href="#cb44-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-64"><a href="#cb44-64" aria-hidden="true" tabindex="-1"></a>Here's a detailed reference table for advanced ERGM structural terms:</span>
+<span id="cb44-65"><a href="#cb44-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-66"><a href="#cb44-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Function <span class="pp">|</span> Syntax <span class="pp">|</span> Description <span class="pp">|</span> Interpretation <span class="pp">|</span> When to Use <span class="pp">|</span></span>
+<span id="cb44-67"><a href="#cb44-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|----------|---------|-------------|----------------|-------------|</span></span>
+<span id="cb44-68"><a href="#cb44-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **istar(k)** <span class="pp">|</span> <span class="in">`istar(2)`</span> <span class="pp">|</span> k-in-stars: counts nodes with exactly k incoming edges <span class="pp">|</span> Popularity effects in directed networks <span class="pp">|</span> Testing for preferential attachment to popular nodes <span class="pp">|</span></span>
+<span id="cb44-69"><a href="#cb44-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **ostar(k)** <span class="pp">|</span> <span class="in">`ostar(2)`</span> <span class="pp">|</span> k-out-stars: counts nodes with exactly k outgoing edges <span class="pp">|</span> Activity effects in directed networks <span class="pp">|</span> Testing for variation in node activity levels <span class="pp">|</span></span>
+<span id="cb44-70"><a href="#cb44-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **gwodegree(decay)** <span class="pp">|</span> <span class="in">`gwodegree(0.5, fixed=TRUE)`</span> <span class="pp">|</span> Geometrically weighted out-degree distribution <span class="pp">|</span> Controls out-degree heterogeneity with diminishing returns <span class="pp">|</span> Modeling sender activity patterns without degeneracy <span class="pp">|</span></span>
+<span id="cb44-71"><a href="#cb44-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **gwidegree(decay)** <span class="pp">|</span> <span class="in">`gwidegree(0.5, fixed=TRUE)`</span> <span class="pp">|</span> Geometrically weighted in-degree distribution <span class="pp">|</span> Controls in-degree heterogeneity with diminishing returns <span class="pp">|</span> Modeling popularity/receiver effects without degeneracy <span class="pp">|</span></span>
+<span id="cb44-72"><a href="#cb44-72" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **gwesp(decay)** <span class="pp">|</span> <span class="in">`gwesp(0.5, fixed=TRUE)`</span> <span class="pp">|</span> Geometrically weighted edgewise shared partners <span class="pp">|</span> Transitivity: "friend of friend is friend" with diminishing returns <span class="pp">|</span> Capturing clustering while avoiding degeneracy <span class="pp">|</span></span>
+<span id="cb44-73"><a href="#cb44-73" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **gwdsp(decay)** <span class="pp">|</span> <span class="in">`gwdsp(0.5, fixed=TRUE)`</span> <span class="pp">|</span> Geometrically weighted dyadwise shared partners <span class="pp">|</span> Shared partners between any dyad (connected or not) <span class="pp">|</span> Modeling local clustering and "small world" effects <span class="pp">|</span></span>
+<span id="cb44-74"><a href="#cb44-74" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **ctriple** <span class="pp">|</span> <span class="in">`ctriple`</span> or <span class="in">`ctriad`</span> <span class="pp">|</span> Cyclic triples: A→B→C→A patterns <span class="pp">|</span> Non-hierarchical, cyclic relationships <span class="pp">|</span> Testing for cyclic vs hierarchical structures <span class="pp">|</span></span>
+<span id="cb44-75"><a href="#cb44-75" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **ttriple** <span class="pp">|</span> <span class="in">`ttriple`</span> or <span class="in">`ttriad`</span> <span class="pp">|</span> Transitive triples: A→B→C with A→C <span class="pp">|</span> Hierarchical, transitive closure <span class="pp">|</span> Testing for transitivity and balance theory <span class="pp">|</span></span>
+<span id="cb44-76"><a href="#cb44-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-77"><a href="#cb44-77" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb44-78"><a href="#cb44-78" aria-hidden="true" tabindex="-1"></a>Choosing Decay Parameters</span>
+<span id="cb44-79"><a href="#cb44-79" aria-hidden="true" tabindex="-1"></a>The decay parameter (α) in geometrically weighted terms controls how quickly the weight diminishes:</span>
+<span id="cb44-80"><a href="#cb44-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-81"><a href="#cb44-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**α = 0**: Only the first shared partner matters</span>
+<span id="cb44-82"><a href="#cb44-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**α = 0.5**: Moderate decay (common choice)</span>
+<span id="cb44-83"><a href="#cb44-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**α = 1.0**: Slower decay, more weight on higher numbers</span>
+<span id="cb44-84"><a href="#cb44-84" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**α → ∞**: Approaches regular count statistics</span>
+<span id="cb44-85"><a href="#cb44-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-86"><a href="#cb44-86" aria-hidden="true" tabindex="-1"></a>Start with α = 0.5 as a default and adjust based on model diagnostics.</span>
+<span id="cb44-87"><a href="#cb44-87" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-88"><a href="#cb44-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-89"><a href="#cb44-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-90"><a href="#cb44-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Case Study 1 - The French Financial Elite Network</span></span>
+<span id="cb44-91"><a href="#cb44-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-92"><a href="#cb44-92" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.1 The French Financial Elite Network Basic Information</span></span>
+<span id="cb44-93"><a href="#cb44-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-94"><a href="#cb44-94" aria-hidden="true" tabindex="-1"></a>We'll work with a network collected by Charles Kadushin (1995) of 28 members of the French financial elite. This network captures friendship ties and includes rich vertex attributes that allow us to explore multiple dimensions of homophily.</span>
+<span id="cb44-95"><a href="#cb44-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-96"><a href="#cb44-96" aria-hidden="true" tabindex="-1"></a>**Data Source:**</span>
+<span id="cb44-97"><a href="#cb44-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-98"><a href="#cb44-98" aria-hidden="true" tabindex="-1"></a>Kadushin, C. 1995. Friendship among the French financial elite. *American Sociological Review* 60:202-221.</span>
+<span id="cb44-99"><a href="#cb44-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-100"><a href="#cb44-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, message=FALSE, warning=FALSE}</span></span>
+<span id="cb44-101"><a href="#cb44-101" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(ffef)</span>
+<span id="cb44-102"><a href="#cb44-102" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(ffef)</span>
+<span id="cb44-103"><a href="#cb44-103" aria-hidden="true" tabindex="-1"></a><span class="fu">network.size</span>(ffef)</span>
+<span id="cb44-104"><a href="#cb44-104" aria-hidden="true" tabindex="-1"></a><span class="fu">network.edgecount</span>(ffef)</span>
+<span id="cb44-105"><a href="#cb44-105" aria-hidden="true" tabindex="-1"></a><span class="fu">gden</span>(ffef)</span>
+<span id="cb44-106"><a href="#cb44-106" aria-hidden="true" tabindex="-1"></a><span class="fu">list.vertex.attributes</span>(ffef)</span>
+<span id="cb44-107"><a href="#cb44-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-108"><a href="#cb44-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-109"><a href="#cb44-109" aria-hidden="true" tabindex="-1"></a>The network includes several important vertex covariates:</span>
+<span id="cb44-110"><a href="#cb44-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-111"><a href="#cb44-111" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**prestige**: 0 (neither particule nor social register), 1 (either), or 2 (both)</span>
+<span id="cb44-112"><a href="#cb44-112" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**party**: Political party membership (11 parties)</span>
+<span id="cb44-113"><a href="#cb44-113" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**ena**: Graduated from ENA (École nationale d'administration)? 1=yes, 2=no</span>
+<span id="cb44-114"><a href="#cb44-114" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**masons**: Mason membership</span>
+<span id="cb44-115"><a href="#cb44-115" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**religion**: Religious affiliation</span>
+<span id="cb44-116"><a href="#cb44-116" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**topboards**: Number of top corporate boards</span>
+<span id="cb44-117"><a href="#cb44-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-118"><a href="#cb44-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}</span></span>
+<span id="cb44-119"><a href="#cb44-119" aria-hidden="true" tabindex="-1"></a>ena_status <span class="ot">&lt;-</span> ffef <span class="sc">%v%</span> <span class="st">"ena"</span></span>
+<span id="cb44-120"><a href="#cb44-120" aria-hidden="true" tabindex="-1"></a>vertex_colors <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ena_status <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"coral"</span>, <span class="st">"skyblue"</span>)</span>
+<span id="cb44-121"><a href="#cb44-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-122"><a href="#cb44-122" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ffef, <span class="at">vertex.col =</span> vertex_colors, </span>
+<span id="cb44-123"><a href="#cb44-123" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"French Financial Elite Network Colored by ENA Status"</span>, </span>
+<span id="cb44-124"><a href="#cb44-124" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="fl">1.5</span>, <span class="at">edge.col =</span> <span class="st">"gray70"</span>)</span>
+<span id="cb44-125"><a href="#cb44-125" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-126"><a href="#cb44-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-127"><a href="#cb44-127" aria-hidden="true" tabindex="-1"></a>**Observations:**</span>
+<span id="cb44-128"><a href="#cb44-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-129"><a href="#cb44-129" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>**Visible clustering by ENA attendance**: Individuals who graduated from ENA tend to form connections with other ENA graduates, suggesting strong educational homophily</span>
+<span id="cb44-130"><a href="#cb44-130" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>**Centrality patterns**: ENA graduates appear more concentrated in the network core, while non-ENA graduates are more dispersed around the periphery</span>
+<span id="cb44-131"><a href="#cb44-131" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>**Cross-group ties exist**: While there's clear same-status clustering, we also observe connections between ENA and non-ENA graduates</span>
+<span id="cb44-132"><a href="#cb44-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-133"><a href="#cb44-133" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.2 Building a Sophisticated ERGM Model</span></span>
+<span id="cb44-134"><a href="#cb44-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-135"><a href="#cb44-135" aria-hidden="true" tabindex="-1"></a><span class="in">```{r french-ergm, message=FALSE, warning=FALSE}</span></span>
+<span id="cb44-136"><a href="#cb44-136" aria-hidden="true" tabindex="-1"></a><span class="co">#using ergm.tapered() for better handling of strong dependencies</span></span>
+<span id="cb44-137"><a href="#cb44-137" aria-hidden="true" tabindex="-1"></a>fit_elite <span class="ot">&lt;-</span> <span class="fu">ergm.tapered</span>(</span>
+<span id="cb44-138"><a href="#cb44-138" aria-hidden="true" tabindex="-1"></a>  ffef <span class="sc">~</span> </span>
+<span id="cb44-139"><a href="#cb44-139" aria-hidden="true" tabindex="-1"></a>    edges <span class="sc">+</span>                           <span class="co"># Baseline density</span></span>
+<span id="cb44-140"><a href="#cb44-140" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"ena"</span>) <span class="sc">+</span>               <span class="co"># ENA homophily</span></span>
+<span id="cb44-141"><a href="#cb44-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"prestige"</span>) <span class="sc">+</span>          <span class="co"># Prestige homophily</span></span>
+<span id="cb44-142"><a href="#cb44-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"party"</span>) <span class="sc">+</span>             <span class="co"># Political party homophily</span></span>
+<span id="cb44-143"><a href="#cb44-143" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwesp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>       <span class="co"># Transitive closure (clustering)</span></span>
+<span id="cb44-144"><a href="#cb44-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwdsp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>),        <span class="co"># Shared partners</span></span>
+<span id="cb44-145"><a href="#cb44-145" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb44-146"><a href="#cb44-146" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-147"><a href="#cb44-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-148"><a href="#cb44-148" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_elite)</span>
+<span id="cb44-149"><a href="#cb44-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-150"><a href="#cb44-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-151"><a href="#cb44-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-152"><a href="#cb44-152" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.3 Interpreting Model Coefficients</span></span>
+<span id="cb44-153"><a href="#cb44-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-154"><a href="#cb44-154" aria-hidden="true" tabindex="-1"></a><span class="in">```{r interpretation, message=FALSE}</span></span>
+<span id="cb44-155"><a href="#cb44-155" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb44-156"><a href="#cb44-156" aria-hidden="true" tabindex="-1"></a>  <span class="at">Term =</span> <span class="fu">names</span>(<span class="fu">coef</span>(fit_elite)),</span>
+<span id="cb44-157"><a href="#cb44-157" aria-hidden="true" tabindex="-1"></a>  <span class="at">Coefficient =</span> <span class="fu">round</span>(<span class="fu">coef</span>(fit_elite), <span class="dv">3</span>),</span>
+<span id="cb44-158"><a href="#cb44-158" aria-hidden="true" tabindex="-1"></a>  <span class="at">SE =</span> <span class="fu">round</span>(<span class="fu">summary</span>(fit_elite)<span class="sc">$</span>coefficients[, <span class="st">"Std. Error"</span>], <span class="dv">3</span>),</span>
+<span id="cb44-159"><a href="#cb44-159" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR =</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">coef</span>(fit_elite)), <span class="dv">3</span>),</span>
+<span id="cb44-160"><a href="#cb44-160" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> <span class="fu">round</span>(<span class="fu">summary</span>(fit_elite)<span class="sc">$</span>coefficients[, <span class="st">"Pr(&gt;|z|)"</span>], <span class="dv">4</span>)</span>
+<span id="cb44-161"><a href="#cb44-161" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-162"><a href="#cb44-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-163"><a href="#cb44-163" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(coef_table)</span>
+<span id="cb44-164"><a href="#cb44-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-165"><a href="#cb44-165" aria-hidden="true" tabindex="-1"></a>baseline_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>])</span>
+<span id="cb44-166"><a href="#cb44-166" aria-hidden="true" tabindex="-1"></a>ena_match_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_elite)[<span class="st">"nodematch.ena"</span>])</span>
+<span id="cb44-167"><a href="#cb44-167" aria-hidden="true" tabindex="-1"></a>prestige_match_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_elite)[<span class="st">"nodematch.prestige"</span>])</span>
+<span id="cb44-168"><a href="#cb44-168" aria-hidden="true" tabindex="-1"></a>party_match_prob <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">coef</span>(fit_elite)[<span class="st">"edges"</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_elite)[<span class="st">"nodematch.party"</span>])</span>
+<span id="cb44-169"><a href="#cb44-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-170"><a href="#cb44-170" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Baseline (no matches):"</span>, <span class="fu">round</span>(baseline_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb44-171"><a href="#cb44-171" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Same ENA status:"</span>, <span class="fu">round</span>(ena_match_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb44-172"><a href="#cb44-172" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Same prestige level:"</span>, <span class="fu">round</span>(prestige_match_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb44-173"><a href="#cb44-173" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Same party affiliation:"</span>, <span class="fu">round</span>(party_match_prob, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb44-174"><a href="#cb44-174" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-175"><a href="#cb44-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-176"><a href="#cb44-176" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Edges:** $\beta = -4.63$ represent the baseline log-odds of a friendship tie existing between any two randomly selected individuals in the networks, while controlling other predictors. The strong negative coefficient indicates this is a very sparse network. The $OR = 0.010$ means the baseline odds of a tie is about 1.0%. The baseline robability of friendship is approximately 0.96%.</span>
+<span id="cb44-177"><a href="#cb44-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-178"><a href="#cb44-178" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**nodematch.ena:** $\beta = 1.57$ measures homophily on ENA attendance. The $OR = 4.79$ means that two individuals who share ENA status (both graduate from ENA or both did not) have 4.79 times higher odds of being friends compared to two individuals with different ENA status. The coefficient is strong and highly significant. And the probability of a friendship tie between two individuals who share the same ENA status is 4.45%.</span>
+<span id="cb44-179"><a href="#cb44-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-180"><a href="#cb44-180" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**nodematch.prestige:** $\beta = 0.68$ measures homophily on prestige level (having particule and/or social register listing).The coefficient is moderate and significant (p = 0.015). The $OR = 1.97$ mean that two individuals with the same prestige level have 1.97 times higher odds of being friends compared to those with different prestige levels. The probability of a friendship tie between two individuals who share the same prestige level is 1.88%.</span>
+<span id="cb44-181"><a href="#cb44-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-182"><a href="#cb44-182" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**nodematch.party:** $\beta = 1.25$ measures homophily on political party affiliation. The coefficient is strong and highly significant (p <span class="sc">\&lt;</span> 0.001).The $OR = 3.49$ means that two individuals from the same political party have 3.49 times higher odds of being friends compared to those from different parties. The probability of a friendship tie between two individuals who share the same party affiliation is 3.28%.</span>
+<span id="cb44-183"><a href="#cb44-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-184"><a href="#cb44-184" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**GWESP(0.5):** $\beta = 0.43$ measures transitivity and clustering through Geometrically Weighted Edgewise Shared Partners. This term captures the "friend of a friend is a friend" phenomenon. The coefficient is moderate and significant (p = 0.013). The $OR = 1.53$ indicates that networks with more shared partners (triangles) are more probable. The French financial elite network exhibits strong transitivity. If person A is friends with person B, and person B is friends with person C, then A and C are significantly more likely to also be friends.</span>
+<span id="cb44-185"><a href="#cb44-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-186"><a href="#cb44-186" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**GWDSP(0.5):** $\beta = 0.19$ measures local network structure through Geometrically Weighted Dyadwise Shared Partners. This term captures the tendency for dyads (pairs) to share partners, even if they're not directly connected. The coefficient is modest but significant (p = 0.003). The $OR = 1.21$ indicates preference for configurations where individuals share common friends. Beyond direct transitivity, there's a tendency for individuals to be embedded in overlapping social circles. This creates a "small world" structure where even if two people aren't direct friends, they're likely to share mutual acquaintances.</span>
+<span id="cb44-187"><a href="#cb44-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-188"><a href="#cb44-188" aria-hidden="true" tabindex="-1"></a>::: callout-note</span>
+<span id="cb44-189"><a href="#cb44-189" aria-hidden="true" tabindex="-1"></a><span class="in">```         </span></span>
+<span id="cb44-190"><a href="#cb44-190" aria-hidden="true" tabindex="-1"></a><span class="in">plogis(coef["edges"] + coef["gwesp.fixed.0.5"])</span></span>
+<span id="cb44-191"><a href="#cb44-191" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-192"><a href="#cb44-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-193"><a href="#cb44-193" aria-hidden="true" tabindex="-1"></a>**This does NOT work because:**</span>
+<span id="cb44-194"><a href="#cb44-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-195"><a href="#cb44-195" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>GWESP is not a 0/1 indicator variable</span>
+<span id="cb44-196"><a href="#cb44-196" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>GWESP is a **count statistic** that depends on the entire network structure</span>
+<span id="cb44-197"><a href="#cb44-197" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>GWESP uses a **geometrically weighted** function: $\sum_{k=1}^{n-2} <span class="sc">\{</span>1 - (1-e^{-\alpha})^k<span class="sc">\}</span> \cdot EP_k$</span>
+<span id="cb44-198"><a href="#cb44-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-199"><a href="#cb44-199" aria-hidden="true" tabindex="-1"></a>Summary:</span>
+<span id="cb44-200"><a href="#cb44-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-201"><a href="#cb44-201" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Term Type <span class="pp">|</span> Example Terms <span class="pp">|</span> Can use <span class="in">`plogis(edges + term)`</span>? <span class="pp">|</span> Why/Why not? <span class="pp">|</span></span>
+<span id="cb44-202"><a href="#cb44-202" aria-hidden="true" tabindex="-1"></a><span class="pp">|------------------|------------------|------------------|------------------|</span></span>
+<span id="cb44-203"><a href="#cb44-203" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Node attributes** <span class="pp">|</span> <span class="in">`nodematch()`</span>, <span class="in">`nodecov()`</span>, <span class="in">`absdiff()`</span> <span class="pp">|</span> YES <span class="pp">|</span> Binary 0/1 or known numeric covariate values <span class="pp">|</span></span>
+<span id="cb44-204"><a href="#cb44-204" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Dyad attributes** <span class="pp">|</span> <span class="in">`edgecov()`</span>, <span class="in">`dyadcov()`</span> <span class="pp">|</span> YES (with care) <span class="pp">|</span> Known covariate value for specific dyad <span class="pp">|</span></span>
+<span id="cb44-205"><a href="#cb44-205" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Structural terms** <span class="pp">|</span> <span class="in">`gwesp()`</span>, <span class="in">`gwdsp()`</span>, <span class="in">`triangle`</span>, <span class="in">`ttriad`</span>, <span class="in">`ctriad`</span> <span class="pp">|</span> NO <span class="pp">|</span> Value depends on entire network configuration <span class="pp">|</span></span>
+<span id="cb44-206"><a href="#cb44-206" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Degree terms** <span class="pp">|</span> <span class="in">`gwdegree()`</span>, <span class="in">`degree()`</span>, <span class="in">`idegree()`</span>, <span class="in">`odegree()`</span> <span class="pp">|</span> NO <span class="pp">|</span> Depends on node's position in network <span class="pp">|</span></span>
+<span id="cb44-207"><a href="#cb44-207" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-208"><a href="#cb44-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-209"><a href="#cb44-209" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.4 MCMC Diagnostics - Ensuring Model Reliability</span></span>
+<span id="cb44-210"><a href="#cb44-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-211"><a href="#cb44-211" aria-hidden="true" tabindex="-1"></a><span class="in">```{r mcmc-diagnostics, fig.width=12, fig.height=10, message=FALSE, warning=FALSE}</span></span>
+<span id="cb44-212"><a href="#cb44-212" aria-hidden="true" tabindex="-1"></a>mcmc_diag <span class="ot">&lt;-</span> <span class="fu">mcmc.diagnostics</span>(fit_elite, <span class="at">vars.per.page =</span> <span class="dv">6</span>)</span>
+<span id="cb44-213"><a href="#cb44-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-214"><a href="#cb44-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-215"><a href="#cb44-215" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb44-216"><a href="#cb44-216" aria-hidden="true" tabindex="-1"></a>MCMC Diagnostic Components Explained:</span>
+<span id="cb44-217"><a href="#cb44-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-218"><a href="#cb44-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sample Statistics vs. Observed**: Compares simulated network statistics to observed values. Good fit shows statistics centered around zero.</span>
+<span id="cb44-219"><a href="#cb44-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trace Plots**: Show MCMC chain values over iterations. Good mixing looks like "fuzzy caterpillar" around zero.</span>
+<span id="cb44-220"><a href="#cb44-220" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Density Plots**: Distribution of sampled statistics. Should be approximately normal and centered near zero.</span>
+<span id="cb44-221"><a href="#cb44-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Autocorrelation Function (ACF)**: Measures correlation between successive samples. Should decay quickly to near zero.</span>
+<span id="cb44-222"><a href="#cb44-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Geweke Diagnostic**: Tests whether early and late parts of chain come from same distribution (burn-in test).</span>
+<span id="cb44-223"><a href="#cb44-223" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-224"><a href="#cb44-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-225"><a href="#cb44-225" aria-hidden="true" tabindex="-1"></a>Let's extract some key diagnostic statistics:</span>
+<span id="cb44-226"><a href="#cb44-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-227"><a href="#cb44-227" aria-hidden="true" tabindex="-1"></a><span class="in">```{r diagnostic-summary}</span></span>
+<span id="cb44-228"><a href="#cb44-228" aria-hidden="true" tabindex="-1"></a>gof_elite <span class="ot">&lt;-</span> <span class="fu">gof</span>(fit_elite, <span class="at">GOF =</span> <span class="sc">~</span>degree <span class="sc">+</span> esp <span class="sc">+</span> dsp <span class="sc">+</span> triadcensus, </span>
+<span id="cb44-229"><a href="#cb44-229" aria-hidden="true" tabindex="-1"></a>                 <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb44-230"><a href="#cb44-230" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(gof_elite)</span>
+<span id="cb44-231"><a href="#cb44-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-232"><a href="#cb44-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-233"><a href="#cb44-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-234"><a href="#cb44-234" aria-hidden="true" tabindex="-1"></a>From the sample statistics vs. observed values, the statistics show good agreement between simulated and observed values. All terms have p-value <span class="sc">\&gt;</span> 0.05, The overall chi-squared test p = 0.022, indicating the model successfully reproduces the observed network statistics. The trace plots show relatively good mixing, fluctuating randomly around zero, which means MCMC chains are exploring the parameter space well and not getting trapped in any particular region. All the density plots are approximately centered near zeor, and no extreme skewness and multinodality (multiple peaks), indicating the sampling stable parameter estimation. Moreover, for the Geweke Diagnostic (Burn-in Test), all p-values are well above 0.05, indicating no evidence of non-convergence. The joint p-value of 0.820 indicates good overall convergence. Overall, the model successfully converged and the parameter estimates are reliable for inference.</span>
+<span id="cb44-235"><a href="#cb44-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-236"><a href="#cb44-236" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Case Study 2 - Balance Theory in Hansell Classroom Friendships</span></span>
+<span id="cb44-237"><a href="#cb44-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-238"><a href="#cb44-238" aria-hidden="true" tabindex="-1"></a>Now let's examine balance theory using directed friendship nominations in a sixth-grade classroom, we've used this dataset in the <span class="co">[</span><span class="ot">previous tutorial (Part 5)</span><span class="co">](https://aliceaii.github.io/posts/snapart5/)</span>:</span>
+<span id="cb44-239"><a href="#cb44-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-240"><a href="#cb44-240" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.1 Is the friendship network balanced in Heider’s definition of balance?</span></span>
+<span id="cb44-241"><a href="#cb44-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-242"><a href="#cb44-242" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb44-243"><a href="#cb44-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-244"><a href="#cb44-244" aria-hidden="true" tabindex="-1"></a>**Heider's Balance Theory**</span>
+<span id="cb44-245"><a href="#cb44-245" aria-hidden="true" tabindex="-1"></a>In a balanced network:</span>
+<span id="cb44-246"><a href="#cb44-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-247"><a href="#cb44-247" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Transitive triads** (A→B→C implies A→C): "Friend of friend is friend"</span>
+<span id="cb44-248"><a href="#cb44-248" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Avoided cyclic triads** (A→B→C→A without A→C): Creates tension</span>
+<span id="cb44-249"><a href="#cb44-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-250"><a href="#cb44-250" aria-hidden="true" tabindex="-1"></a>Balanced networks have positive transitive triad coefficients and negative cyclic triad coefficients.</span>
+<span id="cb44-251"><a href="#cb44-251" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-252"><a href="#cb44-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-253"><a href="#cb44-253" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, message=FALSE, warning=FALSE}</span></span>
+<span id="cb44-254"><a href="#cb44-254" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkdata)</span>
+<span id="cb44-255"><a href="#cb44-255" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(hansell)</span>
+<span id="cb44-256"><a href="#cb44-256" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(hansell)</span>
+<span id="cb44-257"><a href="#cb44-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-258"><a href="#cb44-258" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(hansell)</span></span>
+<span id="cb44-259"><a href="#cb44-259" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(hansell <span class="sc">%v%</span> <span class="st">"sex"</span>)</span>
+<span id="cb44-260"><a href="#cb44-260" aria-hidden="true" tabindex="-1"></a><span class="fu">triad.census</span>(hansell)</span>
+<span id="cb44-261"><a href="#cb44-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-262"><a href="#cb44-262" aria-hidden="true" tabindex="-1"></a><span class="co">#transitive triads</span></span>
+<span id="cb44-263"><a href="#cb44-263" aria-hidden="true" tabindex="-1"></a>triads <span class="ot">&lt;-</span> <span class="fu">triad.census</span>(hansell)</span>
+<span id="cb44-264"><a href="#cb44-264" aria-hidden="true" tabindex="-1"></a>triads[<span class="dv">9</span>]  <span class="co"># 030T</span></span>
+<span id="cb44-265"><a href="#cb44-265" aria-hidden="true" tabindex="-1"></a><span class="co">#cyclic triads</span></span>
+<span id="cb44-266"><a href="#cb44-266" aria-hidden="true" tabindex="-1"></a>triads[<span class="dv">10</span>]   <span class="co"># 030C    </span></span>
+<span id="cb44-267"><a href="#cb44-267" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-268"><a href="#cb44-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-269"><a href="#cb44-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-270"><a href="#cb44-270" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.2 Fit the model</span></span>
+<span id="cb44-271"><a href="#cb44-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-272"><a href="#cb44-272" aria-hidden="true" tabindex="-1"></a><span class="in">```{r balance-ergm, message=FALSE, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb44-273"><a href="#cb44-273" aria-hidden="true" tabindex="-1"></a>fit_balance <span class="ot">&lt;-</span> <span class="fu">ergm.tapered</span>(</span>
+<span id="cb44-274"><a href="#cb44-274" aria-hidden="true" tabindex="-1"></a>  hansell <span class="sc">~</span> </span>
+<span id="cb44-275"><a href="#cb44-275" aria-hidden="true" tabindex="-1"></a>    edges <span class="sc">+</span>                          <span class="co"># Baseline density</span></span>
+<span id="cb44-276"><a href="#cb44-276" aria-hidden="true" tabindex="-1"></a>    mutual <span class="sc">+</span>                         <span class="co"># Reciprocity</span></span>
+<span id="cb44-277"><a href="#cb44-277" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"sex"</span>, <span class="at">diff =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>  <span class="co"># Sex homophily (differentiated)</span></span>
+<span id="cb44-278"><a href="#cb44-278" aria-hidden="true" tabindex="-1"></a>    ttriple <span class="sc">+</span>                        <span class="co"># Transitive triples</span></span>
+<span id="cb44-279"><a href="#cb44-279" aria-hidden="true" tabindex="-1"></a>    ctriple,                         <span class="co"># Cyclic triples</span></span>
+<span id="cb44-280"><a href="#cb44-280" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb44-281"><a href="#cb44-281" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-282"><a href="#cb44-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-283"><a href="#cb44-283" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_balance)</span>
+<span id="cb44-284"><a href="#cb44-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-285"><a href="#cb44-285" aria-hidden="true" tabindex="-1"></a>balance_coef <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb44-286"><a href="#cb44-286" aria-hidden="true" tabindex="-1"></a>  <span class="at">Term =</span> <span class="fu">c</span>(<span class="st">"Edges"</span>, <span class="st">"Mutual"</span>, <span class="st">"Same Sex (Female)"</span>, <span class="st">"Same Sex (Male)"</span>, </span>
+<span id="cb44-287"><a href="#cb44-287" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Transitive Triples"</span>, <span class="st">"Cyclic Triples"</span>),</span>
+<span id="cb44-288"><a href="#cb44-288" aria-hidden="true" tabindex="-1"></a>  <span class="at">Coefficient =</span> <span class="fu">round</span>(<span class="fu">coef</span>(fit_balance), <span class="dv">3</span>),</span>
+<span id="cb44-289"><a href="#cb44-289" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR =</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">coef</span>(fit_balance)), <span class="dv">3</span>))</span>
+<span id="cb44-290"><a href="#cb44-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-291"><a href="#cb44-291" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(balance_coef, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb44-292"><a href="#cb44-292" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-293"><a href="#cb44-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-294"><a href="#cb44-294" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb44-295"><a href="#cb44-295" aria-hidden="true" tabindex="-1"></a>Evidence for Balance model</span>
+<span id="cb44-296"><a href="#cb44-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-297"><a href="#cb44-297" aria-hidden="true" tabindex="-1"></a>The model provides strong evidence for balance theory:</span>
+<span id="cb44-298"><a href="#cb44-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-299"><a href="#cb44-299" aria-hidden="true" tabindex="-1"></a><span class="ss">-  </span>**Positive transitivity** (β = 0.33, p &lt; 0.05): Transitive closure is preferred</span>
+<span id="cb44-300"><a href="#cb44-300" aria-hidden="true" tabindex="-1"></a><span class="ss">-  </span>**Negative cyclicity** (β = -0.40, p &lt; 0.001): Cyclic patterns are avoided</span>
+<span id="cb44-301"><a href="#cb44-301" aria-hidden="true" tabindex="-1"></a><span class="ss">-  </span>**Strong sex homophily**: Both boys and girls prefer same-sex friendships</span>
+<span id="cb44-302"><a href="#cb44-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**No reciprocity effect**: Friendships aren't necessarily mutual at this age</span>
+<span id="cb44-303"><a href="#cb44-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-304"><a href="#cb44-304" aria-hidden="true" tabindex="-1"></a>This pattern suggests the classroom network organizes into balanced, sex-segregated friendship groups with clear hierarchical structures rather than cyclic patterns.</span>
+<span id="cb44-305"><a href="#cb44-305" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-306"><a href="#cb44-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-307"><a href="#cb44-307" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Transitive ties (ttriple):** $\beta = 0.33$, the coefficient measures the tendency for transitive triadic closure in the network, it's significant. The $OR = 1.39$ means that for each additional transitive triple configuration, the odds of the network configuration increased by 39%. When student A nominates student B as a friend, and B nominates C, there is a significantly higher-than-random probability that A will also nominate C. This creates cohesive friendship groups with closed triadic structures.</span>
+<span id="cb44-308"><a href="#cb44-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-309"><a href="#cb44-309" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Cyclic ties (ctriple):** $\beta = -0.40$, the coefficient measures the tendency for cyclic triadic structures in the network, where: $A→B→C→A$ forms a cycle, but without the full transitive closure. The negative and highly significant coefficient (p <span class="sc">\&lt;</span> 0.001) indicates a strong avoidance of cyclic triadic structures. $OR = 0.67$ means that cyclic triple configurations decrease the odds of the network configuration by 33%. The negative coefficient shows that cyclic patterns are less common than would be expected in a random network.</span>
+<span id="cb44-310"><a href="#cb44-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-311"><a href="#cb44-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-312"><a href="#cb44-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.3 Model Comparison and Selection</span></span>
+<span id="cb44-313"><a href="#cb44-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-314"><a href="#cb44-314" aria-hidden="true" tabindex="-1"></a><span class="in">```{r model-comparison, message=FALSE, warning=FALSE}</span></span>
+<span id="cb44-315"><a href="#cb44-315" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit alternative model for French elite network</span></span>
+<span id="cb44-316"><a href="#cb44-316" aria-hidden="true" tabindex="-1"></a>fit_elite_extended <span class="ot">&lt;-</span> <span class="fu">ergm.tapered</span>(</span>
+<span id="cb44-317"><a href="#cb44-317" aria-hidden="true" tabindex="-1"></a>  ffef <span class="sc">~</span> </span>
+<span id="cb44-318"><a href="#cb44-318" aria-hidden="true" tabindex="-1"></a>    edges <span class="sc">+</span> </span>
+<span id="cb44-319"><a href="#cb44-319" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"ena"</span>) <span class="sc">+</span> </span>
+<span id="cb44-320"><a href="#cb44-320" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"prestige"</span>) <span class="sc">+</span> </span>
+<span id="cb44-321"><a href="#cb44-321" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"party"</span>) <span class="sc">+</span></span>
+<span id="cb44-322"><a href="#cb44-322" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"masons"</span>) <span class="sc">+</span>           <span class="co"># Add Masonic membership</span></span>
+<span id="cb44-323"><a href="#cb44-323" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodematch</span>(<span class="st">"religion"</span>) <span class="sc">+</span>          <span class="co"># Add religion</span></span>
+<span id="cb44-324"><a href="#cb44-324" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nodecov</span>(<span class="st">"topboards"</span>) <span class="sc">+</span>           <span class="co"># Board memberships as covariate</span></span>
+<span id="cb44-325"><a href="#cb44-325" aria-hidden="true" tabindex="-1"></a>    <span class="fu">absdiff</span>(<span class="st">"topboards"</span>) <span class="sc">+</span>           <span class="co"># Difference in board memberships</span></span>
+<span id="cb44-326"><a href="#cb44-326" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwesp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> </span>
+<span id="cb44-327"><a href="#cb44-327" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gwdsp</span>(<span class="fl">0.5</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb44-328"><a href="#cb44-328" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb44-329"><a href="#cb44-329" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-330"><a href="#cb44-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-331"><a href="#cb44-331" aria-hidden="true" tabindex="-1"></a><span class="co"># Model comparison</span></span>
+<span id="cb44-332"><a href="#cb44-332" aria-hidden="true" tabindex="-1"></a>anova_result <span class="ot">&lt;-</span> <span class="fu">anova</span>(fit_elite, fit_elite_extended)</span>
+<span id="cb44-333"><a href="#cb44-333" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(anova_result)</span>
+<span id="cb44-334"><a href="#cb44-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-335"><a href="#cb44-335" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC comparison</span></span>
+<span id="cb44-336"><a href="#cb44-336" aria-hidden="true" tabindex="-1"></a>aic_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb44-337"><a href="#cb44-337" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Base"</span>, <span class="st">"Extended"</span>),</span>
+<span id="cb44-338"><a href="#cb44-338" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">c</span>(<span class="fu">AIC</span>(fit_elite), <span class="fu">AIC</span>(fit_elite_extended)),</span>
+<span id="cb44-339"><a href="#cb44-339" aria-hidden="true" tabindex="-1"></a>  <span class="at">BIC =</span> <span class="fu">c</span>(<span class="fu">BIC</span>(fit_elite), <span class="fu">BIC</span>(fit_elite_extended)),</span>
+<span id="cb44-340"><a href="#cb44-340" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameters =</span> <span class="fu">c</span>(<span class="fu">length</span>(<span class="fu">coef</span>(fit_elite)), <span class="fu">length</span>(<span class="fu">coef</span>(fit_elite_extended)))</span>
+<span id="cb44-341"><a href="#cb44-341" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-342"><a href="#cb44-342" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(aic_comparison)</span>
+<span id="cb44-343"><a href="#cb44-343" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb44-344"><a href="#cb44-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-345"><a href="#cb44-345" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb44-346"><a href="#cb44-346" aria-hidden="true" tabindex="-1"></a>Model Selection Guidelines</span>
+<span id="cb44-347"><a href="#cb44-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-348"><a href="#cb44-348" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Lower AIC/BIC** indicates better model fit accounting for complexity</span>
+<span id="cb44-349"><a href="#cb44-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**ANOVA p-value &gt; 0.05** suggests additional terms don't significantly improve fit</span>
+<span id="cb44-350"><a href="#cb44-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Check MCMC diagnostics** for both models - better convergence often trumps marginal fit improvements</span>
+<span id="cb44-351"><a href="#cb44-351" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Substantive interpretation** matters - include terms that make theoretical sense</span>
+<span id="cb44-352"><a href="#cb44-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-353"><a href="#cb44-353" aria-hidden="true" tabindex="-1"></a>In our case, the simpler model is preferred: lower AIC, similar fit, better convergence.</span>
+<span id="cb44-354"><a href="#cb44-354" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb44-355"><a href="#cb44-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-356"><a href="#cb44-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-357"><a href="#cb44-357" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb44-358"><a href="#cb44-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-359"><a href="#cb44-359" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hansell, S. (1984). "Cooperative groups, weak ties, and the integration of peer friendships." *Social Psychology Quarterly*, 47(4), 316-328.</span>
+<span id="cb44-360"><a href="#cb44-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-361"><a href="#cb44-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kadushin, C. (1995). "Friendship among the French financial elite." *American Sociological Review*, 60, 202-221.</span>
+<span id="cb44-362"><a href="#cb44-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-363"><a href="#cb44-363" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Snijders, T.A.B., Pattison, P.E., Robins, G.L., &amp; Handcock, M.S. (2006). "New specifications for exponential random graph models." *Sociological Methodology*, 36(1), 99-153.</span>
+<span id="cb44-364"><a href="#cb44-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-365"><a href="#cb44-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hunter, D.R., &amp; Handcock, M.S. (2006). "Inference in curved exponential family models for networks." *Journal of Computational and Graphical Statistics*, 15(3), 565-583.</span>
+<span id="cb44-366"><a href="#cb44-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-367"><a href="#cb44-367" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb44-368"><a href="#cb44-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-369"><a href="#cb44-369" aria-hidden="true" tabindex="-1"></a>*This tutorial is based on UCLA [STATS 218: Social Network Analysis](https://handcock.github.io/teaching/218/) taught by Prof [Mark Handcock](https://handcock.github.io/).*</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
