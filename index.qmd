@@ -1,5 +1,5 @@
 ---
-title: "Nice to e-meet you!"
+title: ""
 image: 233.jpeg
 about:
   template: jolla
@@ -15,7 +15,7 @@ about:
       href: https://github.com/AliceAii
 ---
 
-I’m **Shuhan Ai**, but feel free to call me **Alice**. I am a Ph.D. candidate in [Higher Education and Organizational Change (HEOC)](https://seis.ucla.edu/academics/department-of-education/academic-degrees/higher-education-organizational-change-division/) and an M.S. student in [Statistics & Data Science](https://statistics.ucla.edu/) at UCLA. I study educational research with my Ph.D. advisor, Professor [Kevin Eagan](https://scholar.google.com/citations?user=5Y2m6OkAAAAJ&hl=en&oi=ao), and learn advanced quantitative methods with my M.S. advisor, Professor [Qing Zhou](http://www.stat.ucla.edu/~zhou/index.html).
+Nice to e-meet you! I’m **Shuhan Ai**, but feel free to call me **Alice**. I am a Ph.D. candidate in [Higher Education and Organizational Change (HEOC)](https://seis.ucla.edu/academics/department-of-education/academic-degrees/higher-education-organizational-change-division/) and an M.S. student in [Statistics & Data Science](https://statistics.ucla.edu/) at UCLA. I study educational research with my Ph.D. advisor, Professor [Kevin Eagan](https://scholar.google.com/citations?user=5Y2m6OkAAAAJ&hl=en&oi=ao), and learn advanced quantitative methods with my M.S. advisor, Professor [Qing Zhou](http://www.stat.ucla.edu/~zhou/index.html).
 
 My research focuses on the fields of STEM education, higher education policy, and student development, especially during key transitions in the academic pipeline. I investigate: (1) how students make decisions about STEM majors and careers when transitioning from high school to college; (2) what factors influence persistence, graduation, and major-changing during undergraduate study; and (3) what drives STEM students to pursue socially responsible outcomes (e.g., civic engagement, civic awareness, and social agency). Through these areas, I aim to uncover the structural and cultural factors that shape educational trajectories, with a particular interest in improving diversity and representation in STEM.
 
