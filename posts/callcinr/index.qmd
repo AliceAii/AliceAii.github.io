@@ -9,7 +9,7 @@ toc-title: "Contents"
 image: "plot1.png"
 ---
 
-## Introduction
+## 1. Introduction
 
 In data analysis and statistical computing, R is an excellent language for its expressiveness and extensive statistical libraries. However, R can be slow for certain computationally intensive tasks. This is where calling C or C++ from R becomes valuable.
 
@@ -22,7 +22,7 @@ In this tutorial, we'll explore:
 
 This tutorial builds on our [previous kernel density estimation post](https://aliceaii.github.io/posts/kerneldensity2/#loading-earthquake-data), where we implemented algorithms in R. Now, we'll see how to accelerate these computations using C.
 
-## Why Call C from R?
+## 2. Why Call C from R?
 
 ### Performance Comparison
 
@@ -37,7 +37,7 @@ R is an interpreted language, which makes it flexible but slower for certain ope
 
 ### When to Use C from R
 
-✅ **Use C when:**
+*Use C when:**
 
 - You have loops that iterate millions of times
 - You're performing the same simple operation repeatedly
@@ -45,7 +45,7 @@ R is an interpreted language, which makes it flexible but slower for certain ope
 - You need numerical precision or memory efficiency
 - Existing R functions are too slow for your application
 
-❌ **Don't use C when:**
+*Don't use C when:**
 
 - Vectorized R code already runs fast enough
 - You're doing exploratory data analysis
@@ -53,7 +53,7 @@ R is an interpreted language, which makes it flexible but slower for certain ope
 - The code complexity isn't worth the speedup
 - R packages already provide optimized solutions
 
-## Getting Started with Rcpp
+## 3. Getting Started with Rcpp
 
 ### Installation
 ```{r, eval=FALSE}
@@ -99,7 +99,7 @@ system.time(result_cpp <- sum_cpp(n))
 - Array indexing starts at **0 in C**, **1 in R**
 - C++ uses **`++i`** for increment, R uses **`i + 1`**
 
-## Example 1: Alternating Series Convergence
+## 4. Example 1: Alternating Series Convergence
 
 ### Problem
 
@@ -177,15 +177,15 @@ legend("topright",
        cex = 0.9)
 ```
 
-**Key insight**: The series converges slowly, requiring about 1 million terms to get within 0.0000005 of ln(2). Computing this in pure R would be much slower!
+**Key insight**: The series converges slowly, requiring about 1 million terms to get within 0.0000005 of ln(2). Computing this in pure R would be much slower.
 
-## Example 2: Kernel Density Estimation
+## 5. Example 2: Kernel Density Estimation
 
 ### Problem
 
 Compute kernel density estimates for earthquake magnitude data using a Gaussian kernel.
 
-**Why C?** With n=223 data points and m=100 grid points, we perform 22,300 kernel evaluations. For larger datasets (n=10,000, m=500), that's 5 million calculations!
+**Why C?** With n=223 data points and m=100 grid points, we perform 22,300 kernel evaluations. For larger datasets (n=10,000, m=500), that's 5 million calculations.
 
 ### Loading the Data
 ```{r, message=FALSE, warning=FALSE}
@@ -295,7 +295,7 @@ system.time(y_cpp <- kernel_density(g, magnitudes, h))
 
 ```
 
-## Example 3: Numerical Integration
+## 6. Example 3: Numerical Integration
 
 ### Problem
 
@@ -384,9 +384,9 @@ abline(h = 1, col = "red", lwd = 2, lty = 2)
 
 **Interpretation**: Both integrals converge to 1 (shown by red dashed line), which is expected since we're integrating a probability density function. The convergence is faster for larger c and p values.
 
-## Common Pitfalls
+## 7. Common Pitfalls
 
-### 1. Array Indexing
+### Array Indexing
 ```cpp
 // C++ uses 0-based indexing
 for(int i = 0; i < n; ++i) {  // 0 to n-1
@@ -399,16 +399,16 @@ for(i in 1:n) {  // 1 to n
 }
 ```
 
-### 2. Integer Division
+### Integer Division
 ```cpp
 double result = 5 / 2;      // Result: 2.0 (integer division)
 double result = 5.0 / 2.0;  // Result: 2.5 (correct)
 ```
 
-### 3. Power Functions
+### Power Functions
 ```cpp
 pow(-1, i)    // Correct
-(-1)^i        // WRONG! ^ is XOR in C++, not exponentiation
+(-1)^i        // WRONG. ^ is XOR in C++, not exponentiation
 ```
 
 ## Further Reading
