@@ -493,13 +493,15 @@ In our case, the simpler model is preferred: lower AIC, similar fit, better conv
 
 ## References
 
-- Hansell, S. (1984). "Cooperative groups, weak ties, and the integration of peer friendships." *Social Psychology Quarterly*, 47(4), 316-328.
+- Hansell, S. (1984). Cooperative groups, weak ties, and the integration of peer friendships. *Social Psychology Quarterly*, 47(4), 316-328.
 
-- Kadushin, C. (1995). "Friendship among the French financial elite." *American Sociological Review*, 60, 202-221.
+- Kadushin, C. (1995). Friendship among the French financial elite. *American Sociological Review*, 60, 202-221.
 
-- Snijders, T.A.B., Pattison, P.E., Robins, G.L., & Handcock, M.S. (2006). "New specifications for exponential random graph models." *Sociological Methodology*, 36(1), 99-153.
+- Snijders, T.A.B., Pattison, P.E., Robins, G.L., & Handcock, M.S. (2006). New specifications for exponential random graph models. *Sociological Methodology*, 36(1), 99-153.
 
-- Hunter, D.R., & Handcock, M.S. (2006). "Inference in curved exponential family models for networks." *Journal of Computational and Graphical Statistics*, 15(3), 565-583.
+- Hunter, D.R., & Handcock, M.S. (2006). Inference in curved exponential family models for networks. *Journal of Computational and Graphical Statistics*, 15(3), 565-583.
+
+- Blackburn, B., & Handcock, M. S. (2023). Practical network modeling via tapered exponential-family random graph models. *Journal of Computational and Graphical Statistics*, 32(2), 388-401.
 
 ---
 
