@@ -12,7 +12,7 @@ self-contained: true
 image: "f1.png"
 ---
 
-![](f1.png)
+![](p1.png)
 
 
 
@@ -144,6 +144,21 @@ lines(inflation_dt$time, inflation_dt$Rate, col = "gray70", lwd = 1)
 kernel_smooth <- ksmooth(inflation_dt$time, inflation_dt$Rate, kernel = "normal", bandwidth = 10)
 lines(kernel_smooth$x, kernel_smooth$y, col = "blue", lwd = 2)
 ```
+
+::: {.callout-note}
+**Inspecting HTML Elements Before Scraping**
+
+Before scraping data from a webpage, it's helpful to inspect the HTML structure to understand where your target data is located. Here's how:
+
+1. **Open Browser Developer Tools**: Press `Command + Option + I` (Mac) or `Ctrl + Shift + I` (Windows/Linux) to open your browser's developer tools
+2. **Locate the data**: Use the element selector button (usually in the top-left of the developer tools panel) to click on the object you want to scrape on the webpage
+3. **Identify the HTML structure**: Look for the keyword and type of element containing your data. For tables, you'll typically see:
+   - Element type: `<table>`
+   - Common attributes: `<table width="100%" cellspacing="0" cellpadding="0">`
+4. **Note CSS selectors or classes**: This information will help you write more precise scraping code
+
+This inspection step makes your scraping more reliable and helps you understand the page structure before writing code.
+:::
 
 
 ## 4. More Resources
