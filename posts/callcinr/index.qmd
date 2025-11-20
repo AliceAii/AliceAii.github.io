@@ -384,7 +384,160 @@ abline(h = 1, col = "red", lwd = 2, lty = 2)
 
 **Interpretation**: Both integrals converge to 1 (shown by red dashed line), which is expected since we're integrating a probability density function. The convergence is faster for larger c and p values.
 
-## 7. Common Pitfalls
+## 7. Example 4: Nadaraya-Watson Kernel Regression with Bootstrap Confidence Intervals
+
+This example demonstrates a more advanced application combining C functions with statistical inference. We'll implement kernel regression to analyze the relationship between petroleum taxes and consumption, then use bootstrap methods to quantify uncertainty.
+
+### Problem
+
+Given data on petroleum taxes (X) and consumption (Y), we want to:
+
+1. Estimate the relationship using Nadaraya-Watson kernel regression
+2. Compute bootstrap confidence intervals for the regression curve
+3. Visualize the results with uncertainty bands
+
+
+### C Implementation: Nadaraya-Watson Estimator
+
+The Nadaraya-Watson estimator computes a weighted average of Y values at each grid point g:
+
+$$\hat{f}(g) = \frac{\sum_{i=1}^{n} K\left(\frac{g - X_i}{b}\right) Y_i}{\sum_{i=1}^{n} K\left(\frac{g - X_i}{b}\right)}$$
+
+where K is the Gaussian kernel and b is the bandwidth.
+
+```{r nadaraya_watson}
+Rcpp::cppFunction("
+NumericVector nadaraya_watson(int n, NumericVector X, NumericVector Y, 
+                               int m, NumericVector g2, double b) {
+  NumericVector res2(m);
+  
+  // Compute kernel regression estimates at each grid point
+  for(int j = 0; j < m; j++) {
+    double numerator = 0.0;
+    double denominator = 0.0;
+    
+    // Sum over all observations
+    for(int i = 0; i < n; i++) {
+      // Gaussian kernel: exp(-0.5 * ((x - xi) / b)^2)
+      double u = (g2[j] - X[i]) / b;
+      double kernel_weight = exp(-0.5 * u * u);
+      
+      numerator += kernel_weight * Y[i];
+      denominator += kernel_weight;
+    }
+    
+    // Compute the weighted average
+    if(denominator > 0) {
+      res2[j] = numerator / denominator;
+    } else {
+      res2[j] = NA_REAL;
+    }
+  }
+  
+  return res2;
+}
+")
+```
+
+**Key implementation details:**
+
+- **Nested loops**: The outer loop iterates over m grid points, the inner over n observations
+- **Gaussian kernel**: We use $K(u) = \exp(-0.5u^2)$ without the normalizing constant (it cancels in the ratio)
+- **Numerical stability**: Check for `denominator > 0` before division
+- **NA handling**: Return `NA_REAL` for grid points with no nearby data
+
+### Loading the Data
+
+We'll use petroleum tax and consumption data to illustrate the method:
+
+```{r load_petroleum_data}
+# Petroleum taxes and consumption data
+url <- "https://people.sc.fsu.edu/~jburkardt/datasets/regression/x15.txt"
+data_raw <- readLines(url)
+data_lines <- data_raw[grep("^\\s*[0-9]", data_raw)]
+data_lines <- data_lines[-(1:2)]
+data <- read.table(text = data_lines)
+
+X <- data$V2  # Petroleum tax
+Y <- data$V6  # Petroleum consumption
+
+cat("Sample size:", length(X), "\n")
+cat("Tax range: [", min(X), ",", max(X), "]\n")
+cat("Consumption range: [", min(Y), ",", max(Y), "]\n")
+```
+
+### Computing the Kernel Regression Estimate
+
+```{r compute_kernel_regression}
+n <- length(X)
+b <- bw.nrd(X)  # Scott's bandwidth rule
+m <- 100
+g2 <- seq(min(X), max(X), length.out = m)
+
+# Compute kernel regression estimates
+kernel_fit <- nadaraya_watson(n, X, Y, m, g2, b)
+
+# Initial plot
+par(mar = c(4.5, 4.5, 3.5, 2))
+plot(X, Y, pch = 19, col = "gray50", cex = 0.8,
+     xlab = "Petroleum Tax", ylab = "Consumption",
+     main = "Kernel Regression: Tax vs. Consumption")
+lines(g2, kernel_fit, col = "blue", lwd = 2.5)
+legend("topright", legend = "Kernel Estimate", 
+       col = "blue", lwd = 2.5, bg = "white")
+```
+
+### Bootstrap Confidence Intervals
+
+To quantify uncertainty in our estimates, we use the bootstrap:
+
+1. **Resample**: Draw n pairs $(X_i, Y_i)$ with replacement from the original data
+2. **Refit**: Compute kernel regression on the bootstrap sample
+3. **Repeat**: Do this B = 200 times
+4. **Quantiles**: At each grid point, compute the 2.5th and 97.5th percentiles
+
+```{r bootstrap_confidence_intervals}
+B <- 200  # Number of bootstrap samples
+boot_mat <- matrix(NA, nrow = B, ncol = m)
+
+# Bootstrap loop
+for(i in 1:B) {
+  # Resample with replacement
+  idx <- sample(1:n, n, replace = TRUE)
+  X_boot <- X[idx]
+  Y_boot <- Y[idx]
+  
+  # Compute kernel regression on bootstrap sample
+  boot_mat[i, ] <- nadaraya_watson(n, X_boot, Y_boot, m, g2, b)
+}
+
+# Compute confidence bounds
+lower_ci <- apply(boot_mat, 2, quantile, probs = 0.025, na.rm = TRUE)
+upper_ci <- apply(boot_mat, 2, quantile, probs = 0.975, na.rm = TRUE)
+```
+
+**Why bootstrap works here:**
+
+- Kernel regression is a smooth function of the data
+- Bootstrap resampling preserves the joint distribution of (X, Y)
+- Percentile method provides valid confidence bands under mild conditions
+- The 200 bootstrap samples give stable percentile estimates
+
+### Final Visualization
+
+```{r final_plot}
+par(mar = c(4.5, 4.5, 3.5, 2))
+plot(X, Y, pch = 19, col = "gray50", cex = 0.8, main = "Kernel Regression with 95% Bootstrap CI",
+     xlab = "Petroleum Tax", ylab = "Consumption", cex.lab = 1.1, cex.main = 1.2)
+lines(g2, kernel_fit, col = "blue", lwd = 2.5)
+polygon(c(g2, rev(g2)), c(lower_ci, rev(upper_ci)), col = rgb(1, 0, 0, 0.2), border = NA)
+
+lines(g2, lower_ci, col = "red", lty = 2, lwd = 1.5)
+lines(g2, upper_ci, col = "red", lty = 2, lwd = 1.5)
+```
+
+
+## 8. Common Pitfalls
 
 ### Array Indexing
 ```cpp

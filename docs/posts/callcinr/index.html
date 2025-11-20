@@ -276,7 +276,16 @@ window.Quarto = {
   <li><a href="#case-1-c-3-p-2" id="toc-case-1-c-3-p-2" class="nav-link" data-scroll-target="#case-1-c-3-p-2">Case 1: c = 3, p = 2</a></li>
   <li><a href="#case-2-c-12-p-3.5" id="toc-case-2-c-12-p-3.5" class="nav-link" data-scroll-target="#case-2-c-12-p-3.5">Case 2: c = 12, p = 3.5</a></li>
   </ul></li>
-  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls">7. Common Pitfalls</a>
+  <li><a href="#example-4-nadaraya-watson-kernel-regression-with-bootstrap-confidence-intervals" id="toc-example-4-nadaraya-watson-kernel-regression-with-bootstrap-confidence-intervals" class="nav-link" data-scroll-target="#example-4-nadaraya-watson-kernel-regression-with-bootstrap-confidence-intervals">7. Example 4: Nadaraya-Watson Kernel Regression with Bootstrap Confidence Intervals</a>
+  <ul class="collapse">
+  <li><a href="#problem-3" id="toc-problem-3" class="nav-link" data-scroll-target="#problem-3">Problem</a></li>
+  <li><a href="#c-implementation-nadaraya-watson-estimator" id="toc-c-implementation-nadaraya-watson-estimator" class="nav-link" data-scroll-target="#c-implementation-nadaraya-watson-estimator">C Implementation: Nadaraya-Watson Estimator</a></li>
+  <li><a href="#loading-the-data-1" id="toc-loading-the-data-1" class="nav-link" data-scroll-target="#loading-the-data-1">Loading the Data</a></li>
+  <li><a href="#computing-the-kernel-regression-estimate" id="toc-computing-the-kernel-regression-estimate" class="nav-link" data-scroll-target="#computing-the-kernel-regression-estimate">Computing the Kernel Regression Estimate</a></li>
+  <li><a href="#bootstrap-confidence-intervals" id="toc-bootstrap-confidence-intervals" class="nav-link" data-scroll-target="#bootstrap-confidence-intervals">Bootstrap Confidence Intervals</a></li>
+  <li><a href="#final-visualization" id="toc-final-visualization" class="nav-link" data-scroll-target="#final-visualization">Final Visualization</a></li>
+  </ul></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls">8. Common Pitfalls</a>
   <ul class="collapse">
   <li><a href="#array-indexing" id="toc-array-indexing" class="nav-link" data-scroll-target="#array-indexing">Array Indexing</a></li>
   <li><a href="#integer-division" id="toc-integer-division" class="nav-link" data-scroll-target="#integer-division">Integer Division</a></li>
@@ -378,12 +387,12 @@ window.Quarto = {
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(result_r <span class="ot">&lt;-</span> <span class="fu">sum_r</span>(n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.011   0.000   0.011 </code></pre>
+  0.009   0.000   0.009 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(result_cpp <span class="ot">&lt;-</span> <span class="fu">sum_cpp</span>(n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.000   0.000   0.001 </code></pre>
+  0.000   0.001   0.000 </code></pre>
 </div>
 </div>
 <p><strong>Key differences:</strong></p>
@@ -634,12 +643,12 @@ Performance comparison:</code></pre>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(y_r <span class="ot">&lt;-</span> <span class="fu">kernel_density_r</span>(g, magnitudes, h))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.006   0.000   0.005 </code></pre>
+  0.005   0.000   0.005 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(y_cpp <span class="ot">&lt;-</span> <span class="fu">kernel_density</span>(g, magnitudes, h))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.000   0.000   0.001 </code></pre>
+  0.001   0.000   0.001 </code></pre>
 </div>
 </div>
 </section>
@@ -748,29 +757,200 @@ Performance comparison:</code></pre>
 <p><strong>Interpretation</strong>: Both integrals converge to 1 (shown by red dashed line), which is expected since we’re integrating a probability density function. The convergence is faster for larger c and p values.</p>
 </section>
 </section>
+<section id="example-4-nadaraya-watson-kernel-regression-with-bootstrap-confidence-intervals" class="level2">
+<h2 class="anchored" data-anchor-id="example-4-nadaraya-watson-kernel-regression-with-bootstrap-confidence-intervals">7. Example 4: Nadaraya-Watson Kernel Regression with Bootstrap Confidence Intervals</h2>
+<p>This example demonstrates a more advanced application combining C functions with statistical inference. We’ll implement kernel regression to analyze the relationship between petroleum taxes and consumption, then use bootstrap methods to quantify uncertainty.</p>
+<section id="problem-3" class="level3">
+<h3 class="anchored" data-anchor-id="problem-3">Problem</h3>
+<p>Given data on petroleum taxes (X) and consumption (Y), we want to:</p>
+<ol type="1">
+<li>Estimate the relationship using Nadaraya-Watson kernel regression</li>
+<li>Compute bootstrap confidence intervals for the regression curve</li>
+<li>Visualize the results with uncertainty bands</li>
+</ol>
+</section>
+<section id="c-implementation-nadaraya-watson-estimator" class="level3">
+<h3 class="anchored" data-anchor-id="c-implementation-nadaraya-watson-estimator">C Implementation: Nadaraya-Watson Estimator</h3>
+<p>The Nadaraya-Watson estimator computes a weighted average of Y values at each grid point g:</p>
+<p><span class="math display">\[\hat{f}(g) = \frac{\sum_{i=1}^{n} K\left(\frac{g - X_i}{b}\right) Y_i}{\sum_{i=1}^{n} K\left(\frac{g - X_i}{b}\right)}\]</span></p>
+<p>where K is the Gaussian kernel and b is the bandwidth.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="sc">::</span><span class="fu">cppFunction</span>(<span class="st">"</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="st">NumericVector nadaraya_watson(int n, NumericVector X, NumericVector Y, </span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="st">                               int m, NumericVector g2, double b) {</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="st">  NumericVector res2(m);</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="st">  // Compute kernel regression estimates at each grid point</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="st">  for(int j = 0; j &lt; m; j++) {</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="st">    double numerator = 0.0;</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="st">    double denominator = 0.0;</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="st">    // Sum over all observations</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="st">    for(int i = 0; i &lt; n; i++) {</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="st">      // Gaussian kernel: exp(-0.5 * ((x - xi) / b)^2)</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="st">      double u = (g2[j] - X[i]) / b;</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="st">      double kernel_weight = exp(-0.5 * u * u);</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="st">      numerator += kernel_weight * Y[i];</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="st">      denominator += kernel_weight;</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a><span class="st">    // Compute the weighted average</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="st">    if(denominator &gt; 0) {</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="st">      res2[j] = numerator / denominator;</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a><span class="st">    } else {</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a><span class="st">      res2[j] = NA_REAL;</span></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a><span class="st">  return res2;</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Key implementation details:</strong></p>
+<ul>
+<li><strong>Nested loops</strong>: The outer loop iterates over m grid points, the inner over n observations</li>
+<li><strong>Gaussian kernel</strong>: We use <span class="math inline">\(K(u) = \exp(-0.5u^2)\)</span> without the normalizing constant (it cancels in the ratio)</li>
+<li><strong>Numerical stability</strong>: Check for <code>denominator &gt; 0</code> before division</li>
+<li><strong>NA handling</strong>: Return <code>NA_REAL</code> for grid points with no nearby data</li>
+</ul>
+</section>
+<section id="loading-the-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="loading-the-data-1">Loading the Data</h3>
+<p>We’ll use petroleum tax and consumption data to illustrate the method:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Petroleum taxes and consumption data</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://people.sc.fsu.edu/~jburkardt/datasets/regression/x15.txt"</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>data_raw <span class="ot">&lt;-</span> <span class="fu">readLines</span>(url)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>data_lines <span class="ot">&lt;-</span> data_raw[<span class="fu">grep</span>(<span class="st">"^</span><span class="sc">\\</span><span class="st">s*[0-9]"</span>, data_raw)]</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>data_lines <span class="ot">&lt;-</span> data_lines[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)]</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">text =</span> data_lines)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> data<span class="sc">$</span>V2  <span class="co"># Petroleum tax</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> data<span class="sc">$</span>V6  <span class="co"># Petroleum consumption</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Sample size:"</span>, <span class="fu">length</span>(X), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sample size: 48 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tax range: ["</span>, <span class="fu">min</span>(X), <span class="st">","</span>, <span class="fu">max</span>(X), <span class="st">"]</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tax range: [ 5 , 10 ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Consumption range: ["</span>, <span class="fu">min</span>(Y), <span class="st">","</span>, <span class="fu">max</span>(Y), <span class="st">"]</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Consumption range: [ 344 , 968 ]</code></pre>
+</div>
+</div>
+</section>
+<section id="computing-the-kernel-regression-estimate" class="level3">
+<h3 class="anchored" data-anchor-id="computing-the-kernel-regression-estimate">Computing the Kernel Regression Estimate</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(X)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">bw.nrd</span>(X)  <span class="co"># Scott's bandwidth rule</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(X), <span class="fu">max</span>(X), <span class="at">length.out =</span> m)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute kernel regression estimates</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>kernel_fit <span class="ot">&lt;-</span> <span class="fu">nadaraya_watson</span>(n, X, Y, m, g2, b)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial plot</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">4.5</span>, <span class="fl">3.5</span>, <span class="dv">2</span>))</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(X, Y, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"gray50"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Petroleum Tax"</span>, <span class="at">ylab =</span> <span class="st">"Consumption"</span>,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Kernel Regression: Tax vs. Consumption"</span>)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(g2, kernel_fit, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="fl">2.5</span>)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="st">"Kernel Estimate"</span>, </span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="fl">2.5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/compute_kernel_regression-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="bootstrap-confidence-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="bootstrap-confidence-intervals">Bootstrap Confidence Intervals</h3>
+<p>To quantify uncertainty in our estimates, we use the bootstrap:</p>
+<ol type="1">
+<li><strong>Resample</strong>: Draw n pairs <span class="math inline">\((X_i, Y_i)\)</span> with replacement from the original data</li>
+<li><strong>Refit</strong>: Compute kernel regression on the bootstrap sample</li>
+<li><strong>Repeat</strong>: Do this B = 200 times</li>
+<li><strong>Quantiles</strong>: At each grid point, compute the 2.5th and 97.5th percentiles</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">200</span>  <span class="co"># Number of bootstrap samples</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>boot_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> B, <span class="at">ncol =</span> m)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap loop</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B) {</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Resample with replacement</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  X_boot <span class="ot">&lt;-</span> X[idx]</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  Y_boot <span class="ot">&lt;-</span> Y[idx]</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute kernel regression on bootstrap sample</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  boot_mat[i, ] <span class="ot">&lt;-</span> <span class="fu">nadaraya_watson</span>(n, X_boot, Y_boot, m, g2, b)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute confidence bounds</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>lower_ci <span class="ot">&lt;-</span> <span class="fu">apply</span>(boot_mat, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>upper_ci <span class="ot">&lt;-</span> <span class="fu">apply</span>(boot_mat, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why bootstrap works here:</strong></p>
+<ul>
+<li>Kernel regression is a smooth function of the data</li>
+<li>Bootstrap resampling preserves the joint distribution of (X, Y)</li>
+<li>Percentile method provides valid confidence bands under mild conditions</li>
+<li>The 200 bootstrap samples give stable percentile estimates</li>
+</ul>
+</section>
+<section id="final-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="final-visualization">Final Visualization</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">4.5</span>, <span class="fl">3.5</span>, <span class="dv">2</span>))</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(X, Y, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"gray50"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">main =</span> <span class="st">"Kernel Regression with 95% Bootstrap CI"</span>,</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Petroleum Tax"</span>, <span class="at">ylab =</span> <span class="st">"Consumption"</span>, <span class="at">cex.lab =</span> <span class="fl">1.1</span>, <span class="at">cex.main =</span> <span class="fl">1.2</span>)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(g2, kernel_fit, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="fl">2.5</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon</span>(<span class="fu">c</span>(g2, <span class="fu">rev</span>(g2)), <span class="fu">c</span>(lower_ci, <span class="fu">rev</span>(upper_ci)), <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(g2, lower_ci, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(g2, upper_ci, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/final_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
 <section id="common-pitfalls" class="level2">
-<h2 class="anchored" data-anchor-id="common-pitfalls">7. Common Pitfalls</h2>
+<h2 class="anchored" data-anchor-id="common-pitfalls">8. Common Pitfalls</h2>
 <section id="array-indexing" class="level3">
 <h3 class="anchored" data-anchor-id="array-indexing">Array Indexing</h3>
-<div class="sourceCode" id="cb34"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">// C++ uses 0-based indexing</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span>  <span class="co">// 0 to n-1</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  x<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="op">...</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">// R uses 1-based indexing</span></span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span><span class="op">(</span>i in <span class="dv">1</span><span class="op">:</span>n<span class="op">)</span> <span class="op">{</span>  <span class="co">// 1 to n</span></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  x<span class="op">[</span>i<span class="op">]</span> <span class="op">&lt;-</span> <span class="op">...</span></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">// C++ uses 0-based indexing</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span>  <span class="co">// 0 to n-1</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  x<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="op">...</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="co">// R uses 1-based indexing</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span><span class="op">(</span>i in <span class="dv">1</span><span class="op">:</span>n<span class="op">)</span> <span class="op">{</span>  <span class="co">// 1 to n</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  x<span class="op">[</span>i<span class="op">]</span> <span class="op">&lt;-</span> <span class="op">...</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="integer-division" class="level3">
 <h3 class="anchored" data-anchor-id="integer-division">Integer Division</h3>
-<div class="sourceCode" id="cb35"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> result <span class="op">=</span> <span class="dv">5</span> <span class="op">/</span> <span class="dv">2</span><span class="op">;</span>      <span class="co">// Result: 2.0 (integer division)</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> result <span class="op">=</span> <span class="fl">5.0</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span>  <span class="co">// Result: 2.5 (correct)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> result <span class="op">=</span> <span class="dv">5</span> <span class="op">/</span> <span class="dv">2</span><span class="op">;</span>      <span class="co">// Result: 2.0 (integer division)</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> result <span class="op">=</span> <span class="fl">5.0</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span>  <span class="co">// Result: 2.5 (correct)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="power-functions" class="level3">
 <h3 class="anchored" data-anchor-id="power-functions">Power Functions</h3>
-<div class="sourceCode" id="cb36"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>pow<span class="op">(-</span><span class="dv">1</span><span class="op">,</span> i<span class="op">)</span>    <span class="co">// Correct</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="op">(-</span><span class="dv">1</span><span class="op">)^</span>i        <span class="co">// WRONG. ^ is XOR in C++, not exponentiation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>pow<span class="op">(-</span><span class="dv">1</span><span class="op">,</span> i<span class="op">)</span>    <span class="co">// Correct</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="op">(-</span><span class="dv">1</span><span class="op">)^</span>i        <span class="co">// WRONG. ^ is XOR in C++, not exponentiation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="further-reading" class="level2">
