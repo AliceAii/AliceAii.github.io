@@ -2,6 +2,7 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/webscrap/index.html",
       "/posts/snapart7/index.html",
       "/posts/ml/index.html",
       "/posts/snapart6/index.html",
