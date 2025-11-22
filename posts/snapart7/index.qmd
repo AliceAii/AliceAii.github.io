@@ -1,5 +1,5 @@
 ---
-title: "Social Network Analysis R Tutorial Part 7: dvanced ERGM Modeling with Structural Terms, and MCMC Diagnostics"
+title: "Social Network Analysis R Tutorial Part 7: Tapered ERGM Modeling, Social Balance and Transitivity, and MCMC Diagnostics"
 author: Shuhan (Alice) Ai
 date: "2025-11-17"
 categories: [R, SNA]
@@ -9,7 +9,7 @@ toc-title: "Contents"
 code-fold: show
 code-tools: true
 self-contained: true
-image: "figure1.png"
+image: "f1.png"
 execute:
      freeze: false
      cache: false
@@ -20,7 +20,7 @@ Welcome to Part 7 of our Social Network Analysis R Tutorial series! In our [prev
 
 In this post, we will advance into **sophisticated ERGM modeling** by incorporating complex structural terms that capture network dependencies beyond simple dyadic relationships. We'll explore geometrically weighted statistics, perform comprehensive MCMC diagnostics, and learn to interpret results in meaningful sociological contexts.
 
-![](figure1.png)
+![](f1.png)
 
 After completing this tutorial, you will be able to:
 
@@ -28,7 +28,7 @@ After completing this tutorial, you will be able to:
 - Perform and interpret MCMC convergence diagnostics
 - Compare nested models and assess model fit
 - Interpret complex ERGM results in substantive terms
-- Handle model degeneracy using tapered ERGMs
+- Handle model degeneracy using **tapered ERGMs**
 
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -37,9 +37,10 @@ rm(list = ls())
 library(network)        # Network object manipulation
 library(ergm)           # ERGM fitting
 library(networkdata)    # Network datasets
-library(sna)           # Social network analysis tools
-library(ergm.tapered)  # Tapered ERGM for handling degeneracy
-
+library(sna)            # Social network analysis tools
+library(parallel)       # Speed up MCMC
+library(ergm.tapered)   # Tapered ERGM for handling degeneracy
+library(amen)
 # Install ergm.tapered if needed
 # devtools::install_github("statnet/ergm", ref="tapered")
 
@@ -51,6 +52,21 @@ library(ergm.tapered)  # Tapered ERGM for handling degeneracy
 The `ergm.tapered` package provides an alternative estimation method that better handles models with strong dependence between terms. When you include multiple structural terms (like gwesp and gwdsp), standard ERGM estimation can struggle with convergence. Tapered ERGM adds a "tapering" mechanism that helps stabilize estimation.
 
 Software available on GitHub as ergm.tapered: https://github.com/statnet/ergm.tapered
+
+You can use these following code to install `ergm` or `ergm.tapered`:
+
+```
+install.packages("ergm", repos="http://www.stat.ucla.edu/~handcock")
+install.packages("ergm.tapered", repos="http://www.stat.ucla.edu/~handcock")
+```
+
+or 
+
+```
+install.packages("devtools")
+devtools::install_github("statnet/ergm.tapered")
+```
+
 :::
 
 ## 1. Introduction for Advanced Structural Terms in ERGMs
@@ -205,19 +221,22 @@ Automatic Selection: in practice, the package `ergm.tapered()` will
 
 ### 2.4 Summary: When to Use Tapered ERGM
 
-**Use Tapered ERGM when:**
+**Use Tapered ERGM when (recommended):**
+
 - You want to include theoretically important but potentially problematic terms (triangles, GWESP, etc.)
 - Standard ERGM shows convergence issues or degeneracy warnings
 - You need guaranteed computational stability
 - You're modeling larger networks where degeneracy is more likely
 
 **Advantages:**
+
 - Theoretical guarantee of non-degeneracy
 - Minimal bias when standard ERGM would work
 - Interpretable as constrained maximum entropy
 - Available in user-friendly software (`ergm.tapered` package)
 
 **Trade-offs:**
+
 - Slight bias in parameter estimates (usually small)
 - Additional hyperparameters ($\tau$) to consider
 - Need to understand what tapering means for interpretation
@@ -370,11 +389,77 @@ plot(gof_elite)
 
 From the sample statistics vs. observed values, the statistics show good agreement between simulated and observed values. All terms have p-value \> 0.05, The overall chi-squared test p = 0.022, indicating the model successfully reproduces the observed network statistics. The trace plots show relatively good mixing, fluctuating randomly around zero, which means MCMC chains are exploring the parameter space well and not getting trapped in any particular region. All the density plots are approximately centered near zeor, and no extreme skewness and multinodality (multiple peaks), indicating the sampling stable parameter estimation. Moreover, for the Geweke Diagnostic (Burn-in Test), all p-values are well above 0.05, indicating no evidence of non-convergence. The joint p-value of 0.820 indicates good overall convergence. Overall, the model successfully converged and the parameter estimates are reliable for inference.
 
-## 4. Case Study 2 - Balance Theory in Hansell Classroom Friendships
+
+## 4. Social Balance and Transitivity in Network Analysis
+
+### 4.1 Definition of Social Balance
+
+Social balance and transitivity are concepts in network analysis that help us understand how relationships form and evolve in social networks. These concepts, rooted in social psychology and graph theory, provide insights into the micro-level mechanisms that shape macro-level network structures.
+
+#### Heider's Balance Theory
+
+Fritz Heider's balance theory examines relationships among three actors (P-O-X triads) where each dyadic relationship can be positive (+) or negative (-). According to Heider:
+
+- **Balanced triads** have stable configurations:
+  - All three relationships are positive: (+)(+)(+) = (+) — "A friend of a friend is a friend"
+  - Two negative relationships: (-)(+)(-) = (-) — "An enemy of my enemy is a friend"
+
+- **Unbalanced triads** create psychological tension:
+  - All negative: (-)(-)(-)= (-) — "An enemy of my enemy is an enemy"
+  - One negative: (+)(-)(+) = (-) — "A friend of a friend is an enemy"
+
+The key principle: **multiply the signs of all three edges**. If the product is positive, the triad is balanced; if negative, it's unbalanced.
+
+*The following plot shows the four foundamental triad configurations in balance theory. Balanced triads (top row) are psychologically stable, while unbalanced triads (bottom row) create cognitive tension that motivates relationship change.*
+
+
+![](f1.png)
+
+### 4.2 From Undirected to Directed Networks
+
+While Heider's original theory focused on undirected relationships, real social networks often involve directed ties (e.g., "A nominates B as a friend" doesn't guarantee reciprocity). For directed networks, we use:
+
+- **MAN notation**: Classifies triads by the number of Mutual, Asymmetric, and Null dyads
+- **16 triad types**: From 003 (no connections) to 300 (completely connected), the following plots represent the 16 types
+- **Notation** The first number represents the number of mutual (bidirectional) edges within the triad. These are pairs of vertices with a connection in both directions (e.g., A is connected to B, and B is connected to A). The second number in the three-digit code indicates the number of asymmetric (unidirectional) edges, and the third number represents the number of null (non-existent) edges.  
+
+![](f2.png)
+#### Transitivity in Directed Networks
+
+Transitivity captures the "friend of a friend" phenomenon:
+- If i → j and j → k, then i → k (transitive closure)
+- **Transitive triads**: e.g., 030T, 120D, 120U, 300, indicate hierarchical or clustered structures
+- **Intransitive triads** e.g., 111D, 111U, 030C, suggest competing relationships or ranked preferences
+- **Cyclic triads** e.g.m 030C: A→B→C→A, represent circular patterns without hierarchical closure
+
+### 4.3 Network-Level Implications
+
+Balance theory has profound implications for understanding macro-level network structure:
+
+1. **Clustered Communities**: If balance holds throughout a network, we expect clear group boundaries with positive ties within groups and negative ties between groups
+
+2. **Structural Balance Theorem**: A completely balanced signed network must have one of two structures:
+
+   - A single cohesive clique (all positive ties)
+   - Two opposing factions (positive within, negative between)
+
+3. **Weak Balance**: Real networks often show "weak balance" where the all-negative triad (-)(-)(-) is also allowed, permitting multiple clusters rather than just two factions
+
+### 4.4 Measuring Balance in Real Networks
+
+We can empirically test balance theory using:
+
+- **Triad census**: Count the frequency of each triad type
+- **Statistical comparison**: Compare observed counts to expected distributions under random graphs
+- **ERGM terms**: 
+  - `ttriad` (transitive triads count)
+  - `ctriad` (cyclic triads count)
+
+## 5. Case Study 2 - Balance Theory in Hansell Classroom Friendships
 
 Now let's examine balance theory using directed friendship nominations in a sixth-grade classroom, we've used this dataset in the [previous tutorial (Part 5)](https://aliceaii.github.io/posts/snapart5/):
 
-### 4.1 Is the friendship network balanced in Heider’s definition of balance?
+### 5.1 Is the friendship network balanced in Heider’s definition of balance?
 
 ::: {.callout-tip}
 
@@ -404,7 +489,7 @@ triads[10]   # 030C
 ```
 
 
-### 4.2 Fit the model
+### 5.2 Fit the model
 
 ```{r balance-ergm, message=FALSE, warning=FALSE, cache=TRUE}
 fit_balance <- ergm.tapered(
@@ -446,7 +531,7 @@ This pattern suggests the classroom network organizes into balanced, sex-segrega
 -   **Cyclic ties (ctriple):** $\beta = -0.40$, the coefficient measures the tendency for cyclic triadic structures in the network, where: $A→B→C→A$ forms a cycle, but without the full transitive closure. The negative and highly significant coefficient (p \< 0.001) indicates a strong avoidance of cyclic triadic structures. $OR = 0.67$ means that cyclic triple configurations decrease the odds of the network configuration by 33%. The negative coefficient shows that cyclic patterns are less common than would be expected in a random network.
 
 
-### 4.3 Model Comparison and Selection
+### 5.3 Model Comparison and Selection
 
 ```{r model-comparison, message=FALSE, warning=FALSE}
 # Fit alternative model for French elite network
@@ -477,6 +562,7 @@ aic_comparison <- data.frame(
   Parameters = c(length(coef(fit_elite)), length(coef(fit_elite_extended)))
 )
 print(aic_comparison)
+
 ```
 
 ::: {.callout-note}
@@ -490,6 +576,72 @@ Model Selection Guidelines
 In our case, the simpler model is preferred: lower AIC, similar fit, better convergence.
 :::
 
+
+## 6. Case Study 3 - Protein-Protein Interaction Networks
+
+Butland et al (2005) “Interaction network containing conserved and essential protein complexes in Escherichia coli”
+reported a network of protein-protein interactions (bindings) that we obtained from http://pil.phys.uniroma1.it/~gcalda/cosinsite/extra/data/proteins/.
+
+This data is available in the networkdata package.
+
+Convert the edgelist to a directed network (The `el2sm` function may be helpful).
+
+Fit various tapered ERGM models to the network using ergm.tapered. Consider terms documented under ergm-terms. Good candidates include `istar`, `ostar`, `gwodegree`, `gwidegree`, `dgwest`, `dgwdsp`, `ctriple`, `ttriple`. Check the MCMC diagnostics with mcmc.diagnostics. Overall, how does the goodness-of-fit look?
+
+- Model 1 is a basic model, only include `edges` + `mutual` terms, The `mutual` term has an estimate of -Inf, may indicate the network don't have many mutual ties.
+
+- Model 2 is a degree distribution model, includes `edges` + `gwidegree` + `gwodegree`, MCMC diagnostics show relatively good convergence, sample statistics not significantly different from observed (overall p = 0.548) and the trace plot show good mixing.
+
+- Model 3 added `dgwesp` + `dgwdsp` + `ctriple` + `ttriple` based on the model 2, the `ctriple` term has estimate -14.20 with NA standard error, which may suggest there are zero or nearly zero cyclic triads in the network. MCMC diagnostics show reasonable convergence, with overall chi-squared test p = 0.530. Lower AIC (6770 vs 7083) suggests better fit than Model 2.
+
+
+```{r, message=FALSE, warning=FALSE}
+library(networkdata)
+library(amen)
+library(network)
+data(butland_ppi)
+help(butland_ppi)
+head(butland_ppi)
+
+#get all unique vertices and create mapping
+all_vertices <- sort(unique(c(butland_ppi[, 1], butland_ppi[, 2])))
+n_vertices <- length(all_vertices)
+vertex_map <- data.frame(original_id = all_vertices, new_id = 1:n_vertices)
+#remap edgelist to sequential IDs
+edgelist_remapped <- butland_ppi
+edgelist_remapped[, 1] <- match(butland_ppi[, 1], vertex_map$original_id)
+edgelist_remapped[, 2] <- match(butland_ppi[, 2], vertex_map$original_id)
+#convert edgelist to sociomatrix
+sm <- el2sm(edgelist_remapped)
+#create network object
+ppi_net <- network(sm, directed = TRUE)
+network.size(ppi_net)
+network.edgecount(ppi_net)
+network.edgecount(ppi_net)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(parallel)
+library(ergm.tapered)
+set.seed(123)
+
+#model 1: basic model with edges and reciprocity
+#fit_ppi1 <- ergm.tapered(ppi_net ~ edges + mutual, r= 1)
+fit_ppi1 <- ergm(ppi_net ~ edges + mutual)
+summary(fit_ppi1)
+#mcmc.diagnostics(fit_ppi1)
+
+#model 2: add in-degree / outdegree distribution effects
+fit_ppi2 <- ergm.tapered(ppi_net ~ edges + gwidegree(0.5, fixed = TRUE) + gwodegree(0.5, fixed = TRUE))
+summary(fit_ppi2)
+#mcmc.diagnostics(fit_ppi2)
+
+#model 3: add GW edgewise shared partners + GW Dyadwise Shared Partners
+fit_ppi3 <- ergm.tapered(ppi_net ~ edges + gwidegree(0.5, fixed = TRUE) + gwodegree(0.5, fixed = TRUE) +
+dgwesp(0.5, fixed = TRUE) + dgwdsp(0.5, fixed = TRUE) + ctriple + ttriple)
+summary(fit_ppi3)
+mcmc.diagnostics(fit_ppi3)
+```
 
 ## References
 
