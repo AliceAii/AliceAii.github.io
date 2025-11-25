@@ -1,7 +1,7 @@
 ---
 title: "Welcome to My Blog"
 author: "Shuhan (Alice) Ai"
-date: "2025-05-27"
+date: "2025-04-01"
 ---
 
 A space for sharing research and reflections.
