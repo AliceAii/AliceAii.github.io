@@ -1,5 +1,5 @@
 ---
-title: "HSLS:09 Study Replication Example 1 (Pinneo & Nolen, 2024)."
+title: "HSLS:09 Study Replication Example 1 (Pinneo & Nolen, 2024)"
 author: "Shuhan (Alice) Ai"
 date: "2025-11-18"
 categories: [ED230A]
