@@ -424,9 +424,11 @@ While Heider's original theory focused on undirected relationships, real social 
 - **Notation** The first number represents the number of mutual (bidirectional) edges within the triad. These are pairs of vertices with a connection in both directions (e.g., A is connected to B, and B is connected to A). The second number in the three-digit code indicates the number of asymmetric (unidirectional) edges, and the third number represents the number of null (non-existent) edges.  
 
 ![](f2.png)
+
 #### Transitivity in Directed Networks
 
 Transitivity captures the "friend of a friend" phenomenon:
+
 - If i → j and j → k, then i → k (transitive closure)
 - **Transitive triads**: e.g., 030T, 120D, 120U, 300, indicate hierarchical or clustered structures
 - **Intransitive triads** e.g., 111D, 111U, 030C, suggest competing relationships or ranked preferences
