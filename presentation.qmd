@@ -16,9 +16,9 @@ format:
 
 ### 2025
 
-**Ai, S.** (2025). *Can Community Service Foster Commitment to Social Responsibility Among First-year STEM Major Aspirants?*  Dissertation Proposal Defense. [<a href="slides/2025.12PreliOralDefense.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.** (2025). *Can Community Service Foster Commitment to Social Responsibility Among First-year STEM Major Aspirants?*  Dissertation Proposal Defense at UCLA School of Education & Information Studies, Los Angeles, CA. [<a href="slides/2025.12PreliOralDefense.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-**Ai, S.**, Eagan, K., & Wu, J. (2025). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. Paper presentation at the annual meeting of the Association for the Study of Higher Education, Denver, CO. [<a href="slides/2025ASHE_GradegWOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.**, Eagan, K., & Wu, J. (2025). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Denver, CO. [<a href="slides/2025ASHE_GradegWOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
 **Ai, S.**, & Eagan, K. (2025). *What Factors Promote High School Students’ Development of Science Identity and STEM Major Aspiration? An Analysis of HSLS:09 Data.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO. [<a href="slides/2025AERA_STEMmajor.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
@@ -41,7 +41,7 @@ Jiang, T., **Ai, S.**, & Li, K. (2024). *Revealing Contributions on Research Dat
 
 **Ai, S.** (2024). *STEM Curriculum as a Catalyst: Narrowing Racial and Structural Inequalities.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division L: Educational Policies and Politics, Philadelphia, PA. [<a href="slides/2024AERA_STEMcatalyst.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-Liu, Xi., & **Ai, S. **(2024). *Improving Affect Detections for K-12 Online Math Learning Using Time-related Variables.* Paper presentation at the annual meeting of the American Education Research Association, Division C: Learning and Instruction, Philadelphia, PA. [<a href="slides/2024AERA_affect detector.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+Liu, Xi., & **Ai, S. **(2024). *Improving Affect Detections for K-12 Online Math Learning Using Time-related Variables.* Paper presentation at the annual meeting of the American Education Research Association (AERA), Division C: Learning and Instruction, Philadelphia, PA. [<a href="slides/2024AERA_affect detector.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
 </div>
 
