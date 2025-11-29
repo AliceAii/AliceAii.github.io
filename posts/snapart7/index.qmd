@@ -80,7 +80,7 @@ Before diving into applications, let's understand the sophisticated structural t
 Traditional count statistics (like triangle counts) can lead to model degeneracy because they treat all configurations equally. Geometrically weighted terms apply **diminishing returns** - the first few shared partners matter more than additional ones, making the model more stable and interpretable.
 :::
 
-### 1.2 Comprehensive Function Reference Table
+### 1.2 Main Function Reference Table
 
 Here's a detailed reference table for advanced ERGM structural terms:
 
@@ -94,6 +94,11 @@ Here's a detailed reference table for advanced ERGM structural terms:
 | **gwdsp(decay)** | `gwdsp(0.5, fixed=TRUE)` | Geometrically weighted dyadwise shared partners | Shared partners between any dyad (connected or not) | Modeling local clustering and "small world" effects |
 | **ctriple** | `ctriple` or `ctriad` | Cyclic triples: A→B→C→A patterns | Non-hierarchical, cyclic relationships | Testing for cyclic vs hierarchical structures |
 | **ttriple** | `ttriple` or `ttriad` | Transitive triples: A→B→C with A→C | Hierarchical, transitive closure | Testing for transitivity and balance theory |
+
+::: {.callout-note}
+Check the model terms using `help("ergm-terms")`
+:::
+
 
 ::: {.callout-tip}
 Choosing Decay Parameters
