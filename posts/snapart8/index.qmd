@@ -16,7 +16,7 @@ execute:
      keep-md: false
 ---
 
-In this tutorial, we'll explore **triadic structures** in social network and their role in understanding social relationships. We'll learn how to use **triad census models** within the **Tapered ERGM** framework to capture complex patterns of transitivity, balance, and clustering in social networks.
+In this tutorial, we'll explore triadic structures in social network and their role in understanding social relationships. We'll learn how to use triad census models within the Tapered ERGM framework to capture complex patterns of transitivity, balance, and clustering in social networks.
 
 ![](f2.png)
 

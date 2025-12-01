@@ -7,7 +7,6 @@ toc: true
 toc-depth: 3
 toc-title: "Contents"
 code-fold: show
-code-tools: true
 self-contained: true
 image: "nw1.png"
 execute:
@@ -16,7 +15,7 @@ execute:
      keep-md: false
 ---
 
-Welcome to **Part 9** of the Social Network Analysis R Tutorial series. In our previous tutorials, we've been working exclusively with **binary networks**—where edges either exist (1) or don't exist (0). However, many real-world networks have **valued relationships** where connections vary in strength, frequency, or intensity.
+Welcome to Part 9 of the Social Network Analysis R Tutorial series. In our previous tutorials, we've been working exclusively with binary networks, where edges either exist (1) or don't exist (0). However, many real-world networks have valued relationships where connections vary in strength, frequency, or intensity.
 
 ![](nw1.png)
 

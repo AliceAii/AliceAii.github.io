@@ -1,0 +1,11 @@
+---
+title: "Predicting STEM Undergraduates’ Intentions to Pursue Scientific Research Careers"
+author: Shuhan (Alice) Ai
+date: "2025-12-03"
+categories: [Kernel Density, C++, R]
+image: "p3.png"
+---
+
+This document presents the results and R analyses for the STATS 202A final project
+
+![](202Afp.pdf){width="100%" height="1000px"}
