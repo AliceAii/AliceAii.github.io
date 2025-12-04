@@ -22,6 +22,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -78,7 +113,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
       const mode = bsSheetEl.getAttribute("data-mode");
       const bodyEl = window.document.querySelector("body");
@@ -315,6 +350,7 @@ ul.task-list li input[type="checkbox"] {
                 <div class="quarto-category">Kernel Density</div>
                 <div class="quarto-category">C++</div>
                 <div class="quarto-category">R</div>
+                <div class="quarto-category">ML</div>
               </div>
                   </div>
   </div>
@@ -343,7 +379,35 @@ ul.task-list li input[type="checkbox"] {
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">0. Introduction</a>
+  <ul class="collapse">
+  <li><a href="#load-the-data" id="toc-load-the-data" class="nav-link" data-scroll-target="#load-the-data">load the data</a></li>
+  <li><a href="#check-missingness-and-outliers" id="toc-check-missingness-and-outliers" class="nav-link" data-scroll-target="#check-missingness-and-outliers">check missingness and outliers</a></li>
+  </ul></li>
+  <li><a href="#descriptive-linear" id="toc-descriptive-linear" class="nav-link" data-scroll-target="#descriptive-linear">1. Descriptive &amp; Linear</a>
+  <ul class="collapse">
+  <li><a href="#sample" id="toc-sample" class="nav-link" data-scroll-target="#sample">sample</a></li>
+  <li><a href="#box-plot" id="toc-box-plot" class="nav-link" data-scroll-target="#box-plot">box-plot</a></li>
+  <li><a href="#linear-regression-and-qq-plot" id="toc-linear-regression-and-qq-plot" class="nav-link" data-scroll-target="#linear-regression-and-qq-plot">linear regression and qq-plot</a></li>
+  </ul></li>
+  <li><a href="#univariate-kernel-density-plot" id="toc-univariate-kernel-density-plot" class="nav-link" data-scroll-target="#univariate-kernel-density-plot">2. Univariate Kernel Density Plot</a>
+  <ul class="collapse">
+  <li><a href="#with-c" id="toc-with-c" class="nav-link" data-scroll-target="#with-c">With C</a></li>
+  <li><a href="#without-c" id="toc-without-c" class="nav-link" data-scroll-target="#without-c">without C</a></li>
+  </ul></li>
+  <li><a href="#kernel-regression-esimate" id="toc-kernel-regression-esimate" class="nav-link" data-scroll-target="#kernel-regression-esimate">3. Kernel Regression Esimate</a></li>
+  <li><a href="#prediction-using-ml-algorithms" id="toc-prediction-using-ml-algorithms" class="nav-link" data-scroll-target="#prediction-using-ml-algorithms">4. Prediction using ML algorithms</a>
+  <ul class="collapse">
+  <li><a href="#check-variables-importance" id="toc-check-variables-importance" class="nav-link" data-scroll-target="#check-variables-importance">check variables importance</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -354,8 +418,921 @@ ul.task-list li input[type="checkbox"] {
 
 <p>This document presents the results and R analyses for the STATS 202A final project</p>
 <p><embed src="202Afp.pdf" style="width:100.0%" height="1000"></p>
+<p><embed src="202aslides.pdf" style="width:100.0%" height="1000"></p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">0. Introduction</h2>
+<ul>
+<li>limit the sample to STEM bachelor degree recipient</li>
+<li>missing values rate, mice</li>
+<li>outliers</li>
+</ul>
+<p>Also prepare the variables lists here…</p>
+<ul>
+<li><p>SCICAREER (outcome): Will you puruse a science-related research career? 5-point(1=Definitely no; 2=Probably no; 3=Uncertain; 4=Probably yes; 5=Definitely yes);binary (1 = Yes, 0 = otherwise)</p></li>
+<li><p>Science identity (continous): A measure describing the extent to which students conceive of themselves as scientists.</p></li>
+<li><p>Science self-efficacy (continuous): Measure of students’ confidence in their ability to conduct scientific research.</p></li>
+<li><p>Academic self-concept (continous): A measure of students’ beliefs about their abilities and confidence in academic environments.</p></li>
+<li><p>Habits of minds (continous): A measure of the behaviors and traits associated with academic success. These behaviors are seen as the foundation for lifelong learning.</p></li>
+<li><p>MAJORGPA: 1=D; 2=C; 3=C+; 4=B-; 5=B; 6=B+; 7=A-; 8=A or A+</p></li>
+<li><p>GOAL19: Goal: Making a theoretical contribution to science (1=Not Important; 2=Somewhat Important; 3=Very Important; 4=Essential)</p></li>
+<li><p>GOAL11: Goal: Helping others who are in difficulty</p></li>
+<li><p>GOAL04: Goal: Becoming an authority in my field</p></li>
+<li><p>RESEARCH: How many months since entering college (including summer) did you work on a professor’s research project? (1=0 months; 2=1-3 months; 3=4-6 months; 4=7-12 months; 5=13-24 months; 6=25+ months)</p></li>
+<li><p>HPW17: Hours per Week: Studying/homework. During the past year, how much time did you spend during a typical week: (1=None; 2=Less than 1 hour; 3=1-2; 4=3-5; 5=6-10; 6=11-15; 7=16-20; 8=Over 20)</p></li>
+<li><p>HPW29: Hours per Week: Studying with other students</p></li>
+<li><p>HPW28: Hours per Week: Socializing with friends in person</p></li>
+<li><p>HPW09: Hours per Week: Using social media</p></li>
+<li><p>HPW04: Hours per Week: Participating in student clubs/groups</p></li>
+<li><p>HPW24: Hours per Week: Watching TV/online video content (e.g., Amazon, Hulu, Netflix, YouTube)</p></li>
+<li><p>HPW06: Hours per Week: Exercising/sports</p></li>
+<li><p>HPW27: Hours per Week: Working (for pay) on campus</p></li>
+<li><p>HPW02:Hours per Week: Career planning (job searches, networking, etc.)</p></li>
+</ul>
+<p>Methods</p>
+<ul>
+<li><p>descriptive analysis, cross-tabulations, raw data (with jitter) overlaid with Box</p></li>
+<li><p>Linear regression, model diagnosis</p></li>
+<li><p>Univariate Kernel Density Estimation</p></li>
+<li><p>Kernel Regression Estimation</p></li>
+<li><p>Prediction Model</p></li>
+</ul>
+<section id="load-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="load-the-data">load the data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(table1)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mice)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)  </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales) </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lattice)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_sav</span>(<span class="st">"/Users/aishuhan/Desktop/CCW and Undergraduate WOC STEM Career/CSS2019.SAV"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11776   677</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MAJOR1, STUID, SCICAREER, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>         SCIENCE_SELF_EFFICACY, SCIENCE_IDENTITY, ACADEMIC_SELFCONCEPT, HABITS_OF_MIND,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>         MAJORGPA, GOAL19, GOAL11, GOAL04, RESEARCH,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>         HPW17, HPW29, HPW28, HPW09, HPW04, HPW24, HPW06, HPW27, HPW02)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 21
+  MAJOR1                  STUID SCICAREER SCIENCE_SELF_EFFICACY SCIENCE_IDENTITY
+  &lt;dbl+lbl&gt;               &lt;chr&gt; &lt;dbl+lbl&gt;                 &lt;dbl&gt;            &lt;dbl&gt;
+1   1 [Art, fine and app… 9892… 3 [Uncer…                  65.0             48.6
+2 114 [Biochemistry/Biop… 9892… 3 [Uncer…                  46.8             55.2
+3   3 [English (language… 9892… 1 [Defin…                  39.7             33.4
+4   4 [History]           9891… 1 [Defin…                  42.8             43.6
+5   7 [Music]             9892… 2 [Proba…                  48.6             43.3
+6  11 [Other Arts and Hu… 9892… 4 [Proba…                  51.2             52.5
+# ℹ 16 more variables: ACADEMIC_SELFCONCEPT &lt;dbl&gt;, HABITS_OF_MIND &lt;dbl&gt;,
+#   MAJORGPA &lt;dbl+lbl&gt;, GOAL19 &lt;dbl+lbl&gt;, GOAL11 &lt;dbl+lbl&gt;, GOAL04 &lt;dbl+lbl&gt;,
+#   RESEARCH &lt;dbl+lbl&gt;, HPW17 &lt;dbl+lbl&gt;, HPW29 &lt;dbl+lbl&gt;, HPW28 &lt;dbl+lbl&gt;,
+#   HPW09 &lt;dbl+lbl&gt;, HPW04 &lt;dbl+lbl&gt;, HPW24 &lt;dbl+lbl&gt;, HPW06 &lt;dbl+lbl&gt;,
+#   HPW27 &lt;dbl+lbl&gt;, HPW02 &lt;dbl+lbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#str(dt)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">major =</span> <span class="fu">case_when</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      MAJOR1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">112</span>, <span class="dv">113</span>, <span class="dv">114</span>, <span class="dv">115</span>, <span class="dv">116</span>, <span class="dv">117</span>, <span class="dv">118</span>, <span class="dv">119</span>, <span class="dv">120</span>, <span class="dv">121</span>, <span class="dv">122</span>, <span class="dv">123</span>) <span class="sc">~</span> <span class="dv">1</span>,  <span class="co"># Bio &amp; Life Sci</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      MAJOR1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">663</span>, <span class="dv">664</span>, <span class="dv">665</span>) <span class="sc">~</span> <span class="dv">2</span>,                                               <span class="co"># Math &amp; CS</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      MAJOR1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">442</span>, <span class="dv">443</span>, <span class="dv">444</span>, <span class="dv">445</span>, <span class="dv">446</span>, <span class="dv">447</span>, <span class="dv">448</span>, <span class="dv">449</span>, <span class="dv">450</span>, <span class="dv">451</span>, <span class="dv">452</span>, <span class="dv">453</span>, <span class="dv">454</span>) <span class="sc">~</span> <span class="dv">3</span>,  <span class="co"># Engineering</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      MAJOR1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">766</span>, <span class="dv">767</span>, <span class="dv">768</span>, <span class="dv">769</span>, <span class="dv">770</span>, <span class="dv">771</span>, <span class="dv">772</span>) <span class="sc">~</span> <span class="dv">4</span>,                          <span class="co"># Physical Sci</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      MAJOR1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">555</span>, <span class="dv">556</span>, <span class="dv">557</span>, <span class="dv">558</span>, <span class="dv">559</span>, <span class="dv">560</span>, <span class="dv">561</span>, <span class="dv">562</span>) <span class="sc">~</span> <span class="dv">5</span>,                    <span class="co"># Health Professions</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(MAJOR1) <span class="sc">~</span> <span class="dv">0</span>,  <span class="co"># Non-STEM: any valid MAJOR1 value not in the above categories</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">major =</span> <span class="fu">factor</span>(major,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>), </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"non-STEM"</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Health Professions"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Biological &amp; Life Sciences"</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Math &amp; Computer Science"</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Engineering"</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Physical Science"</span>)))</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(dt)    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11776    22</code></pre>
+</div>
+</div>
+</section>
+<section id="check-missingness-and-outliers" class="level3">
+<h3 class="anchored" data-anchor-id="check-missingness-and-outliers">check missingness and outliers</h3>
+<p>The missing rate is less than 1.6%, the Little’s MCAR test is non significant, suggesting the missingness appears random and not systematically related to observed values. So I used the likewise deletion here.</p>
+<p>For the outcome variables, since it’s a continues variables, I standardized them removed those cases have |z|&gt;3.0. Removed 22 outliers.</p>
+<p>For those ordinal variables using 3/4/5 points Likert responses, so I don’t remove or Winsorize anything.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#filter students who have non-missing outcome variable</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(MAJOR1), <span class="sc">!</span><span class="fu">is.na</span>(SCICAREER))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dt <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(.)))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 22
+  MAJOR1 STUID SCICAREER SCIENCE_SELF_EFFICACY SCIENCE_IDENTITY
+   &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;                 &lt;dbl&gt;            &lt;dbl&gt;
+1      0     0         0                0.0190           0.0163
+# ℹ 17 more variables: ACADEMIC_SELFCONCEPT &lt;dbl&gt;, HABITS_OF_MIND &lt;dbl&gt;,
+#   MAJORGPA &lt;dbl&gt;, GOAL19 &lt;dbl&gt;, GOAL11 &lt;dbl&gt;, GOAL04 &lt;dbl&gt;, RESEARCH &lt;dbl&gt;,
+#   HPW17 &lt;dbl&gt;, HPW29 &lt;dbl&gt;, HPW28 &lt;dbl&gt;, HPW09 &lt;dbl&gt;, HPW04 &lt;dbl&gt;,
+#   HPW24 &lt;dbl&gt;, HPW06 &lt;dbl&gt;, HPW27 &lt;dbl&gt;, HPW02 &lt;dbl&gt;, major &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#run Little's MCAR test</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MissMech)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>dt.c <span class="ot">&lt;-</span> dt[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,<span class="dv">22</span>)]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#TestMCARNormality(dt.c)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#check outliers, remove cases with z-scores beyond ±3</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SCIENCE_SELF_EFFICACY_z =</span> <span class="fu">scale</span>(SCIENCE_SELF_EFFICACY)[,<span class="dv">1</span>],</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">SCIENCE_IDENTITY_z =</span> <span class="fu">scale</span>(SCIENCE_IDENTITY)[,<span class="dv">1</span>],</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">ACADEMIC_SELFCONCEPT_z =</span> <span class="fu">scale</span>(ACADEMIC_SELFCONCEPT)[,<span class="dv">1</span>],</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">HABITS_OF_MIND_z =</span> <span class="fu">scale</span>(HABITS_OF_MIND)[,<span class="dv">1</span>])</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#listwise deletion and filter the sample to only include STEM students</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(major <span class="sc">!=</span> <span class="st">"non-STEM"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">abs</span>(SCIENCE_SELF_EFFICACY_z) <span class="sc">&lt;=</span> <span class="fl">3.0</span> <span class="sc">&amp;</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         <span class="fu">abs</span>(SCIENCE_IDENTITY_z) <span class="sc">&lt;=</span> <span class="fl">3.0</span> <span class="sc">&amp;</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>         <span class="fu">abs</span>(ACADEMIC_SELFCONCEPT_z) <span class="sc">&lt;=</span> <span class="fl">3.0</span> <span class="sc">&amp;</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>         <span class="fu">abs</span>(HABITS_OF_MIND_z) <span class="sc">&lt;=</span> <span class="fl">3.0</span>)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#write.csv(dt, "dt_cleaned.csv", row.names = FALSE)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="descriptive-linear" class="level2">
+<h2 class="anchored" data-anchor-id="descriptive-linear">1. Descriptive &amp; Linear</h2>
+<section id="sample" class="level3">
+<h3 class="anchored" data-anchor-id="sample">sample</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#skim(dt)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table1</span>(<span class="sc">~</span> <span class="fu">factor</span>(SCICAREER) <span class="sc">+</span> <span class="fu">factor</span>(major) <span class="sc">+</span> SCIENCE_SELF_EFFICACY <span class="sc">+</span> SCIENCE_IDENTITY <span class="sc">+</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         ACADEMIC_SELFCONCEPT <span class="sc">+</span>  HABITS_OF_MIND <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         MAJORGPA <span class="sc">+</span> GOAL19 <span class="sc">+</span> GOAL11 <span class="sc">+</span> GOAL04 <span class="sc">+</span> RESEARCH <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         HPW17 <span class="sc">+</span> HPW29 <span class="sc">+</span> HPW28 <span class="sc">+</span> HPW09 <span class="sc">+</span> HPW04 <span class="sc">+</span> HPW24 <span class="sc">+</span> HPW06 <span class="sc">+</span> HPW27 <span class="sc">+</span> HPW02, <span class="at">data =</span> dt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="box-plot" class="level3">
+<h3 class="anchored" data-anchor-id="box-plot">box-plot</h3>
+<p>Box plot of science-related research aspirations/science self-efficacay/GOAL19/RESEARCH by major.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>major_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Health Professions"</span> <span class="ot">=</span> <span class="st">"#B7B7EB"</span>,<span class="st">"Biological &amp; Life Sciences"</span> <span class="ot">=</span> <span class="st">"#56B4E9"</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">"Math &amp; Computer Science"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>,<span class="st">"Engineering"</span> <span class="ot">=</span> <span class="st">"#F0E442"</span>, <span class="st">"Physical Science"</span> <span class="ot">=</span> <span class="st">"#F09BA0"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dt, <span class="fu">aes</span>(<span class="at">x =</span> major, <span class="at">y =</span> <span class="fu">as.numeric</span>(SCICAREER), <span class="at">fill =</span> major)) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray45"</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> major_colors) <span class="sc">+</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Definitely no"</span>, <span class="st">"Probably no"</span>, <span class="st">"Uncertain"</span>, <span class="st">"Probably yes"</span>, <span class="st">"Definitely yes"</span>)) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Scientific Research Careers Aspirations by Major"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">x =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(), <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dt, <span class="fu">aes</span>(<span class="at">x =</span> major, <span class="at">y =</span> <span class="fu">as.numeric</span>(SCIENCE_SELF_EFFICACY), <span class="at">fill =</span> major)) <span class="sc">+</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray45"</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> major_colors) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Science self-efficacy by major"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">x =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(), <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dt, <span class="fu">aes</span>(<span class="at">x =</span> major, <span class="at">y =</span> <span class="fu">as.numeric</span>(GOAL19), <span class="at">fill =</span> major)) <span class="sc">+</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray45"</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> major_colors) <span class="sc">+</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, </span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Important"</span>, <span class="st">"Somewhat Important"</span>, <span class="st">"Very Important"</span>, <span class="st">"Essential"</span>)) <span class="sc">+</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Make theoretical contribution to science by major"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">x =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(), <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dt, <span class="fu">aes</span>(<span class="at">x =</span> major, <span class="at">y =</span> <span class="fu">as.numeric</span>(RESEARCH), <span class="at">fill =</span> major)) <span class="sc">+</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray45"</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> major_colors) <span class="sc">+</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, </span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"0 months"</span>, <span class="st">"1-3 months"</span>, <span class="st">"4-6 months"</span>, <span class="st">"7-12 months"</span>, <span class="st">"13-24 months"</span>, <span class="st">"25+ months"</span>)) <span class="sc">+</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Time work on a professor's research project by major"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">x =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"right"</span>,</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="co">#combined_plot&lt;- (p0 | p1) / (p2 | p3) + plot_layout(guides = "collect")</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>combined_plot<span class="ot">&lt;-</span> (p0 <span class="sc">|</span> p3) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>)</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(combined_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("p0.png", combined_plot, width = 15, height = 5, dpi = 300)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>hpw_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"HPW17"</span>, <span class="st">"HPW29"</span>, <span class="st">"HPW28"</span>, <span class="st">"HPW09"</span>, <span class="st">"HPW04"</span>, </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>              <span class="st">"HPW24"</span>, <span class="st">"HPW06"</span>, <span class="st">"HPW27"</span>, <span class="st">"HPW02"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>hpw_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW17"</span> <span class="ot">=</span> <span class="st">"Studying/homework"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW29"</span> <span class="ot">=</span> <span class="st">"Studying with other students"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW28"</span> <span class="ot">=</span> <span class="st">"Socializing with friends in person"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW09"</span> <span class="ot">=</span> <span class="st">"Using social media"</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW04"</span> <span class="ot">=</span> <span class="st">"Participating in student clubs/groups"</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW24"</span> <span class="ot">=</span> <span class="st">"Watching TV/online video content"</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW06"</span> <span class="ot">=</span> <span class="st">"Exercising/sports"</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW27"</span> <span class="ot">=</span> <span class="st">"Working (for pay) on campus"</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HPW02"</span> <span class="ot">=</span> <span class="st">"Career planning (job searches, networking, etc.)"</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(hpw_vars)) {</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  var_name <span class="ot">&lt;-</span> hpw_vars[i]</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  show_y_axis <span class="ot">&lt;-</span> i <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  is_last_plot <span class="ot">&lt;-</span> i <span class="sc">==</span> <span class="dv">9</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  plot_list[[i]] <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dt, <span class="fu">aes</span>(<span class="at">x =</span> major, <span class="at">y =</span> <span class="fu">as.numeric</span>(.data[[var_name]]), <span class="at">fill =</span> major)) <span class="sc">+</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray45"</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> major_colors) <span class="sc">+</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">c</span>(<span class="st">"None"</span>, <span class="st">"&lt;1 hr"</span>, <span class="st">"1-2 hrs"</span>, <span class="st">"3-5 hrs"</span>, <span class="st">"6-10 hrs"</span>, </span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"11-15 hrs"</span>, <span class="st">"16-20 hrs"</span>, <span class="st">"&gt;20 hrs"</span>) <span class="cf">else</span> <span class="cn">NULL</span>,</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">8</span>)) <span class="sc">+</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> hpw_labels[var_name], <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">x =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),  </span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>) <span class="cf">else</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.ticks.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_line</span>() <span class="cf">else</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">legend.position =</span> <span class="cf">if</span>(is_last_plot) <span class="st">"right"</span> <span class="cf">else</span> <span class="st">"none"</span>,</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>combined_hpw_plot <span class="ot">&lt;-</span> <span class="fu">wrap_plots</span>(plot_list, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">+</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Hours Per Week Spent on Activities by Major"</span>,</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">theme =</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(combined_hpw_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("p1.png", combined_hpw_plot, width = 15, height = 10, dpi = 300)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="linear-regression-and-qq-plot" class="level3">
+<h3 class="anchored" data-anchor-id="linear-regression-and-qq-plot">linear regression and qq-plot</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">major =</span> <span class="fu">relevel</span>(major, <span class="at">ref =</span> <span class="st">"Biological &amp; Life Sciences"</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>lm1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(SCICAREER <span class="sc">~</span> SCIENCE_SELF_EFFICACY_z <span class="sc">+</span> SCIENCE_IDENTITY_z <span class="sc">+</span> ACADEMIC_SELFCONCEPT_z <span class="sc">+</span>  HABITS_OF_MIND_z <span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>         MAJORGPA <span class="sc">+</span> GOAL19 <span class="sc">+</span> GOAL11 <span class="sc">+</span> GOAL04 <span class="sc">+</span> RESEARCH <span class="sc">+</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>         HPW17 <span class="sc">+</span> HPW29 <span class="sc">+</span> HPW28 <span class="sc">+</span> HPW09 <span class="sc">+</span> HPW04 <span class="sc">+</span> HPW24 <span class="sc">+</span> HPW06 <span class="sc">+</span> HPW27 <span class="sc">+</span> HPW02, <span class="at">data =</span> dt)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SCICAREER ~ SCIENCE_SELF_EFFICACY_z + SCIENCE_IDENTITY_z + 
+    ACADEMIC_SELFCONCEPT_z + HABITS_OF_MIND_z + MAJORGPA + GOAL19 + 
+    GOAL11 + GOAL04 + RESEARCH + HPW17 + HPW29 + HPW28 + HPW09 + 
+    HPW04 + HPW24 + HPW06 + HPW27 + HPW02, data = dt)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.6574 -0.7194  0.0327  0.7256  3.5067 
+
+Coefficients:
+                         Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)              2.349907   0.166396  14.122  &lt; 2e-16 ***
+SCIENCE_SELF_EFFICACY_z  0.034941   0.029036   1.203 0.228918    
+SCIENCE_IDENTITY_z       0.615498   0.031524  19.525  &lt; 2e-16 ***
+ACADEMIC_SELFCONCEPT_z  -0.111186   0.021939  -5.068 4.24e-07 ***
+HABITS_OF_MIND_z        -0.015615   0.022184  -0.704 0.481560    
+MAJORGPA                -0.020372   0.013711  -1.486 0.137426    
+GOAL19                   0.370008   0.023275  15.897  &lt; 2e-16 ***
+GOAL11                  -0.116779   0.025407  -4.596 4.46e-06 ***
+GOAL04                  -0.016020   0.023856  -0.672 0.501924    
+RESEARCH                 0.071731   0.011264   6.368 2.17e-10 ***
+HPW17                    0.037257   0.014299   2.606 0.009213 ** 
+HPW29                   -0.003509   0.013585  -0.258 0.796212    
+HPW28                   -0.048605   0.013415  -3.623 0.000295 ***
+HPW09                   -0.009554   0.013053  -0.732 0.464264    
+HPW04                   -0.019121   0.012025  -1.590 0.111905    
+HPW24                    0.009542   0.013153   0.725 0.468241    
+HPW06                    0.012262   0.011942   1.027 0.304601    
+HPW27                    0.004713   0.008866   0.532 0.595070    
+HPW02                    0.006295   0.015441   0.408 0.683532    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.055 on 3327 degrees of freedom
+Multiple R-squared:  0.3644,    Adjusted R-squared:  0.361 
+F-statistic:   106 on 18 and 3327 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tidy_lm1 <span class="ot">&lt;-</span> <span class="fu">tidy</span>(lm1, <span class="at">conf.int =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tidy_lm1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 19 × 7
+   term                 estimate std.error statistic  p.value conf.low conf.high
+   &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1 (Intercept)           2.35      0.166      14.1   5.04e-44  2.02      2.68   
+ 2 SCIENCE_SELF_EFFICA…  0.0349    0.0290      1.20  2.29e- 1 -0.0220    0.0919 
+ 3 SCIENCE_IDENTITY_z    0.615     0.0315     19.5   1.84e-80  0.554     0.677  
+ 4 ACADEMIC_SELFCONCEP… -0.111     0.0219     -5.07  4.24e- 7 -0.154    -0.0682 
+ 5 HABITS_OF_MIND_z     -0.0156    0.0222     -0.704 4.82e- 1 -0.0591    0.0279 
+ 6 MAJORGPA             -0.0204    0.0137     -1.49  1.37e- 1 -0.0473    0.00651
+ 7 GOAL19                0.370     0.0233     15.9   6.64e-55  0.324     0.416  
+ 8 GOAL11               -0.117     0.0254     -4.60  4.46e- 6 -0.167    -0.0670 
+ 9 GOAL04               -0.0160    0.0239     -0.672 5.02e- 1 -0.0628    0.0308 
+10 RESEARCH              0.0717    0.0113      6.37  2.17e-10  0.0496    0.0938 
+11 HPW17                 0.0373    0.0143      2.61  9.21e- 3  0.00922   0.0653 
+12 HPW29                -0.00351   0.0136     -0.258 7.96e- 1 -0.0301    0.0231 
+13 HPW28                -0.0486    0.0134     -3.62  2.95e- 4 -0.0749   -0.0223 
+14 HPW09                -0.00955   0.0131     -0.732 4.64e- 1 -0.0351    0.0160 
+15 HPW04                -0.0191    0.0120     -1.59  1.12e- 1 -0.0427    0.00446
+16 HPW24                 0.00954   0.0132      0.725 4.68e- 1 -0.0162    0.0353 
+17 HPW06                 0.0123    0.0119      1.03  3.05e- 1 -0.0112    0.0357 
+18 HPW27                 0.00471   0.00887     0.532 5.95e- 1 -0.0127    0.0221 
+19 HPW02                 0.00629   0.0154      0.408 6.84e- 1 -0.0240    0.0366 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lm.beta)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm.beta</span>(lm1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SCICAREER ~ SCIENCE_SELF_EFFICACY_z + SCIENCE_IDENTITY_z + 
+    ACADEMIC_SELFCONCEPT_z + HABITS_OF_MIND_z + MAJORGPA + GOAL19 + 
+    GOAL11 + GOAL04 + RESEARCH + HPW17 + HPW29 + HPW28 + HPW09 + 
+    HPW04 + HPW24 + HPW06 + HPW27 + HPW02, data = dt)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.6574 -0.7194  0.0327  0.7256  3.5067 
+
+Coefficients:
+                         Estimate Standardized Std. Error t value Pr(&gt;|t|)    
+(Intercept)              2.349907           NA   0.166396  14.122  &lt; 2e-16 ***
+SCIENCE_SELF_EFFICACY_z  0.034941     0.021417   0.029036   1.203 0.228918    
+SCIENCE_IDENTITY_z       0.615498     0.365636   0.031524  19.525  &lt; 2e-16 ***
+ACADEMIC_SELFCONCEPT_z  -0.111186    -0.084548   0.021939  -5.068 4.24e-07 ***
+HABITS_OF_MIND_z        -0.015615    -0.011415   0.022184  -0.704 0.481560    
+MAJORGPA                -0.020372    -0.023502   0.013711  -1.486 0.137426    
+GOAL19                   0.370008     0.276986   0.023275  15.897  &lt; 2e-16 ***
+GOAL11                  -0.116779    -0.066788   0.025407  -4.596 4.46e-06 ***
+GOAL04                  -0.016020    -0.010374   0.023856  -0.672 0.501924    
+RESEARCH                 0.071731     0.099129   0.011264   6.368 2.17e-10 ***
+HPW17                    0.037257     0.041155   0.014299   2.606 0.009213 ** 
+HPW29                   -0.003509    -0.004186   0.013585  -0.258 0.796212    
+HPW28                   -0.048605    -0.057289   0.013415  -3.623 0.000295 ***
+HPW09                   -0.009554    -0.011604   0.013053  -0.732 0.464264    
+HPW04                   -0.019121    -0.023976   0.012025  -1.590 0.111905    
+HPW24                    0.009542     0.011069   0.013153   0.725 0.468241    
+HPW06                    0.012262     0.014947   0.011942   1.027 0.304601    
+HPW27                    0.004713     0.007723   0.008866   0.532 0.595070    
+HPW02                    0.006295     0.005975   0.015441   0.408 0.683532    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.055 on 3327 degrees of freedom
+Multiple R-squared:  0.3644,    Adjusted R-squared:  0.361 
+F-statistic:   106 on 18 and 3327 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lm1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="univariate-kernel-density-plot" class="level2">
+<h2 class="anchored" data-anchor-id="univariate-kernel-density-plot">2. Univariate Kernel Density Plot</h2>
+<section id="with-c" class="level3">
+<h3 class="anchored" data-anchor-id="with-c">With C</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Rcpp)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cppFunction</span>(<span class="st">'</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="st">  NumericVector kde_cpp(NumericVector x, NumericVector eval_points, double bandwidth) {</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="st">    int n = x.size();</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="st">    int m = eval_points.size();</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="st">    NumericVector density(m);</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="st">    for (int j = 0; j &lt; m; j++) {</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="st">      double sum = 0.0;</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="st">      for (int i = 0; i &lt; n; i++) {</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="st">        double u = (eval_points[j] - x[i]) / bandwidth;</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="st">        sum += exp(-0.5 * u * u) / sqrt(2.0 * M_PI);  // Gaussian kernel</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="st">      density[j] = sum / (n * bandwidth);</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="st">    return density;</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="fu">cppFunction</span>(<span class="st">'</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="st">  NumericMatrix kde_bootstrap_cpp(NumericVector x, NumericVector eval_points, </span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="st">                                  double bandwidth, int n_boot) {</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a><span class="st">    int n = x.size();</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="st">    int m = eval_points.size();</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a><span class="st">    NumericMatrix boot_densities(n_boot, m);</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a><span class="st">    for (int b = 0; b &lt; n_boot; b++) {</span></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="st">     </span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="st">      NumericVector boot_sample(n);</span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="st">      for (int i = 0; i &lt; n; i++) {</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="st">        int idx = floor(R::runif(0, n));</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a><span class="st">        boot_sample[i] = x[idx];</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="st">      for (int j = 0; j &lt; m; j++) {</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a><span class="st">        double sum = 0.0;</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a><span class="st">        for (int i = 0; i &lt; n; i++) {</span></span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a><span class="st">          double u = (eval_points[j] - boot_sample[i]) / bandwidth;</span></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="st">          sum += exp(-0.5 * u * u) / sqrt(2.0 * M_PI);</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a><span class="st">        boot_densities(b, j) = sum / (n * bandwidth);</span></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a><span class="st">    return boot_densities;</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a><span class="co">#KDE estimation</span></span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>kde_estimate_cpp <span class="ot">&lt;-</span> <span class="cf">function</span>(data, var_name, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">n_grid =</span> <span class="dv">512</span>) {</span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>  data_clean <span class="ot">&lt;-</span> data[[var_name]][<span class="sc">!</span><span class="fu">is.na</span>(data[[var_name]])]</span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(data_clean)</span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a>  bw_scott <span class="ot">&lt;-</span> <span class="fu">bw.nrd0</span>(data_clean)</span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>  x_range <span class="ot">&lt;-</span> <span class="fu">range</span>(data_clean)</span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a>  x_padding <span class="ot">&lt;-</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fu">diff</span>(x_range)</span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a>  x_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(x_range[<span class="dv">1</span>] <span class="sc">-</span> x_padding, x_range[<span class="dv">2</span>] <span class="sc">+</span> x_padding, <span class="at">length.out =</span> n_grid)</span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a>  <span class="co">#compute original density using Rcpp</span></span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"Computing KDE for "</span>, var_name, <span class="st">"...</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a>  dens_original <span class="ot">&lt;-</span> <span class="fu">kde_cpp</span>(data_clean, x_grid, bw_scott)</span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a>  <span class="co">#bootstrap for confidence intervals using Rcpp</span></span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"Bootstrapping ("</span>, n_boot, <span class="st">" iterations)...</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb24-65"><a href="#cb24-65" aria-hidden="true" tabindex="-1"></a>  boot_densities <span class="ot">&lt;-</span> <span class="fu">kde_bootstrap_cpp</span>(data_clean, x_grid, bw_scott, n_boot)</span>
+<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a>  ci_lower <span class="ot">&lt;-</span> <span class="fu">apply</span>(boot_densities, <span class="dv">2</span>, quantile, <span class="at">probs =</span> alpha<span class="sc">/</span><span class="dv">2</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a>  ci_upper <span class="ot">&lt;-</span> <span class="fu">apply</span>(boot_densities, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="dv">1</span> <span class="sc">-</span> alpha<span class="sc">/</span><span class="dv">2</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">x_grid =</span> x_grid, <span class="at">density =</span> dens_original,<span class="at">ci_lower =</span> ci_lower, <span class="at">ci_upper =</span> ci_upper,</span>
+<span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_clean =</span> data_clean, <span class="at">bandwidth =</span> bw_scott</span>
+<span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-73"><a href="#cb24-73" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-74"><a href="#cb24-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-75"><a href="#cb24-75" aria-hidden="true" tabindex="-1"></a>kde_plot <span class="ot">&lt;-</span> <span class="cf">function</span>(kde_result, var_label, <span class="at">x_breaks =</span> <span class="cn">NULL</span>, <span class="at">x_labels =</span> <span class="cn">NULL</span>, </span>
+<span id="cb24-76"><a href="#cb24-76" aria-hidden="true" tabindex="-1"></a>                     <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb24-77"><a href="#cb24-77" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-78"><a href="#cb24-78" aria-hidden="true" tabindex="-1"></a>  dens_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> kde_result<span class="sc">$</span>x_grid, <span class="at">y =</span> kde_result<span class="sc">$</span>density,</span>
+<span id="cb24-79"><a href="#cb24-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_lower =</span> kde_result<span class="sc">$</span>ci_lower, <span class="at">ci_upper =</span> kde_result<span class="sc">$</span>ci_upper)</span>
+<span id="cb24-80"><a href="#cb24-80" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-81"><a href="#cb24-81" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb24-82"><a href="#cb24-82" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> kde_result<span class="sc">$</span>data_clean), <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> <span class="fu">after_stat</span>(density)), </span>
+<span id="cb24-83"><a href="#cb24-83" aria-hidden="true" tabindex="-1"></a>                   <span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb24-84"><a href="#cb24-84" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="at">data =</span> dens_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> ci_lower, <span class="at">ymax =</span> ci_upper), <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb24-85"><a href="#cb24-85" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> dens_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y), <span class="at">color =</span> <span class="st">"navy"</span>, <span class="at">size =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb24-86"><a href="#cb24-86" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Distribution of"</span>, var_label), <span class="at">x =</span> var_label, <span class="at">y =</span> <span class="cf">if</span>(show_y_axis) <span class="st">"Density"</span> <span class="cf">else</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb24-87"><a href="#cb24-87" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb24-88"><a href="#cb24-88" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb24-89"><a href="#cb24-89" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb24-90"><a href="#cb24-90" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.text.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>) <span class="cf">else</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-91"><a href="#cb24-91" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.ticks.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_line</span>() <span class="cf">else</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-92"><a href="#cb24-92" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.title.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>) <span class="cf">else</span> <span class="fu">element_blank</span>())</span>
+<span id="cb24-93"><a href="#cb24-93" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-94"><a href="#cb24-94" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(x_breaks) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(x_labels)) {</span>
+<span id="cb24-95"><a href="#cb24-95" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> x_breaks, <span class="at">labels =</span> x_labels)</span>
+<span id="cb24-96"><a href="#cb24-96" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-97"><a href="#cb24-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)</span>
+<span id="cb24-98"><a href="#cb24-98" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-99"><a href="#cb24-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-100"><a href="#cb24-100" aria-hidden="true" tabindex="-1"></a><span class="co">#convenience function combining estimation and plotting</span></span>
+<span id="cb24-101"><a href="#cb24-101" aria-hidden="true" tabindex="-1"></a>kde_ci_cpp <span class="ot">&lt;-</span> <span class="cf">function</span>(data, var_name, var_label, <span class="at">x_breaks =</span> <span class="cn">NULL</span>, <span class="at">x_labels =</span> <span class="cn">NULL</span>,</span>
+<span id="cb24-102"><a href="#cb24-102" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>, </span>
+<span id="cb24-103"><a href="#cb24-103" aria-hidden="true" tabindex="-1"></a>                       <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>, <span class="at">n_grid =</span> <span class="dv">512</span>) {</span>
+<span id="cb24-104"><a href="#cb24-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-105"><a href="#cb24-105" aria-hidden="true" tabindex="-1"></a>  kde_result <span class="ot">&lt;-</span> <span class="fu">kde_estimate_cpp</span>(data, var_name, n_boot, alpha, n_grid)</span>
+<span id="cb24-106"><a href="#cb24-106" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">kde_plot</span>(kde_result, var_label, x_breaks, x_labels, show_y_axis)</span>
+<span id="cb24-107"><a href="#cb24-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)</span>
+<span id="cb24-108"><a href="#cb24-108" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-109"><a href="#cb24-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-110"><a href="#cb24-110" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">kde_ci_cpp</span>(dt, <span class="st">"SCIENCE_SELF_EFFICACY_z"</span>, <span class="st">"Science Self-Efficacy"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Computing KDE for SCIENCE_SELF_EFFICACY_z...
+Bootstrapping (1000 iterations)...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">kde_ci_cpp</span>(dt, <span class="st">"SCIENCE_IDENTITY_z"</span>, <span class="st">"Science Identity"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Computing KDE for SCIENCE_IDENTITY_z...
+Bootstrapping (1000 iterations)...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">kde_ci_cpp</span>(dt, <span class="st">"ACADEMIC_SELFCONCEPT_z"</span>, <span class="st">"Academic Self-Concept"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Computing KDE for ACADEMIC_SELFCONCEPT_z...
+Bootstrapping (1000 iterations)...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">kde_ci_cpp</span>(dt, <span class="st">"HABITS_OF_MIND_z"</span>, <span class="st">"Habits of Mind"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Computing KDE for HABITS_OF_MIND_z...
+Bootstrapping (1000 iterations)...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>combined_d_plot <span class="ot">&lt;-</span> (p1 <span class="sc">|</span> p2) <span class="sc">/</span> (p3 <span class="sc">|</span> p4)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(combined_d_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("kde_cpp.png", combined_d_plot, width = 10, height = 8, dpi = 300)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="without-c" class="level3">
+<h3 class="anchored" data-anchor-id="without-c">without C</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#function to create kernel density plot with confidence bounds</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>kde_ci <span class="ot">&lt;-</span> <span class="cf">function</span>(data, var_name, var_label, <span class="at">x_breaks =</span> <span class="cn">NULL</span>, <span class="at">x_labels =</span> <span class="cn">NULL</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  data_clean <span class="ot">&lt;-</span> data[[var_name]][<span class="sc">!</span><span class="fu">is.na</span>(data[[var_name]])]</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(data_clean)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  bw_scott <span class="ot">&lt;-</span> <span class="fu">bw.nrd0</span>(data_clean)  <span class="co"># Scott's bandwidth</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  dens_original <span class="ot">&lt;-</span> <span class="fu">density</span>(data_clean, <span class="at">bw =</span> bw_scott)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  x_grid <span class="ot">&lt;-</span> dens_original<span class="sc">$</span>x</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  n_grid <span class="ot">&lt;-</span> <span class="fu">length</span>(x_grid)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">#bootstrap to get confidence intervals</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  boot_densities <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> n_boot, <span class="at">ncol =</span> n_grid)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"Bootstrapping "</span>, var_label, <span class="st">"...</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_boot) {</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#resample with replacement</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    boot_sample <span class="ot">&lt;-</span> <span class="fu">sample</span>(data_clean, <span class="at">size =</span> n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#calculate density on the same grid</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    boot_dens <span class="ot">&lt;-</span> <span class="fu">density</span>(boot_sample, <span class="at">bw =</span> bw_scott, </span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>                        <span class="at">from =</span> <span class="fu">min</span>(x_grid), <span class="at">to =</span> <span class="fu">max</span>(x_grid), <span class="at">n =</span> n_grid)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    boot_densities[i, ] <span class="ot">&lt;-</span> boot_dens<span class="sc">$</span>y</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#calculate confidence intervals (percentile method)</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  ci_lower <span class="ot">&lt;-</span> <span class="fu">apply</span>(boot_densities, <span class="dv">2</span>, quantile, <span class="at">probs =</span> alpha<span class="sc">/</span><span class="dv">2</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  ci_upper <span class="ot">&lt;-</span> <span class="fu">apply</span>(boot_densities, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="dv">1</span> <span class="sc">-</span> alpha<span class="sc">/</span><span class="dv">2</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>  dens_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x_grid, <span class="at">y =</span> dens_original<span class="sc">$</span>y, </span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>                       <span class="at">ci_lower =</span> ci_lower, <span class="at">ci_upper =</span> ci_upper)</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> data_clean), </span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> <span class="fu">after_stat</span>(density)), </span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>                   <span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="at">data =</span> dens_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> ci_lower, <span class="at">ymax =</span> ci_upper), </span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>                <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> dens_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y), <span class="at">color =</span> <span class="st">"navy"</span>, <span class="at">size =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Distribution of"</span>, var_label), </span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> var_label, </span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="cf">if</span>(show_y_axis) <span class="st">"Density"</span> <span class="cf">else</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.text.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>) <span class="cf">else</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.ticks.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_line</span>() <span class="cf">else</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.title.y =</span> <span class="cf">if</span>(show_y_axis) <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>) <span class="cf">else</span> <span class="fu">element_blank</span>())</span>
+<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(x_breaks) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(x_labels)) {</span>
+<span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> x_breaks, <span class="at">labels =</span> x_labels)</span>
+<span id="cb34-50"><a href="#cb34-50" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb34-51"><a href="#cb34-51" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-52"><a href="#cb34-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)</span>
+<span id="cb34-53"><a href="#cb34-53" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-54"><a href="#cb34-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-55"><a href="#cb34-55" aria-hidden="true" tabindex="-1"></a><span class="co">#create plots - only left side (p1 and p3) show y-axis</span></span>
+<span id="cb34-56"><a href="#cb34-56" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">kde_ci</span>(dt, <span class="st">"SCIENCE_SELF_EFFICACY_z"</span>, <span class="st">"Science Self-Efficacy"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bootstrapping Science Self-Efficacy...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">kde_ci</span>(dt, <span class="st">"SCIENCE_IDENTITY_z"</span>, <span class="st">"Science Identity"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bootstrapping Science Identity...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">kde_ci</span>(dt, <span class="st">"ACADEMIC_SELFCONCEPT_z"</span>, <span class="st">"Academic Self-Concept"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bootstrapping Academic Self-Concept...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">kde_ci</span>(dt, <span class="st">"HABITS_OF_MIND_z"</span>, <span class="st">"Habits of Mind"</span>, <span class="at">n_boot =</span> <span class="dv">1000</span>, <span class="at">show_y_axis =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bootstrapping Habits of Mind...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>combined_d_plot <span class="ot">&lt;-</span> (p1 <span class="sc">|</span> p2) <span class="sc">/</span> (p3 <span class="sc">|</span> p4)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(combined_d_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("p3.png", combined_d_plot, width = 9, height = 6, dpi = 300)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="kernel-regression-esimate" class="level2">
+<h2 class="anchored" data-anchor-id="kernel-regression-esimate">3. Kernel Regression Esimate</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="sc">::</span><span class="fu">cppFunction</span>(<span class="st">"</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="st">NumericVector nadaraya_watson(int n, NumericVector X, NumericVector Y, </span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="st">                               int m, NumericVector g2, double b) {</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="st">  NumericVector res2(m);</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="st">  for(int j = 0; j &lt; m; j++) {</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="st">    double numerator = 0.0;</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="st">    double denominator = 0.0;</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="st">    for(int i = 0; i &lt; n; i++) {</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="st">      // Gaussian kernel: exp(-0.5 * ((x - xi) / b)^2)</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="st">      double u = (g2[j] - X[i]) / b;</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a><span class="st">      double kernel_weight = exp(-0.5 * u * u);</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="st">      numerator += kernel_weight * Y[i];</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a><span class="st">      denominator += kernel_weight;</span></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="st">    </span></span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a><span class="st">    if(denominator &gt; 0) {</span></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a><span class="st">      res2[j] = numerator / denominator;</span></span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a><span class="st">    } else {</span></span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a><span class="st">      res2[j] = NA_REAL;</span></span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a><span class="st">  return res2;</span></span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>run_kernel_reg <span class="ot">&lt;-</span> <span class="cf">function</span>(X, Y, <span class="at">B =</span> <span class="dv">200</span>) {</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(X)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> <span class="fu">bw.nrd</span>(X)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(X), <span class="fu">max</span>(X), <span class="at">length.out =</span> m)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">nadaraya_watson</span>(n, X, Y, m, g, b)</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#bootstrap</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  boot_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, B, m)</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B) {</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>    idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>    boot_mat[i,] <span class="ot">&lt;-</span> <span class="fu">nadaraya_watson</span>(n, X[idx], Y[idx], m, g, b)</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">X =</span> X, <span class="at">Y =</span> Y, <span class="at">grid =</span> g, <span class="at">fit =</span> fit,</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">lower =</span> <span class="fu">apply</span>(boot_mat, <span class="dv">2</span>, quantile, <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">upper =</span> <span class="fu">apply</span>(boot_mat, <span class="dv">2</span>, quantile, <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>reg1 <span class="ot">&lt;-</span> <span class="fu">run_kernel_reg</span>(dt<span class="sc">$</span>RESEARCH, dt<span class="sc">$</span>SCIENCE_IDENTITY_z)</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>reg2 <span class="ot">&lt;-</span> <span class="fu">run_kernel_reg</span>(dt<span class="sc">$</span>RESEARCH, dt<span class="sc">$</span>SCIENCE_SELF_EFFICACY_z)</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>reg3 <span class="ot">&lt;-</span> <span class="fu">run_kernel_reg</span>(dt<span class="sc">$</span>RESEARCH, dt<span class="sc">$</span>ACADEMIC_SELFCONCEPT_z)</span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>reg4 <span class="ot">&lt;-</span> <span class="fu">run_kernel_reg</span>(dt<span class="sc">$</span>RESEARCH, dt<span class="sc">$</span>HABITS_OF_MIND_z)</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>plot_reg <span class="ot">&lt;-</span> <span class="cf">function</span>(r, xlab, ylab, title) {</span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(r<span class="sc">$</span>X, r<span class="sc">$</span>Y, <span class="at">pch =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">main =</span> title, </span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> xlab, <span class="at">ylab =</span> ylab, <span class="at">xaxt =</span> <span class="st">"n"</span>)  <span class="co"># xaxt = "n" suppresses default x-axis</span></span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"0 m"</span>, <span class="st">"1-3 m"</span>, <span class="st">"4-6 m"</span>, <span class="st">"7-12 m"</span>, <span class="st">"13-24 m"</span>, <span class="st">"25+ m"</span>))  </span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(r<span class="sc">$</span>grid, r<span class="sc">$</span>fit, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(r<span class="sc">$</span>grid, r<span class="sc">$</span>lower, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(r<span class="sc">$</span>grid, r<span class="sc">$</span>upper, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a><span class="co">#png("p6_base.png", width = 9, height = 7, units = "in", res = 300)</span></span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_reg</span>(reg1, <span class="st">"Undergraduate Research Time"</span>, <span class="st">"Science Identity"</span>, <span class="st">"Research - Science Identity"</span>)</span>
+<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_reg</span>(reg2, <span class="st">"Undergraduate Research Time"</span>, <span class="st">"Academic Self-Concept"</span>, <span class="st">"Research - Science Self-efficacy"</span>)</span>
+<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_reg</span>(reg3, <span class="st">"Undergraduate Research Time"</span>, <span class="st">"Academic Self-Concept"</span>, <span class="st">"Research - Academic Self-Concept"</span>)</span>
+<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_reg</span>(reg4, <span class="st">"Undergraduate Research Time"</span>, <span class="st">"Science Identity"</span>, <span class="st">"Research - Habits of Mind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">#dev.off()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="prediction-using-ml-algorithms" class="level2">
+<h2 class="anchored" data-anchor-id="prediction-using-ml-algorithms">4. Prediction using ML algorithms</h2>
+<ul>
+<li>Create a binary varible for science career plan (1 = yes (4=Probably yes; 5=Definitely yes), 0 = No)</li>
+<li>Use 10 folds cross-validation , have training set and test set</li>
+<li>Use ML algriothm like trees, knn, logistic regression, and other to predict whether students will pursue a science career</li>
+<li>Report model accuracy, auc roc plots.</li>
+<li>check variable importance</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart) <span class="co">#recursive patitioning and regression trees</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot) <span class="co">#visualization for rpart decision trees</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(xgboost)</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">SCICAREER_binary =</span> <span class="fu">ifelse</span>(<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(SCICAREER)) <span class="sc">&gt;=</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>model_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCICAREER_binary"</span>, <span class="st">"SCIENCE_SELF_EFFICACY"</span>, <span class="st">"SCIENCE_IDENTITY"</span>, <span class="st">"ACADEMIC_SELFCONCEPT"</span>,</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">"HABITS_OF_MIND"</span>, <span class="st">"MAJORGPA"</span>, <span class="st">"GOAL19"</span>, <span class="st">"GOAL11"</span>, <span class="st">"GOAL04"</span>, <span class="st">"RESEARCH"</span>,</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">"HPW17"</span>, <span class="st">"HPW29"</span>, <span class="st">"HPW28"</span>, <span class="st">"HPW09"</span>, <span class="st">"HPW04"</span>, <span class="st">"HPW24"</span>, <span class="st">"HPW06"</span>, <span class="st">"HPW27"</span>, <span class="st">"HPW02"</span>)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>dt_model <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(model_vars)) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SCICAREER_binary =</span> <span class="fu">factor</span>(SCICAREER_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span>, <span class="st">"Yes"</span>)))</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(var <span class="cf">in</span> model_vars[<span class="sc">-</span><span class="dv">1</span>]) {</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>  dt_model[[var]] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(dt_model[[var]]))</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a><span class="co">#set up 10-folds cross-validation</span></span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">612</span>)</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>train_control <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">10</span>, <span class="at">savePredictions =</span> <span class="st">"final"</span>,</span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>                              <span class="at">classProbs =</span> <span class="cn">TRUE</span>, <span class="at">summaryFunction =</span> twoClassSummary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">#model 1: logistic regressin</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>m_logit <span class="ot">&lt;-</span> <span class="fu">train</span>(SCICAREER_binary <span class="sc">~</span> ., <span class="at">data =</span> dt_model, <span class="at">method =</span> <span class="st">"glm"</span>,</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">trControl =</span> train_control, <span class="at">metric =</span> <span class="st">"ROC"</span>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co">#model 2: decision tree</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>m_tree <span class="ot">&lt;-</span> <span class="fu">train</span>(SCICAREER_binary <span class="sc">~</span> ., <span class="at">data =</span> dt_model, <span class="at">method =</span> <span class="st">"rpart"</span>,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> train_control, <span class="at">metric =</span> <span class="st">"ROC"</span>, <span class="at">tuneLength =</span> <span class="dv">10</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="co">#model 3: random forest</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>m_rf <span class="ot">&lt;-</span> <span class="fu">train</span>(SCICAREER_binary <span class="sc">~</span> ., <span class="at">data =</span> dt_model, <span class="at">method =</span> <span class="st">"rf"</span>, <span class="at">trControl =</span> train_control,</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">"ROC"</span>, <span class="at">tuneLength =</span> <span class="dv">5</span>, <span class="at">importance =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a><span class="co">#model 4: KNN</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>m_knn <span class="ot">&lt;-</span> <span class="fu">train</span>(SCICAREER_binary <span class="sc">~</span> ., <span class="at">data =</span> dt_model,<span class="at">method =</span> <span class="st">"knn"</span>, <span class="at">trControl =</span> train_control,</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">"ROC"</span>, <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>), <span class="at">tuneLength =</span> <span class="dv">10</span>)</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a><span class="co">#model 5: Gradient Boosting (XGBoost)</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>m_xgb <span class="ot">&lt;-</span> <span class="fu">train</span>(SCICAREER_binary <span class="sc">~</span> ., <span class="at">data =</span> dt_model, <span class="at">method =</span> <span class="st">"xgbTree"</span>, <span class="at">trControl =</span> train_control,</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">"ROC"</span>, <span class="at">tuneLength =</span> <span class="dv">3</span>, <span class="at">verbosity =</span> <span class="dv">0</span>)</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">resamples</span>(<span class="fu">list</span>(<span class="at">Logistic =</span> m_logit, <span class="at">Tree =</span> m_tree, <span class="at">RandomForest =</span> m_rf,</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">KNN =</span> m_knn, <span class="at">XGBoost =</span> m_xgb))</span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+summary.resamples(object = results)
+
+Models: Logistic, Tree, RandomForest, KNN, XGBoost 
+Number of resamples: 10 
+
+ROC 
+                  Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+Logistic     0.7538151 0.7990175 0.8101776 0.8077944 0.8201123 0.8430392    0
+Tree         0.7382846 0.7542069 0.7657015 0.7709614 0.7864987 0.8127519    0
+RandomForest 0.7876452 0.8013756 0.8057399 0.8038253 0.8091662 0.8154019    0
+KNN          0.7493034 0.7534711 0.7659354 0.7746876 0.7923890 0.8233336    0
+XGBoost      0.7884052 0.7934693 0.8163744 0.8104399 0.8239514 0.8302260    0
+
+Sens 
+                  Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+Logistic     0.7445652 0.7759563 0.7771739 0.7805179 0.7986383 0.8097826    0
+Tree         0.6739130 0.7431694 0.7520492 0.7527322 0.7785326 0.8206522    0
+RandomForest 0.7500000 0.7744565 0.7868852 0.7854241 0.7967302 0.8260870    0
+KNN          0.7650273 0.7855191 0.8043478 0.8038994 0.8206522 0.8478261    0
+XGBoost      0.7336957 0.7486339 0.7738477 0.7696098 0.7894022 0.7989130    0
+
+Spec 
+                  Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+Logistic     0.6357616 0.6506623 0.6622517 0.6781457 0.7036424 0.7549669    0
+Tree         0.6225166 0.6539735 0.6821192 0.6741722 0.6887417 0.7152318    0
+RandomForest 0.6291391 0.6456954 0.6655629 0.6655629 0.6837748 0.7086093    0
+KNN          0.5496689 0.5596026 0.5695364 0.5913907 0.6142384 0.6688742    0
+XGBoost      0.6357616 0.6771523 0.7052980 0.7039735 0.7334437 0.7549669    0</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>perf_p1 <span class="ot">&lt;-</span> <span class="fu">bwplot</span>(results, <span class="at">metric =</span> <span class="st">"ROC"</span>, <span class="at">main =</span> <span class="st">"ROC AUC across 10 Folds"</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>perf_p2 <span class="ot">&lt;-</span> <span class="fu">bwplot</span>(results, <span class="at">metric =</span> <span class="st">"Sens"</span>, <span class="at">main =</span> <span class="st">"Sensitivity across 10 Folds"</span>)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>perf_p3 <span class="ot">&lt;-</span> <span class="fu">bwplot</span>(results, <span class="at">metric =</span> <span class="st">"Spec"</span>, <span class="at">main =</span> <span class="st">"Specificity across 10 Folds"</span>)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>combined_perf <span class="ot">&lt;-</span> <span class="fu">grid.arrange</span>(perf_p1, perf_p2, perf_p3, <span class="at">ncol =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("p4.png", combined_perf, width = 15, height = 5, dpi = 300, bg = "white")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="check-variables-importance" class="level3">
+<h3 class="anchored" data-anchor-id="check-variables-importance">check variables importance</h3>
+<p>Most caret::varImp() outputs are scaled by default: Take the most important predictor; Assign it a value of 100; Scale all other predictors proportionally between 0 and 100.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">#extract importance from all models</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>get_importance <span class="ot">&lt;-</span> <span class="cf">function</span>(model, model_name) {</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    imp <span class="ot">&lt;-</span> <span class="fu">varImp</span>(model, <span class="at">scale =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">Variable =</span> <span class="fu">rownames</span>(imp<span class="sc">$</span>importance), <span class="at">Importance =</span> imp<span class="sc">$</span>importance[, <span class="dv">1</span>], <span class="at">Model =</span> model_name)</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>logit_imp <span class="ot">&lt;-</span> <span class="fu">get_importance</span>(m_logit, <span class="st">"Logistic"</span>)</span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>tree_imp <span class="ot">&lt;-</span> <span class="fu">get_importance</span>(m_tree, <span class="st">"Tree"</span>)</span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>rf_imp <span class="ot">&lt;-</span> <span class="fu">get_importance</span>(m_rf, <span class="st">"RandomForest"</span>)</span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>xgb_imp <span class="ot">&lt;-</span> <span class="fu">get_importance</span>(m_xgb, <span class="st">"XGBoost"</span>)</span>
+<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-16"><a href="#cb52-16" aria-hidden="true" tabindex="-1"></a><span class="co">#combine all (excluding KNN since it doesn't provide meaningful importance)</span></span>
+<span id="cb52-17"><a href="#cb52-17" aria-hidden="true" tabindex="-1"></a>all_imp <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(logit_imp, tree_imp, rf_imp, xgb_imp)</span>
+<span id="cb52-18"><a href="#cb52-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-19"><a href="#cb52-19" aria-hidden="true" tabindex="-1"></a>top10_vars <span class="ot">&lt;-</span> all_imp <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Variable) <span class="sc">%&gt;%</span></span>
+<span id="cb52-20"><a href="#cb52-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Avg_Importance =</span> <span class="fu">mean</span>(Importance, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb52-21"><a href="#cb52-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Avg_Importance)) <span class="sc">%&gt;%</span></span>
+<span id="cb52-22"><a href="#cb52-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Variable)</span>
+<span id="cb52-23"><a href="#cb52-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-24"><a href="#cb52-24" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> all_imp <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Variable <span class="sc">%in%</span> top10_vars)</span>
+<span id="cb52-25"><a href="#cb52-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-26"><a href="#cb52-26" aria-hidden="true" tabindex="-1"></a><span class="co">#comparison plot</span></span>
+<span id="cb52-27"><a href="#cb52-27" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(plot_data,<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Variable, Importance), <span class="at">y =</span> Importance, <span class="at">fill =</span> Model)) <span class="sc">+</span></span>
+<span id="cb52-28"><a href="#cb52-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb52-29"><a href="#cb52-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb52-30"><a href="#cb52-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>) <span class="sc">+</span></span>
+<span id="cb52-31"><a href="#cb52-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 10 Predictors Across 4 Models (Logistic, Tree, RF, XGBoost)"</span>,  <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Importance (0-100)"</span>) <span class="sc">+</span></span>
+<span id="cb52-32"><a href="#cb52-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb52-33"><a href="#cb52-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>), </span>
+<span id="cb52-34"><a href="#cb52-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"top"</span>)</span>
+<span id="cb52-35"><a href="#cb52-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-36"><a href="#cb52-36" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("p5.png", p, width = 10, height = 6, dpi = 300)</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>summary_table <span class="ot">&lt;-</span> all_imp <span class="sc">%&gt;%</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Variable <span class="sc">%in%</span> top10_vars) <span class="sc">%&gt;%</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Model, <span class="at">values_from =</span> Importance) <span class="sc">%&gt;%</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Average =</span> <span class="fu">rowMeans</span>(<span class="fu">select</span>(., <span class="sc">-</span>Variable), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Average))</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(summary_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 6
+   Variable              Logistic    Tree RandomForest XGBoost Average
+   &lt;chr&gt;                    &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 SCIENCE_IDENTITY        100    100           100    100      100   
+ 2 GOAL19                   85.2   96.6          66.1   43.4     72.8 
+ 3 RESEARCH                 45.1   47.8          26.7   11.2     32.7 
+ 4 ACADEMIC_SELFCONCEPT     30.2   19.2          12.2   10.6     18.1 
+ 5 SCIENCE_SELF_EFFICACY     8.63  34.3          20.4    5.04    17.1 
+ 6 HABITS_OF_MIND            1.08  22.0          10.7    6.75    10.1 
+ 7 MAJORGPA                 12.2   16.9           5.95   4.03     9.79
+ 8 GOAL11                   32.2    0.550         0      3.64     9.09
+ 9 HPW28                    19.5    5.51          6.18   3.50     8.68
+10 HPW27                     9.28   4.95          8.09   0.779    5.78</code></pre>
+</div>
+</div>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
