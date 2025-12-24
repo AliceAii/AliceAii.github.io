@@ -1538,7 +1538,7 @@ digraph decision_tree {
 ```
 
 
-### Further Readings:
+## Further Reading
 
 - Angrist, J. D., & Pischke, J. S. (2009). *Mostly Harmless Econometrics*. Princeton University Press.
 - Angrist, J. D., & Pischke, J. S. (2014). *Mastering 'Metrics: The path from cause to effect*. Princeton University Press.

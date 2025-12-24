@@ -456,10 +456,8 @@ window.Quarto = {
   <li><a href="#when-to-use-each-design" id="toc-when-to-use-each-design" class="nav-link" data-scroll-target="#when-to-use-each-design">5.1 When to Use Each Design</a></li>
   <li><a href="#strengths-and-limitations" id="toc-strengths-and-limitations" class="nav-link" data-scroll-target="#strengths-and-limitations">5.2 Strengths and Limitations</a></li>
   </ul></li>
-  <li><a href="#summary-and-comparison" id="toc-summary-and-comparison" class="nav-link" data-scroll-target="#summary-and-comparison">6. Summary and Comparison</a>
-  <ul class="collapse">
-  <li><a href="#further-readings" id="toc-further-readings" class="nav-link" data-scroll-target="#further-readings">Further Readings:</a></li>
-  </ul></li>
+  <li><a href="#summary-and-comparison" id="toc-summary-and-comparison" class="nav-link" data-scroll-target="#summary-and-comparison">6. Summary and Comparison</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
   </ul>
 </nav>
     </div>
@@ -2960,8 +2958,9 @@ Note
 <script type="application/json" data-for="htmlwidget-a7fc7562d371aa900fa1">{"x":{"diagram":"\ndigraph decision_tree {\n  graph [rankdir = TB, fontsize = 12, splines=ortho]\n  node [shape = box, style = filled, fontname = \"Arial\"]\n  \n  start [label = \"Start: Estimate Causal Effect\nof X on Y\", fillcolor = \"#FFE6CC\", shape = ellipse]\n  q1 [label = \"Can you randomize\ntreatment assignment?\", fillcolor = \"#D9EAD3\"]\n  \n  rct [label = \"RCT\n✓ Gold Standard\", fillcolor = \"#B6D7A8\", shape = box]\n  \n  q2 [label = \"Do you have panel data\nwith pre/post treatment\nperiods?\", fillcolor = \"#D9EAD3\"]\n  \n  q3 [label = \"Is treatment assigned\nbased on threshold\nin running variable?\", fillcolor = \"#D9EAD3\"]\n  \n  q4 [label = \"Do you have a valid\ninstrument (exogenous\nvariation in treatment)?\", fillcolor = \"#D9EAD3\"]\n  \n  q5 [label = \"Can you assume\nparallel trends?\", fillcolor = \"#D9EAD3\"]\n  \n  did [label = \"DID / CITS\", fillcolor = \"#B6D7A8\"]\n  rdd [label = \"RDD\n(Sharp or Fuzzy)\", fillcolor = \"#B6D7A8\"]\n  iv [label = \"Instrumental\nVariables\", fillcolor = \"#B6D7A8\"]\n  \n  q6 [label = \"Do you have rich\ncovariate data?\", fillcolor = \"#D9EAD3\"]\n  \n  psm [label = \"Propensity Score\nMatching\", fillcolor = \"#FFD966\"]\n  reg [label = \"Regression\nAdjustment\", fillcolor = \"#FFD966\"]\n  \n  q7 [label = \"Is treatment at\naggregate level\n(few treated units)?\", fillcolor = \"#D9EAD3\"]\n  \n  scm [label = \"Synthetic\nControl\", fillcolor = \"#FFD966\"]\n  caution [label = \"Caution:\nWeak Identification\", fillcolor = \"#EA9999\"]\n  \n  start -> q1\n  q1 -> rct [label = \"Yes\"]\n  q1 -> q2 [label = \"No\"]\n  \n  q2 -> q5 [label = \"Yes\"]\n  q2 -> q3 [label = \"No\"]\n  \n  q5 -> did [label = \"Yes\"]\n  q5 -> q3 [label = \"No/Uncertain\"]\n  \n  q3 -> rdd [label = \"Yes\"]\n  q3 -> q4 [label = \"No\"]\n  \n  q4 -> iv [label = \"Yes\"]\n  q4 -> q6 [label = \"No\"]\n  \n  q6 -> psm [label = \"Yes\"]\n  q6 -> q7 [label = \"No\"]\n  \n  q7 -> scm [label = \"Yes\"]\n  q7 -> caution [label = \"No\"]\n  \n  psm -> reg [label = \"or\", style = dashed]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-<section id="further-readings" class="level3">
-<h3 class="anchored" data-anchor-id="further-readings">Further Readings:</h3>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
 <ul>
 <li>Angrist, J. D., &amp; Pischke, J. S. (2009). <em>Mostly Harmless Econometrics</em>. Princeton University Press.</li>
 <li>Angrist, J. D., &amp; Pischke, J. S. (2014). <em>Mastering ’Metrics: The path from cause to effect</em>. Princeton University Press.</li>
@@ -2975,7 +2974,6 @@ Note
 
 <!-- -->
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -4982,7 +4980,7 @@ Note
 <span id="cb22-1538"><a href="#cb22-1538" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb22-1539"><a href="#cb22-1539" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-1540"><a href="#cb22-1540" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-1541"><a href="#cb22-1541" aria-hidden="true" tabindex="-1"></a><span class="fu">### Further Readings:</span></span>
+<span id="cb22-1541"><a href="#cb22-1541" aria-hidden="true" tabindex="-1"></a><span class="fu">## Further Reading</span></span>
 <span id="cb22-1542"><a href="#cb22-1542" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-1543"><a href="#cb22-1543" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Angrist, J. D., &amp; Pischke, J. S. (2009). *Mostly Harmless Econometrics*. Princeton University Press.</span>
 <span id="cb22-1544"><a href="#cb22-1544" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Angrist, J. D., &amp; Pischke, J. S. (2014). *Mastering 'Metrics: The path from cause to effect*. Princeton University Press.</span>
