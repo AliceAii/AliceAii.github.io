@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -34,18 +34,19 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-a9957ab5e8b7c67643b7e2e6b5c1e54e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-de0ed3b9a49d5daa615839eefb10c6a7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -118,7 +119,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -306,6 +307,8 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Shuhan (Alice) Ai</span>
     </a>
@@ -387,7 +390,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(26)</span></div><div class="category" data-category="QyUyQiUyQg==">C++ <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Q2F1c2FsJTIwSW5mZXJlbmNl">Causal Inference <span class="quarto-category-count">(6)</span></div><div class="category" data-category="Q3JpdGljYWwlMjBRdWFudA==">Critical Quant <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2VybmVsJTIwRGVuc2l0eQ==">Kernel Density <span class="quarto-category-count">(3)</span></div><div class="category" data-category="TUw=">ML <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(22)</span></div><div class="category" data-category="U05B">SNA <span class="quarto-category-count">(11)</span></div><div class="category" data-category="U3Vydml2YWwlMjBBbmFseXNpcw==">Survival Analysis <span class="quarto-category-count">(2)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(27)</span></div><div class="category" data-category="QyUyQiUyQg==">C++ <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Q2F1c2FsJTIwSW5mZXJlbmNl">Causal Inference <span class="quarto-category-count">(6)</span></div><div class="category" data-category="Q3JpdGljYWwlMjBRdWFudA==">Critical Quant <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2VybmVsJTIwRGVuc2l0eQ==">Kernel Density <span class="quarto-category-count">(3)</span></div><div class="category" data-category="TUw=">ML <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(23)</span></div><div class="category" data-category="U05B">SNA <span class="quarto-category-count">(11)</span></div><div class="category" data-category="U3Vydml2YWwlMjBBbmFseXNpcw==">Survival Analysis <span class="quarto-category-count">(2)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -402,7 +405,39 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1765785600000" data-listing-file-modified-sort="1766139168479" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2519">
+<div class="quarto-post image-right" data-index="0" data-categories="UiUyQ01M" data-listing-date-sort="1768032000000" data-listing-file-modified-sort="1768112429603" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2474">
+<div class="thumbnail"><a href="./posts/ml_regression/index.html" class="no-external">
+
+<img loading="lazy" src="./posts/ml_regression/p1.png" class="thumbnail-image">
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/ml_regression/index.html" class="no-external">Machine Learning Methods: Regression</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TUw='); return false;">ML</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/ml_regression/index.html" class="no-external">
+Machine learning begins with a simple yet profound idea: <strong>predicting one thing from another</strong>. This chapter explores how we can build increasingly sophisticated models…
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/ml_regression/index.html" class="no-external">
+<div class="listing-date">
+Jan 10, 2026
+</div>
+<div class="listing-author">
+Shuhan (Alice) Ai
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1765785600000" data-listing-file-modified-sort="1766139168479" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2519">
 <div class="thumbnail"><a href="./posts/snapart10/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart10/f1.png" class="thumbnail-image">
@@ -434,7 +469,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="S2VybmVsJTIwRGVuc2l0eSUyQ0MlMkIlMkIlMkNSJTJDTUw=" data-listing-date-sort="1764748800000" data-listing-file-modified-sort="1764831385261" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="25" data-listing-word-count-sort="4924">
+<div class="quarto-post image-right" data-index="2" data-categories="S2VybmVsJTIwRGVuc2l0eSUyQ0MlMkIlMkIlMkNSJTJDTUw=" data-listing-date-sort="1764748800000" data-listing-file-modified-sort="1764831385261" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="25" data-listing-word-count-sort="4924">
 <div class="thumbnail"><a href="./posts/scicarasp/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/scicarasp/p3.png" class="thumbnail-image">
@@ -470,7 +505,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1764403200000" data-listing-file-modified-sort="1764612935030" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3032">
+<div class="quarto-post image-right" data-index="3" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1764403200000" data-listing-file-modified-sort="1764612935030" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3032">
 <div class="thumbnail"><a href="./posts/snapart9/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart9/nw1.png" class="thumbnail-image">
@@ -502,7 +537,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1764316800000" data-listing-file-modified-sort="1764612616095" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2196">
+<div class="quarto-post image-right" data-index="4" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1764316800000" data-listing-file-modified-sort="1764612616095" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2196">
 <div class="thumbnail"><a href="./posts/snapart8/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart8/f2.png" class="thumbnail-image">
@@ -534,7 +569,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="Ug==" data-listing-date-sort="1763539200000" data-listing-file-modified-sort="1763676105656" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="958">
+<div class="quarto-post image-right" data-index="5" data-categories="Ug==" data-listing-date-sort="1763539200000" data-listing-file-modified-sort="1763676105656" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="958">
 <div class="thumbnail"><a href="./posts/webscrap/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/webscrap/f1.png" class="thumbnail-image">
@@ -564,7 +599,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1763366400000" data-listing-file-modified-sort="1764356574531" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4390">
+<div class="quarto-post image-right" data-index="6" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1763366400000" data-listing-file-modified-sort="1764356574531" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4390">
 <div class="thumbnail"><a href="./posts/snapart7/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart7/f1.png" class="thumbnail-image">
@@ -596,15 +631,15 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="UiUyQ01M" data-listing-date-sort="1763280000000" data-listing-file-modified-sort="1763358864140" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4130">
-<div class="thumbnail"><a href="./posts/ml/index.html" class="no-external">
+<div class="quarto-post image-right" data-index="7" data-categories="UiUyQ01M" data-listing-date-sort="1763280000000" data-listing-file-modified-sort="1763358864140" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4130">
+<div class="thumbnail"><a href="./posts/ml_compare/index.html" class="no-external">
 
-<img loading="lazy" src="./posts/ml/p1.png" class="thumbnail-image">
+<img loading="lazy" src="./posts/ml_compare/p1.png" class="thumbnail-image">
 
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/ml/index.html" class="no-external">A Practical Machine Learning Guide in R</a>
+<a href="./posts/ml_compare/index.html" class="no-external">A Practical Machine Learning Guide in R</a>
 </h3>
 <div class="listing-categories">
 
@@ -613,12 +648,12 @@ Shuhan (Alice) Ai
 <div class="listing-category" onclick="window.quartoListingCategory('TUw='); return false;">ML</div>
 
 </div>
-<div class="delink listing-description"><a href="./posts/ml/index.html" class="no-external">
-Machine learning (ML) has become an increasingly valuable tool in educational research, offering powerful methods to predict student outcomes and identify key factors…
+<div class="delink listing-description"><a href="./posts/ml_compare/index.html" class="no-external">
+
 </a></div>
 </div>
 <div class="metadata">
-<a href="./posts/ml/index.html" class="no-external">
+<a href="./posts/ml_compare/index.html" class="no-external">
 <div class="listing-date">
 Nov 16, 2025
 </div>
@@ -628,7 +663,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="U05B" data-listing-date-sort="1762848000000" data-listing-file-modified-sort="1763420336983" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2864">
+<div class="quarto-post image-right" data-index="8" data-categories="U05B" data-listing-date-sort="1762848000000" data-listing-file-modified-sort="1763420336983" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2864">
 <div class="thumbnail"><a href="./posts/snapart6/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart6/plot1.png" class="thumbnail-image">
@@ -658,7 +693,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="UiUyQ0MlMkIlMkI=" data-listing-date-sort="1762156800000" data-listing-file-modified-sort="1763616113290" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2770">
+<div class="quarto-post image-right" data-index="9" data-categories="UiUyQ0MlMkIlMkI=" data-listing-date-sort="1762156800000" data-listing-file-modified-sort="1763616113290" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2770">
 <div class="thumbnail"><a href="./posts/callcinr/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/callcinr/plot1.png" class="thumbnail-image">
@@ -690,7 +725,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1761894000000" data-listing-file-modified-sort="1762929098930" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3373">
+<div class="quarto-post image-right" data-index="10" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1761894000000" data-listing-file-modified-sort="1762929098930" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3373">
 <div class="thumbnail"><a href="./posts/snapart5/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart5/plot1.png" class="thumbnail-image">
@@ -722,7 +757,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="10" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1761721200000" data-listing-file-modified-sort="1762927756286" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2102">
+<div class="quarto-post image-right" data-index="11" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1761721200000" data-listing-file-modified-sort="1762927756286" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2102">
 <div class="thumbnail"><a href="./posts/snapart4/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart4/plot1.png" class="thumbnail-image">
@@ -754,7 +789,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="11" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1761202800000" data-listing-file-modified-sort="1761717704278" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3771">
+<div class="quarto-post image-right" data-index="12" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1761202800000" data-listing-file-modified-sort="1761717704278" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3771">
 <div class="thumbnail"><a href="./posts/snapart3/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart3/plot1.jpg" class="thumbnail-image">
@@ -786,7 +821,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="12" data-categories="U05B" data-listing-date-sort="1761116400000" data-listing-file-modified-sort="1763349415857" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3727">
+<div class="quarto-post image-right" data-index="13" data-categories="U05B" data-listing-date-sort="1761116400000" data-listing-file-modified-sort="1763349415857" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3727">
 <div class="thumbnail"><a href="./posts/snapart2/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart2/plot1.jpg" class="thumbnail-image">
@@ -816,7 +851,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="13" data-categories="UiUyQ0tlcm5lbCUyMERlbnNpdHk=" data-listing-date-sort="1760943600000" data-listing-file-modified-sort="1761717906497" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3305">
+<div class="quarto-post image-right" data-index="14" data-categories="UiUyQ0tlcm5lbCUyMERlbnNpdHk=" data-listing-date-sort="1760943600000" data-listing-file-modified-sort="1761717906497" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3305">
 <div class="thumbnail"><a href="./posts/kerneldensity2/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/kerneldensity2/plot1.png" class="thumbnail-image">
@@ -848,7 +883,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="14" data-categories="UiUyQ0tlcm5lbCUyMERlbnNpdHk=" data-listing-date-sort="1760338800000" data-listing-file-modified-sort="1761717850998" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4759">
+<div class="quarto-post image-right" data-index="15" data-categories="UiUyQ0tlcm5lbCUyMERlbnNpdHk=" data-listing-date-sort="1760338800000" data-listing-file-modified-sort="1761717850998" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4759">
 <div class="thumbnail"><a href="./posts/kerneldensity/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/kerneldensity/plot1.png" class="thumbnail-image">
@@ -880,7 +915,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="15" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1759215600000" data-listing-file-modified-sort="1761717723561" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1974">
+<div class="quarto-post image-right" data-index="16" data-categories="UiUyQ1NOQQ==" data-listing-date-sort="1759215600000" data-listing-file-modified-sort="1761717723561" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1974">
 <div class="thumbnail"><a href="./posts/snapart1/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/snapart1/sna1.png" class="thumbnail-image">
@@ -912,7 +947,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="16" data-categories="UiUyQ1N1cnZpdmFsJTIwQW5hbHlzaXM=" data-listing-date-sort="1752994800000" data-listing-file-modified-sort="1753063865201" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4389">
+<div class="quarto-post image-right" data-index="17" data-categories="UiUyQ1N1cnZpdmFsJTIwQW5hbHlzaXM=" data-listing-date-sort="1752994800000" data-listing-file-modified-sort="1753063865201" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4389">
 <div class="thumbnail"><a href="./posts/survivalpart2/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/survivalpart2/survival2.jpg" class="thumbnail-image">
@@ -944,7 +979,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="17" data-categories="UiUyQ1N1cnZpdmFsJTIwQW5hbHlzaXM=" data-listing-date-sort="1752044400000" data-listing-file-modified-sort="1752080311891" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1453">
+<div class="quarto-post image-right" data-index="18" data-categories="UiUyQ1N1cnZpdmFsJTIwQW5hbHlzaXM=" data-listing-date-sort="1752044400000" data-listing-file-modified-sort="1752080311891" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1453">
 <div class="thumbnail"><a href="./posts/survivalpart1/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/survivalpart1/survival1.jpg" class="thumbnail-image">
@@ -976,7 +1011,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="18" data-categories="UiUyQ0NyaXRpY2FsJTIwUXVhbnQ=" data-listing-date-sort="1750834800000" data-listing-file-modified-sort="1750919574208" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4021">
+<div class="quarto-post image-right" data-index="19" data-categories="UiUyQ0NyaXRpY2FsJTIwUXVhbnQ=" data-listing-date-sort="1750834800000" data-listing-file-modified-sort="1750919574208" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4021">
 <div class="thumbnail"><a href="./posts/racecode/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/racecode/racecode.jpg" class="thumbnail-image">
@@ -1008,7 +1043,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="19" data-categories="U05BJTJDQ2F1c2FsJTIwSW5mZXJlbmNl" data-listing-date-sort="1750402800000" data-listing-file-modified-sort="1759360381801" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="12">
+<div class="quarto-post image-right" data-index="20" data-categories="U05BJTJDQ2F1c2FsJTIwSW5mZXJlbmNl" data-listing-date-sort="1750402800000" data-listing-file-modified-sort="1759360381801" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="12">
 <div class="thumbnail"><a href="./posts/ci-with-networkdata/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/ci-with-networkdata/snaimage.jpg" class="thumbnail-image">
@@ -1040,7 +1075,7 @@ Yingshi Huang, Shuhan (Alice) Ai, Kayla Teng, Detao Ma
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="20" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1747465200000" data-listing-file-modified-sort="1766571268068" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="46" data-listing-word-count-sort="9118">
+<div class="quarto-post image-right" data-index="21" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1747465200000" data-listing-file-modified-sort="1766571268068" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="46" data-listing-word-count-sort="9118">
 <div class="thumbnail"><a href="./posts/ci_did rdd/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/ci_did rdd/p1.png" class="thumbnail-image">
@@ -1072,7 +1107,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="21" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1746860400000" data-listing-file-modified-sort="1767306280508" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="34" data-listing-word-count-sort="6666">
+<div class="quarto-post image-right" data-index="22" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1746860400000" data-listing-file-modified-sort="1767306280508" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="34" data-listing-word-count-sort="6666">
 <div class="thumbnail"><a href="./posts/ci_weighting/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/ci_weighting/f1.png" class="thumbnail-image">
@@ -1104,7 +1139,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="22" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1746169200000" data-listing-file-modified-sort="1766485744166" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="36" data-listing-word-count-sort="7148">
+<div class="quarto-post image-right" data-index="23" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1746169200000" data-listing-file-modified-sort="1766485744166" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="36" data-listing-word-count-sort="7148">
 <div class="thumbnail"><a href="./posts/ci_matching/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/ci_matching/p1.png" class="thumbnail-image">
@@ -1136,7 +1171,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="23" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1745737200000" data-listing-file-modified-sort="1766397294364" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2632">
+<div class="quarto-post image-right" data-index="24" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1745737200000" data-listing-file-modified-sort="1766397294364" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2632">
 <div class="thumbnail"><a href="./posts/ci_scm/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/ci_scm/p1.png" class="thumbnail-image">
@@ -1168,10 +1203,10 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="24" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1744959600000" data-listing-file-modified-sort="1764107513388" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2787">
+<div class="quarto-post image-right" data-index="25" data-categories="UiUyQ0NhdXNhbCUyMEluZmVyZW5jZQ==" data-listing-date-sort="1744959600000" data-listing-file-modified-sort="1764107513388" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2787">
 <div class="thumbnail"><a href="./posts/ci_po/index.html" class="no-external">
 
-<img loading="lazy" src="./posts/ci_po/1.png" class="thumbnail-image">
+<img loading="lazy" data-src="./posts/ci_po/1.png" class="thumbnail-image">
 
 </a></div>
 <div class="body">
@@ -1200,7 +1235,7 @@ Shuhan (Alice) Ai
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="25" data-listing-date-sort="1743490800000" data-listing-file-modified-sort="1764103718029" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="195">
+<div class="quarto-post image-right" data-index="26" data-listing-date-sort="1743490800000" data-listing-file-modified-sort="1764103718029" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="195">
 <div class="thumbnail"><a href="./posts/welcome/index.html" class="no-external">
 
 <p class="card-img-top"><img data-src="posts/welcome/welcome.jpg"  class="thumbnail-image card-img"/></p>
@@ -1295,13 +1330,14 @@ Shuhan (Alice) Ai
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

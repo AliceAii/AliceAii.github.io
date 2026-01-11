@@ -2,13 +2,14 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/ml_regression/index.html",
       "/posts/snapart10/index.html",
       "/posts/scicarasp/index.html",
       "/posts/snapart9/index.html",
       "/posts/snapart8/index.html",
       "/posts/webscrap/index.html",
       "/posts/snapart7/index.html",
-      "/posts/ml/index.html",
+      "/posts/ml_compare/index.html",
       "/posts/snapart6/index.html",
       "/posts/callcinr/index.html",
       "/posts/snapart5/index.html",
