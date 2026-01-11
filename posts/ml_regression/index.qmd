@@ -1,5 +1,5 @@
 ---
-title: "Machine Learning Methods: Regression"
+title: "Machine Learning Methods: Regression & Prediction"
 author: Shuhan (Alice) Ai
 date: "2026-01-10"
 categories: [R, ML]
@@ -14,7 +14,7 @@ output:
     self_contained: true
 ---
 
-Machine learning begins with a simple yet profound idea: **predicting one thing from another**. This chapter explores how we can build increasingly sophisticated models, starting from the humblest linear regression to more complex piecewise linear models and classification algorithms.
+Machine learning begins with a simple yet profound idea: predicting one thing from another. This chapter explores how we can build increasingly sophisticated models, starting from the humblest linear regression to more complex piecewise linear models and classification algorithms.
 
 The beauty of regression lies not just in its mathematical elegance, but in how it provides a **unified framework** for understanding modern machine learning. As we'll see, concepts like loss functions, gradient descent, and overparameterization, which are central to deep learning, emerge naturally from classical regression.
 
