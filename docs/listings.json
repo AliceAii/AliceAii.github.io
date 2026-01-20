@@ -2,6 +2,7 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/ml_gradient/index.html",
       "/posts/ml_regression/index.html",
       "/posts/snapart10/index.html",
       "/posts/scicarasp/index.html",
