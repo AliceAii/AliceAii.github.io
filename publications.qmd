@@ -22,9 +22,21 @@ format:
 
 Jiang, T., **Ai, S.**, Jiao, C., Li, K. (under review). Revealing Hidden Contributions on Research Data: The Potential of Data Paper. *Scientometrics.*
 
+-----
+
 **Published:**
 
 **Ai, S.** (2024). Empowering Online Teaching: A System Review of Online Instructors’ Professional Development in Higher Education. *InterActions: UCLA Journal of Education and Information Studies, 19*(1). <https://doi.org/10.5070/D41.6661>
+
+------
+
+**Preprint:**
+
+**Ai, S.** (2026). Discussion Network Formation and Evolution in an Online Professional Development Class: Evidence from a MOOC for K-12 Educators. *arXiv preprint*.<https://arxiv.org/abs/2601.01117>
+
+---------
+
+**Research Report:**
 
 Omery, F., Montes-Diaz, I., **Ai, S.** (2023). City Fiscal Conditions. *National League of Cities.*  
 <https://www.nlc.org/resource/city-fiscal-conditions-2023/>
