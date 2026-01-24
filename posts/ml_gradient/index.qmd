@@ -72,26 +72,28 @@ The answer lies in **Maximum Likelihood Estimation (MLE)**, we find parameters t
 
 In normal regression, we assume our observations come from a simple story:
 
-$$y_i = s_i + e_i, \quad e_i \sim \mathcal{N}(0, \sigma^2) \text{ i.i.d.}$$
-::: callout-note
+$$y_i = s_i + e_i, \quad e_i \sim \mathcal{N}(0, \sigma^2) \text{ i.i.d.}$$ 
+
+::: callout-note 
+
 Intuition: The "True Value Plus Noise" Model
 
-Imagine you're measuring people's heights with a slightly wobbly ruler:
+Think of any real-world quantity you want to predict height, income, test scores, house prices. There is a true underlying value, but what we record is never perfectly exact.
 
--   **True height** (what we're trying to predict): $s_i$
--   **Measurement noise** (random error): $e_i$
--   **What we observe**: $y_i = s_i + e_i$
+-   **$s_i$(truth - what we're trying to predict)** :  $s_i = x_i^\top \beta$. This is the ideal value we wish we could observe. In regression, it’s the systematic part explained by the model (for example, a linear function of predictors).
+-   **$e_i$ (noise or error)**: This represents all the small, unpredictable factors we didn’t (or couldn’t) model: measurement imperfections, random fluctuations, omitted variables, human error, etc.
+-   **$y_i = s_i + e_i$ (what we observe)**: true signal plus noise.
 
 The noise $e_i$ follows a bell curve (normal distribution) centered at zero—sometimes we measure a bit high, sometimes a bit low, but on average we're correct. This is why it's called "normal" regression. 
 :::
 
 This means each observation follows a normal distribution centered at our prediction:
 
-$$P_\beta(y_i \mid \mathbf{x}_i) \sim \mathcal{N}(s_i, \sigma^2)$$
+$$P_\beta(y_i \mid \mathbf{s}_i) \sim \mathcal{N}(s_i, \sigma^2)$$
 
 Recall the probability density function for a normal distribution:
 
-$$P(y) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y-\mu)^2}{2\sigma^2}\right)$$
+$$P(y_i|s_i) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i-s_i)^2}{2\sigma^2}\right)$$
 
 ```{python}
 #| label: fig-normal-intuition
@@ -153,7 +155,7 @@ plt.show()
 
 The log-likelihood sums the log-probabilities across all observations:
 
-$$J(\boldsymbol{\beta}) = \sum_{i=1}^{n} \log P_\beta(y_i | \mathbf{x}_i) = -\sum_{i=1}^{n} \left[ \frac{(y_i - s_i)^2}{2\sigma^2} + \log \sqrt{2\pi\sigma^2} \right]$$
+$$J(\boldsymbol{\beta}) = \sum_{i=1}^{n} \log P_\beta(y_i | s_i) = -\sum_{i=1}^{n} \left[ \frac{(y_i - s_i)^2}{2\sigma^2} + \log \sqrt{2\pi\sigma^2} \right]$$
 
 Simplifying:
 
@@ -165,7 +167,6 @@ Since $\sigma^2$ and the constant term don't depend on $\boldsymbol{\beta}$:
 
 $$\hat{\boldsymbol{\beta}}_{\text{MLE}} = \arg\max_{\boldsymbol{\beta}} J(\boldsymbol{\beta}) = \arg\min_{\boldsymbol{\beta}} \frac{1}{2} \sum_{i=1}^{n} (y_i - s_i)^2$$
 
-
 ::: callout-note
 The Least Squares Connection
 
@@ -173,7 +174,7 @@ Maximizing the Gaussian log-likelihood is equivalent to minimizing the least squ
 
 $$L(\boldsymbol{\beta}) = \frac{1}{2} \sum_{i=1}^{n} (y_i - s_i)^2$$
 
-If you believe your data has bell-curve noise, then finding the "most likely" parameters is the same as finding parameters that minimize squared errors. 
+If you believe your data has bell-curve noise, then finding the "most likely" parameters is the same as finding parameters that minimize squared errors.
 :::
 
 ### 1.3 Logistic Regression: Deriving the Log-Likelihood
@@ -259,11 +260,9 @@ We can write the likelihood for any $y_i \in \{0, 1\}$ as:
 $$P(y_i | s_i) = \frac{e^{y_i s_i}}{1 + e^{s_i}}$$
 
 ::: callout-note
-Why Does This Formula Work?
-Let's verify by plugging in values:
+Why Does This Formula Work? Let's verify by plugging in values:
 
-**When** $y_i = 1$ (actual answer is "yes"): $$P(y_i=1 | s_i) = \frac{e^{1 \cdot s_i}}{1 + e^{s_i}} = \frac{e^{s_i}}{1 + e^{s_i}} = p_i$$
-**When** $y_i = 0$ (actual answer is "no"): $$P(y_i=0 | s_i) = \frac{e^{0 \cdot s_i}}{1 + e^{s_i}} = \frac{1}{1 + e^{s_i}} = 1 - p_i$$
+**When** $y_i = 1$ (actual answer is "yes"): $$P(y_i=1 | s_i) = \frac{e^{1 \cdot s_i}}{1 + e^{s_i}} = \frac{e^{s_i}}{1 + e^{s_i}} = p_i$$ **When** $y_i = 0$ (actual answer is "no"): $$P(y_i=0 | s_i) = \frac{e^{0 \cdot s_i}}{1 + e^{s_i}} = \frac{1}{1 + e^{s_i}} = 1 - p_i$$
 :::
 
 **The Log-Likelihood:**
@@ -281,10 +280,8 @@ Intuition: What is a Gradient?
 
 Imagine you're blindfolded on a hilly landscape, trying to find the lowest point (minimum loss).
 
-The **gradient** tells you two things: 1. **Which direction** is uphill (steepest increase) 2. **How steep** the hill is.
-To minimize, you walk **opposite** to the gradient—that's gradient descent.
+The **gradient** tells you two things: 1. **Which direction** is uphill (steepest increase) 2. **How steep** the hill is. To minimize, you walk **opposite** to the gradient—that's gradient descent.
 :::
-
 
 ```{python}
 #| label: fig-gradient-intuition
@@ -346,7 +343,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-
 Let's compute gradients for both models using the **chain rule**.
 
 **For Normal Regression (minimizing** $L$):
@@ -361,8 +357,7 @@ Therefore: $$\frac{\partial L_i}{\partial \boldsymbol{\beta}} = -\mathbf{x}_i e_
 
 Define $e_i = y_i - p_i$ (actual outcome minus predicted probability). The chain rule gives:
 
-$$\frac{\partial J_i}{\partial s_i} = y_i - \frac{e^{s_i}}{1 + e^{s_i}} = y_i - p_i = e_i, \quad \frac{\partial s_i}{\partial \boldsymbol{\beta}} = \mathbf{x}_i$$
-Therefore: $$\frac{\partial J_i}{\partial \boldsymbol{\beta}} = \mathbf{x}_i e_i$$
+$$\frac{\partial J_i}{\partial s_i} = y_i - \frac{e^{s_i}}{1 + e^{s_i}} = y_i - p_i = e_i, \quad \frac{\partial s_i}{\partial \boldsymbol{\beta}} = \mathbf{x}_i$$ Therefore: $$\frac{\partial J_i}{\partial \boldsymbol{\beta}} = \mathbf{x}_i e_i$$
 
 ### 2.2 The Unified Update Rule
 
@@ -388,15 +383,15 @@ $$\boldsymbol{\beta}^{(t+1)} = \boldsymbol{\beta}^{(t)} + \eta_t \sum_{i=1}^{n} 
 where $\eta_t$ is the learning rate at step $t$.
 
 ::: callout-note
- For each training example, we ask:
+For each training example, we ask:
 
-1.  **How wrong were we?**  That's $e_i$
-2.  **Who's responsible?**  The features $\mathbf{x}_i$ that influenced this prediction
+1.  **How wrong were we?** That's $e_i$
+2.  **Who's responsible?** The features $\mathbf{x}_i$ that influenced this prediction
 
 The gradient $\mathbf{x}_i e_i$ says: "Adjust parameters in proportion to both the error and the features that caused it."
 
-- If $e_i > 0$ (we under-predicted), and $x_{ij} > 0$, then increasing $\beta_j$ would have helped 
-- If $e_i < 0$ (we over-predicted), and $x_{ij} > 0$, then decreasing $\beta_j$ would have helped 
+-   If $e_i > 0$ (we under-predicted), and $x_{ij} > 0$, then increasing $\beta_j$ would have helped
+-   If $e_i < 0$ (we over-predicted), and $x_{ij} > 0$, then decreasing $\beta_j$ would have helped
 :::
 
 ## 3. Matrix Regression and Associative Memory
@@ -408,10 +403,10 @@ Intuition: Predicting Multiple Things at Once
 
 So far, we've predicted a single number. But what if we want to predict multiple outputs simultaneously?
 
-**Examples:** 
+**Examples:**
 
-- **Multi-task learning:** Input = student features; Output = (math score, reading score, writing score) 
-- **Neural network layers:** Input = previous layer activations; Output = next layer activations
+-   **Multi-task learning:** Input = student features; Output = (math score, reading score, writing score)
+-   **Neural network layers:** Input = previous layer activations; Output = next layer activations
 
 Instead of a weight vector $\boldsymbol{\beta}$, we need a **weight matrix** $\mathbf{W}$.
 :::
@@ -451,14 +446,13 @@ In matrix form, this becomescompact:
 $$L'(\mathbf{W}) = -\sum_{i=1}^{n} \mathbf{e}_i \mathbf{x}_i^\top$$
 
 ::: callout-note
-For Matrix Gradient Descent, the update rule generalizes: 
-$\mathbf{W}^{(t+1)} = \mathbf{W}^{(t)} + \eta_t \sum_{i=1}^{n} \mathbf{e}_i^{(t)} \mathbf{x}_i^\top, \text{where }\mathbf{e}_i^{(t)} = \mathbf{y}_i - \mathbf{W}^{(t)}\mathbf{x}_i$
+For Matrix Gradient Descent, the update rule generalizes: $\mathbf{W}^{(t+1)} = \mathbf{W}^{(t)} + \eta_t \sum_{i=1}^{n} \mathbf{e}_i^{(t)} \mathbf{x}_i^\top, \text{where }\mathbf{e}_i^{(t)} = \mathbf{y}_i - \mathbf{W}^{(t)}\mathbf{x}_i$
 
-**Notice:** The structure is identical to scalar regression. We just replaced: 
+**Notice:** The structure is identical to scalar regression. We just replaced:
 
-- Scalar error $e_i$ to Vector error $\mathbf{e}_i$ 
-- Scalar input $x_i$ to Vector input $\mathbf{x}_i$\
-- Vector weights $\boldsymbol{\beta}$ to Matrix weights $\mathbf{W}$
+-   Scalar error $e_i$ to Vector error $\mathbf{e}_i$
+-   Scalar input $x_i$ to Vector input $\mathbf{x}_i$\
+-   Vector weights $\boldsymbol{\beta}$ to Matrix weights $\mathbf{W}$
 :::
 
 ### 3.3 Associative Memory: An Application
@@ -480,16 +474,15 @@ Associative Memory: "Content-Addressable" Storage
 
 The matrix $\mathbf{W}$ acts as associative memory: given key $\mathbf{x}_k$, it retrieves the associated value $\mathbf{y}_k$.
 
-Unlike computer memory: 
+Unlike computer memory:
 
-- Computer: "Give me item at address 42" (location-based) 
-- Associative memory: "Give me the item that goes with this pattern" (content-based)
+-   Computer: "Give me item at address 42" (location-based)
+-   Associative memory: "Give me the item that goes with this pattern" (content-based)
 :::
-
 
 ## 4. Regularization: Taming Overparameterization
 
-### 4.1 The Problem: Too Much Flexibility
+### 4.1 The Problem: Overfitting
 
 ::: callout-note
 More parameters = more flexibility = better fit to training data... but worse predictions on new data
@@ -553,16 +546,15 @@ plt.show()
 
 Let's build a flexible model that can capture nonlinear patterns. Given 1D input $x_i^{\text{raw}}$, we create **ReLU-like** (Rectified Linear Unit) features:
 
-$$x_{ij} = \max(0, x_i^{\text{raw}} - a_j)$$
-where $(a_1, a_2, \ldots, a_p)$ are equally spaced change points (knots).
+$$x_{ij} = \max(0, x_i^{\text{raw}} - a_j)$$ where $(a_1, a_2, \ldots, a_p)$ are equally spaced change points (knots).
 
 ::: callout-note
 Intuition: Building with LEGO Ramps
 
-Imagine you're building a shape using LEGO pieces, but you only have "ramp" pieces that: 
+Imagine you're building a shape using LEGO pieces, but you only have "ramp" pieces that:
 
-- Are flat (zero) until some point $a_j$ 
-- Then slope upward after that point
+-   Are flat (zero) until some point $a_j$
+-   Then slope upward after that point
 
 Each ramp $\max(0, x - a_j)$ is like a hinge that activates at position $a_j$.
 
@@ -570,18 +562,18 @@ By combining many ramps with different weights, you can approximate any smooth c
 
 To build something complex, you only need to adjust two things for each "ramp":
 
-* **The Starting Point (Bias):** This tells the ramp *where* to wake up on the x-axis. 
-* **The Slope (Weight):** This determines *how steep* the ramp climbs or if it goes downward instead of upward.
+-   **The Starting Point (Bias):** This tells the ramp *where* to wake up on the x-axis.
+-   **The Slope (Weight):** This determines *how steep* the ramp climbs or if it goes downward instead of upward.
 :::
 
 The model becomes:
 
 $$s_i = f(x_i^{\text{raw}}) = \beta_0 + \sum_{j=1}^{p} x_{ij} \beta_j$$
 
-Each $\beta_j$ controls the **change in slope** at knot $a_j$: 
+Each $\beta_j$ controls the **change in slope** at knot $a_j$:
 
-- Positive $\beta_j$: slope increases (bend upward) - Negative $\beta_j$: slope decreases (bend downward) 
-- Zero $\beta_j$: no change (straight through)
+-   Positive $\beta_j$: slope increases (bend upward) - Negative $\beta_j$: slope decreases (bend downward)
+-   Zero $\beta_j$: no change (straight through)
 
 ```{python}
 #| label: fig-relu-approximation
@@ -664,7 +656,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-
 ### 4.3 The Solution: Ridge Regularization (L2 Penalty)
 
 With many knots ($p$ large), our model becomes **overparameterized**. The solution: **penalize large coefficients!**
@@ -672,25 +663,24 @@ With many knots ($p$ large), our model becomes **overparameterized**. The soluti
 $$L(\boldsymbol{\beta}) = \underbrace{\sum_{i=1}^{n} (y_i - s_i)^2}_{\text{fit the data}} + \underbrace{\lambda \sum_{j=1}^{p} \beta_j^2}_{\text{keep coefficients small}}$$
 
 ::: callout-note
-## Intuition: The Simplicity Tax
+Intuition: The Simplicity Tax
 
-Think of $\lambda$ as a "tax" on complexity: 
+Think of $\lambda$ as a "tax" on complexity:
 
-- **Low tax (**$\lambda$ small): Model can use big coefficients freely → wiggly fit 
-- **High tax (**$\lambda$ large): Big coefficients are expensive → smoother fit
+-   **Low tax (**$\lambda$ small): Model can use big coefficients freely → wiggly fit
+-   **High tax (**$\lambda$ large): Big coefficients are expensive → smoother fit
 
-**In this piecewise linear context:** 
+**In this piecewise linear context:**
 
-- Each $\beta_j$ controls a "kink" in the curve 
-- Penalizing $\beta_j^2$ makes kinks smaller 
-- Result: smoother, more gradual curves
+-   Each $\beta_j$ controls a "kink" in the curve
+-   Penalizing $\beta_j^2$ makes kinks smaller
+-   Result: smoother, more gradual curves
 :::
 
-
-**The Role of $\lambda$ (Regularization Strength)**
+**The Role of** $\lambda$ (Regularization Strength)
 
 | $\lambda$ value   | Behavior                        | Risk                    |
-|------------------|------------------------------|-----------------------|
+|-------------------|------------------------------|-----------------------|
 | $\lambda = 0$     | No penalty, maximum flexibility | **Overfitting**         |
 | $\lambda$ small   | Light penalty, mostly flexible  | Slight regularization   |
 | $\lambda$ optimal | Balanced fit and smoothness     | **Best generalization** |
@@ -698,7 +688,258 @@ Think of $\lambda$ as a "tax" on complexity:
 
 Finding the right $\lambda$ is crucial. Typically done via cross-validation.
 
-### 4.4 Gradient Descent with Regularization
+### 4.4 Other Types of Regulation
+
+The Three Types of Regularization: L2, L1, and L0
+
+The L2 (Ridge) penalty we just discussed is just one member of a family of regularization techniques. Let's explore all three and understand when to use each.
+
+#### The General Form
+
+All regularization methods add a penalty term to the loss function:
+
+$$L(\boldsymbol{\beta}) = \sum_{i=1}^{n} (y_i - \mathbf{x}_i^\top \boldsymbol{\beta})^2 + \lambda \cdot \text{Penalty}(\boldsymbol{\beta})$$
+
+The key difference is **what we penalize**:
+
+| Method | Penalty Term | Mathematical Form |
+|-----------------|-----------------------|--------------------------------|
+| **L2 (Ridge)** | Sum of squared coefficients | $\lambda \sum_{j=1}^{p} \beta_j^2$ |
+| **L1 (Lasso)** | Sum of absolute coefficients | $\lambda \sum_{j=1}^{p} |\beta_j|$ |
+| **L0** | Count of non-zero coefficients | $\lambda \sum_{j=1}^{p} \mathbf{1}(\beta_j \neq 0)$ |
+
+#### L2 Regularization (Ridge Regression): Smooth Solutions
+
+$$L(\boldsymbol{\beta}) = \sum_{i=1}^{n} (y_i - \mathbf{x}_i^\top \boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{p} \beta_j^2$$
+
+**What it does:**
+
+-   Shrinks all coefficients toward zero
+-   But coefficients never become exactly zero
+-   Results in **smooth** solutions where all features contribute a little
+
+**When to use:**
+
+-   When you believe all features are relevant
+-   When you want stable predictions (small changes in data → small changes in model)
+-   When features are correlated (Ridge handles multicollinearity well)
+
+::: callout-tip
+Mathematical Insight: Why Ridge Never Zeros Out Coefficients
+
+The gradient of the L2 penalty is $\frac{\partial}{\partial \beta_j}(\beta_j^2) = 2\beta_j$.
+
+As $\beta_j \to 0$, the gradient also $\to 0$, so there's less and less "push" toward zero. The coefficient approaches zero but never quite reaches it—like an asymptote.
+:::
+
+#### L1 Regularization (Lasso): Sparse Solutions
+
+$$L(\boldsymbol{\beta}) = \sum_{i=1}^{n} (y_i - \mathbf{x}_i^\top \boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{p} |\beta_j|$$
+
+**What it does:**
+
+-   Shrinks coefficients toward zero
+-   Actually sets some coefficients exactly to zero
+-   Results in **sparse** solutions (automatic feature selection)
+
+**When to use:**
+
+-   When you suspect only a few features truly matter
+-   When you want interpretable models (fewer non-zero coefficients)
+-   For feature selection (identify which variables are important)
+
+::: callout-tip
+Mathematical Insight: Why Lasso Creates Zeros
+
+The gradient of the L1 penalty is $\frac{\partial}{\partial \beta_j}|\beta_j| = \text{sign}(\beta_j)$ (either $+1$ or $-1$).
+
+This is a **constant push** toward zero, regardless of how small $\beta_j$ already is. Unlike L2, the "force" doesn't weaken as you approach zero—so coefficients can actually reach zero and stay there.
+
+**Note:** L1 is still convex (the absolute value function forms a "V" shape), which means optimization is tractable.
+:::
+
+#### L0 Regularization: Direct Sparsity (The Ideal but Hard Case)
+
+$$L(\boldsymbol{\beta}) = \sum_{i=1}^{n} (y_i - \mathbf{x}_i^\top \boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{p} \mathbf{1}(\beta_j \neq 0)$$
+
+where $\mathbf{1}(\beta_j \neq 0) = \begin{cases} 1 & \text{if } \beta_j \neq 0 \\ 0 & \text{if } \beta_j = 0 \end{cases}$
+
+**What it does:**
+
+-   Directly counts how many coefficients are non-zero
+-   The "purest" form of variable selection
+-   Exactly what we want for finding the smallest set of predictive features
+
+**The problem:**
+
+-   **Non-convex** and **NP-hard** to optimize!
+-   Would require checking all $2^p$ possible subsets of features
+-   Computationally infeasible for large $p$
+
+
+::: callout-note
+Why L1 Approximates L0
+
+Since L0 is computationally intractable, we use **L1 as a convex relaxation**:
+
+-   L1 is the "closest" convex penalty to L0
+-   L1 still produces sparse solutions (many exact zeros)
+-   L1 can be optimized efficiently
+
+This is why Lasso is so popular in high-dimensional statistics, it gives us practical sparsity.
+:::
+
+#### Visual Comparison: How Each Penalty Shapes Solutions
+
+```{python}
+#| label: fig-regularization-comparison
+#| fig-cap: "The different shapes of three regularization penalties"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 3, figsize=(8.5, 3))
+
+beta = np.linspace(-3, 3, 200)
+
+# L2 penalty
+axes[0].plot(beta, beta**2, 'b-', linewidth=1.5)
+axes[0].fill_between(beta, 0, beta**2, alpha=0.2, color='blue')
+axes[0].set_xlabel('$\\beta_j$', fontsize=9)
+axes[0].set_ylabel('Penalty', fontsize=9)
+axes[0].set_title('L2 (Ridge): $\\beta_j^2$\nSmooth, never zero', fontsize=9)
+axes[0].axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+axes[0].axvline(x=0, color='gray', linestyle='-', alpha=0.3)
+axes[0].grid(True, alpha=0.3)
+axes[0].set_ylim(-0.5, 9)
+
+# L1 penalty  
+axes[1].plot(beta, np.abs(beta), 'r-', linewidth=1.5)
+axes[1].fill_between(beta, 0, np.abs(beta), alpha=0.2, color='red')
+axes[1].set_xlabel('$\\beta_j$', fontsize=9)
+axes[1].set_ylabel('Penalty', fontsize=9)
+axes[1].set_title('L1 (Lasso): $|\\beta_j|$\nCorner at zero → sparsity', fontsize=9)
+axes[1].axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+axes[1].axvline(x=0, color='gray', linestyle='-', alpha=0.3)
+axes[1].scatter([0], [0], color='red', s=100, zorder=5, marker='v')
+axes[1].annotate('Sharp corner\npushes to zero', xy=(0, 0), xytext=(1, 1.5),
+                fontsize=8, arrowprops=dict(arrowstyle='->', color='red'))
+axes[1].grid(True, alpha=0.3)
+axes[1].set_ylim(-0.5, 3)
+
+# L0 penalty
+l0_penalty = np.where(beta != 0, 1, 0)
+# For visualization, show as step function
+beta_neg = beta[beta < -0.1]
+beta_pos = beta[beta > 0.1]
+axes[2].hlines(y=1, xmin=-3, xmax=-0.05, colors='green', linewidth=1.5)
+axes[2].hlines(y=1, xmin=0.05, xmax=3, colors='green', linewidth=1.5)
+axes[2].scatter([0], [0], color='green', s=150, zorder=5)
+axes[2].scatter([-0.05, 0.05], [1, 1], color='green', s=100, zorder=5, facecolors='none', linewidths=1.5)
+axes[2].fill_between([-3, -0.05], 0, 1, alpha=0.2, color='green')
+axes[2].fill_between([0.05, 3], 0, 1, alpha=0.2, color='green')
+axes[2].set_xlabel('$\\beta_j$', fontsize=9)
+axes[2].set_ylabel('Penalty', fontsize=9)
+axes[2].set_title('L0: $\\mathbf{1}(\\beta_j \\neq 0)$\nDirect count (non-convex)', fontsize=9)
+axes[2].axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+axes[2].axvline(x=0, color='gray', linestyle='-', alpha=0.3)
+axes[2].annotate('Only zero\nhas no cost', xy=(0, 0), xytext=(-1.5, 0.3),
+                fontsize=8, arrowprops=dict(arrowstyle='->', color='green'))
+axes[2].grid(True, alpha=0.3)
+axes[2].set_ylim(-0.2, 1.5)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+```{python}
+#| label: fig-constraint-geometry
+#| fig-cap: "Geometric view"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(8.5, 5))
+
+# Create contour levels for a quadratic loss (ellipses)
+beta1 = np.linspace(-2, 2, 100)
+beta2 = np.linspace(-2, 2, 100)
+B1, B2 = np.meshgrid(beta1, beta2)
+
+# Loss function (shifted minimum for visualization)
+Loss = (B1 - 1.2)**2 + 2*(B2 - 0.8)**2
+
+# L2 constraint (circle)
+theta = np.linspace(0, 2*np.pi, 100)
+r = 1.0
+circle_x = r * np.cos(theta)
+circle_y = r * np.sin(theta)
+
+axes[0].contour(B1, B2, Loss, levels=15, cmap='Blues', alpha=0.7)
+axes[0].fill(circle_x, circle_y, alpha=0.3, color='blue', label='L2 constraint: $\\beta_1^2 + \\beta_2^2 \\leq t$')
+axes[0].plot(circle_x, circle_y, 'b-', linewidth=2)
+axes[0].scatter([1.2], [0.8], color='red', s=100, marker='*', zorder=5, label='Unconstrained optimum')
+
+# Find intersection point (approximate)
+t = 0.72
+axes[0].scatter([t*np.cos(0.6)], [t*np.sin(0.6)], color='green', s=150, marker='o', zorder=5, 
+               label='Constrained optimum')
+axes[0].annotate('Both $\\beta_1, \\beta_2 \\neq 0$', xy=(t*np.cos(0.6)+0.1, t*np.sin(0.6)+0.1),
+                fontsize=10, color='green')
+
+axes[0].set_xlabel('$\\beta_1$', fontsize=12)
+axes[0].set_ylabel('$\\beta_2$', fontsize=12)
+axes[0].set_title('L2 (Ridge): Circle Constraint\nSolution rarely on axis', fontsize=12)
+axes[0].legend(loc='upper right', fontsize=9)
+axes[0].set_xlim(-2, 2)
+axes[0].set_ylim(-2, 2)
+axes[0].axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+axes[0].axvline(x=0, color='gray', linestyle='-', alpha=0.3)
+axes[0].set_aspect('equal')
+axes[0].grid(True, alpha=0.3)
+
+# L1 constraint (diamond)
+diamond_x = [1, 0, -1, 0, 1]
+diamond_y = [0, 1, 0, -1, 0]
+
+axes[1].contour(B1, B2, Loss, levels=15, cmap='Blues', alpha=0.7)
+axes[1].fill(diamond_x, diamond_y, alpha=0.3, color='red', label='L1 constraint: $|\\beta_1| + |\\beta_2| \\leq t$')
+axes[1].plot(diamond_x, diamond_y, 'r-', linewidth=2)
+axes[1].scatter([1.2], [0.8], color='red', s=100, marker='*', zorder=5, label='Unconstrained optimum')
+
+# L1 solution hits corner
+axes[1].scatter([1], [0], color='green', s=150, marker='o', zorder=5, label='Constrained optimum')
+axes[1].annotate('$\\beta_2 = 0$ (sparse)', xy=(1.05, 0.05), fontsize=10, color='green')
+
+axes[1].set_xlabel('$\\beta_1$', fontsize=12)
+axes[1].set_ylabel('$\\beta_2$', fontsize=12)
+axes[1].set_title('L1 (Lasso): Diamond Constraint\nSolution likely on corner (axis)', fontsize=12)
+axes[1].legend(loc='upper right', fontsize=9)
+axes[1].set_xlim(-2, 2)
+axes[1].set_ylim(-2, 2)
+axes[1].axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+axes[1].axvline(x=0, color='gray', linestyle='-', alpha=0.3)
+axes[1].set_aspect('equal')
+axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+::: callout-note
+Intuition: Diamond vs Circle
+
+Imagine rolling a ball (the loss function contours) until it touches the constraint region:
+
+-   **Circle (L2):** The ball can touch anywhere on the smooth boundary, typically not on an axis
+-   **Diamond (L1):** The ball is likely to touch at a **corner**, corners are on the axes where some $\beta_j = 0$.
+
+This geometric insight explains why L1 produces sparse solutions while L2 doesn't.
+:::
+
+
+### 4.5 Gradient Descent with Regularization
 
 The gradient now includes the penalty term:
 
@@ -711,11 +952,11 @@ $$\beta_j^{(t+1)} = (1 - \eta_t \lambda) \beta_j^{(t)} + \eta_t \sum_{i=1}^{n} x
 ::: callout-note
 Intuition: Weight Decay
 
-Notice the factor $(1 - \eta_t \lambda)$ multiplying the old coefficient: 
+Notice the factor $(1 - \eta_t \lambda)$ multiplying the old coefficient:
 
-- This **shrinks** the coefficient toward zero at each step 
-- Called "**weight decay**" because weights gradually decay if not reinforced by data 
-- If the data doesn't strongly support a feature, its weight fades away
+-   This **shrinks** the coefficient toward zero at each step
+-   Called "**weight decay**" because weights gradually decay if not reinforced by data
+-   If the data doesn't strongly support a feature, its weight fades away
 
 The intercept $\beta_0$ is typically **not penalized** (we don't want to bias the overall mean): $$\beta_0^{(t+1)} = \beta_0^{(t)} + \eta_t \sum_{i=1}^{n} e_i^{(t)}$$
 :::
@@ -802,7 +1043,6 @@ plt.show()
 
 ## 5. Summary: Key Takeaways
 
-
 | Concept | Mathematical Form | Intuitive Explanation |
 |------------------------|------------------------|------------------------|
 | **From MLE to Loss** | $\max J(\beta) = \min L(\beta)$ | "Most likely parameters" = "smallest errors" |
@@ -812,9 +1052,6 @@ plt.show()
 | **Regularization** | $L + \lambda\|\boldsymbol{\beta}\|^2$ | "Simplicity tax" prevents overfitting |
 | **Weight Decay** | $(1-\eta\lambda)\beta$ | Unused features fade away |
 
-
----
+------------------------------------------------------------------------
 
 *This tutorial is based on lecture and homework materials from STATS M276A Pattern Recognition and Machine Learning (UCLA), taught by Professor [Ying Nian Wu](http://www.stat.ucla.edu/~ywu/) in Winter 2026.*
-
-
