@@ -38,12 +38,11 @@ Every Structural Causal Model (SCM) induces a three-level hierarchy:
 | **L2** | Interventional | $P(y \mid do(x))$ | **Doing** | "What if?" What if I do $X$? | If we mandate after-school tutoring, will grades improve? |
 | **L3** | Counterfactual | $P(y_x \mid x', y')$ | **Imagining** | "Why?" What if I had acted differently? | Given that the student failed, would they have passed if they had studied for one more hour? |
 
-
 **Level 1 (Observational/Associational)**: This is the realm of traditional statistics and machine learning. We observe data and ask questions about correlations and predictions. "Does high classroom attendance predict higher test scores?" This is what most predictive analytics do, they identify patterns without necessarily explaining what causes them.
 
-**Level 2 (Interventional)**: This level asks what happens when we *actively intervene* in the educational system. The key distinction is between **seeing** ($P(y|x)$) and **doing** ($P(y|do(x))$). When we merely observe that students who attend tutoring get good grades, that's "seeing." When we mandate that all students attend tutoring, we are "doing", we force $X$ to take the value $x$, changing the mechanism. This is the level of randomized controlled trials and new policy implementation.
+**Level 2 (Interventional)**: This level asks what happens when we *actively intervene* in the educational system. We move from **seeing** ($P(y|x)$) to **doing** ($P(y|do(x))$). When we merely observe that students who attend tutoring get good grades, that's "seeing." When we mandate that all students attend tutoring, we are "doing", we force $X$ to take the value $x$, changing the mechanism. This is the level of randomized controlled trials and new policy implementation.
 
-**Level 3 (Counterfactual)**: his is the most powerful level, allowing us to reason about what would have happened under different circumstances, even for specific individuals. "Given that this specific student failed the exam, would they have passed if they had studied for one more hour?" This requires reasoning about alternative worlds—imagining a scenario that conflicts with the observed reality (the student didn't study and did fail) to understand individual causality.
+**Level 3 (Counterfactual)**: This is the most powerful level, allowing us to reason about what would have happened under different circumstances, even for specific individuals. "Given that this specific student failed the exam, would they have passed if they had studied for one more hour?" This requires reasoning about alternative worlds—imagining a scenario that conflicts with the observed reality (the student didn't study and did fail) to understand individual causality.
 
 **PCH - Comparing to Human Cognitive Capabilities:**
 
@@ -229,7 +228,7 @@ Define the event as: $E$ represents cancer diagnosed early; $L$ means cancer dia
     \end{aligned}
     $$
 
-**(b)** Construct a probability distribution over three random variables $X, Y, Z$ such that $(X \perp\!\!\!\perp Y)$ but $(X \perp\!\!\!\perp | Z)$ does not hold. You can either describe the full joint distribution or their conditionals.
+**(b)** Construct a probability distribution over three random variables $X, Y, Z$ such that $(X \perp\!\!\!\perp Y)$ but $(X \perp\!\!\!\perp Y | Z)$ does not hold. You can either describe the full joint distribution or their conditionals.
 
 **Answer:**
 
@@ -473,11 +472,11 @@ Consider the two graphs below, $\mathcal{G}$ (left) and $\mathcal{G'}$ (right).
 
 **(a)** List the variables that are d-connected to $A$ given $\{B\}$ in $G$.
 
-**Answer:** ${C, F, H, I, E}$
+**Answer:** $\{C, F, H, I, E\}$
 
 **(b)** List the variables that are d-connected to $A$ given $\{J\}$ in $G'$.
 
-**Answer:** ${G, D, B, E, H}$
+**Answer:** $\{G, D, B, E, I, H\}$
 
 ### Exercise 6. d-Separation
 
@@ -513,12 +512,11 @@ $B$ & $E$ & $P(A=1|BE)$ & $A$ & $C$ & $P(M=1|AC)$ & $A$ & $S$ & $P(J=1|AS)$ \\ \
 
 Conditioning on $J$ opens the paths $S \leftrightarrow A$. The following variables remain d-separated:
 
-1.  $(S \perp\!\!\perp B \mid J)$
-2.  $(S \perp\!\!\perp E \mid J)$
-3.  $(S \perp\!\!\perp C \mid J)$
-4.  $(B \perp\!\!\perp C \mid J)$
+1.  $(S \perp\!\!\perp C \mid J)$
+2.  $(B \perp\!\!\perp C \mid J)$
+3.  $(E \perp\!\!\perp C \mid J)$
+4.  $(A \perp\!\!\perp C \mid J)$
 5.  $(B \perp\!\!\perp E \mid J)$
-6.  $(C \perp\!\!\perp E \mid J)$
 
 **(b)** Compute the given probabilities using the graph and the probability tables:
 
@@ -724,11 +722,11 @@ Let $G$ (shown below) be the causal diagram of some unknown model $M$ and let $P
 
 **(a)** Find a minimal set $A$ (if it exists) that d-separates $X$ and $W$.
 
-**Answer:** ${Z, S}$
+**Answer:** $\{Z, S\}$
 
 **(b)** Find a minimal set $A$ (if it exists) that d-separates $X$ and $S$.
 
-**Answer:** $\emptyset$
+**Answer:** $\{emptyset\}$
 
 **(c)** Find all minimal sets $A$ (if any exists) that d-separate $Z$ and $Y$.
 

@@ -482,8 +482,8 @@ window.Quarto = {
 </tbody>
 </table>
 <p><strong>Level 1 (Observational/Associational)</strong>: This is the realm of traditional statistics and machine learning. We observe data and ask questions about correlations and predictions. “Does high classroom attendance predict higher test scores?” This is what most predictive analytics do, they identify patterns without necessarily explaining what causes them.</p>
-<p><strong>Level 2 (Interventional)</strong>: This level asks what happens when we <em>actively intervene</em> in the educational system. The key distinction is between <strong>seeing</strong> (<span class="math inline">\(P(y|x)\)</span>) and <strong>doing</strong> (<span class="math inline">\(P(y|do(x))\)</span>). When we merely observe that students who attend tutoring get good grades, that’s “seeing.” When we mandate that all students attend tutoring, we are “doing”, we force <span class="math inline">\(X\)</span> to take the value <span class="math inline">\(x\)</span>, changing the mechanism. This is the level of randomized controlled trials and new policy implementation.</p>
-<p><strong>Level 3 (Counterfactual)</strong>: his is the most powerful level, allowing us to reason about what would have happened under different circumstances, even for specific individuals. “Given that this specific student failed the exam, would they have passed if they had studied for one more hour?” This requires reasoning about alternative worlds—imagining a scenario that conflicts with the observed reality (the student didn’t study and did fail) to understand individual causality.</p>
+<p><strong>Level 2 (Interventional)</strong>: This level asks what happens when we <em>actively intervene</em> in the educational system. We move from <strong>seeing</strong> (<span class="math inline">\(P(y|x)\)</span>) to <strong>doing</strong> (<span class="math inline">\(P(y|do(x))\)</span>). When we merely observe that students who attend tutoring get good grades, that’s “seeing.” When we mandate that all students attend tutoring, we are “doing”, we force <span class="math inline">\(X\)</span> to take the value <span class="math inline">\(x\)</span>, changing the mechanism. This is the level of randomized controlled trials and new policy implementation.</p>
+<p><strong>Level 3 (Counterfactual)</strong>: This is the most powerful level, allowing us to reason about what would have happened under different circumstances, even for specific individuals. “Given that this specific student failed the exam, would they have passed if they had studied for one more hour?” This requires reasoning about alternative worlds—imagining a scenario that conflicts with the observed reality (the student didn’t study and did fail) to understand individual causality.</p>
 <p><strong>PCH - Comparing to Human Cognitive Capabilities:</strong></p>
 <ul>
 <li>human: sensors + agency + retrospection</li>
@@ -683,7 +683,7 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 \end{aligned}
 \]</span></li>
 </ul>
-<p><strong>(b)</strong> Construct a probability distribution over three random variables <span class="math inline">\(X, Y, Z\)</span> such that <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span> but <span class="math inline">\((X \perp\!\!\!\perp | Z)\)</span> does not hold. You can either describe the full joint distribution or their conditionals.</p>
+<p><strong>(b)</strong> Construct a probability distribution over three random variables <span class="math inline">\(X, Y, Z\)</span> such that <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span> but <span class="math inline">\((X \perp\!\!\!\perp Y | Z)\)</span> does not hold. You can either describe the full joint distribution or their conditionals.</p>
 <p><strong>Answer:</strong></p>
 <p>Let’s define two independent coin toss experiments, we have:</p>
 <ul>
@@ -898,9 +898,9 @@ Yes  Yes  Yes        1.00</code></pre>
 </div>
 </div>
 <p><strong>(a)</strong> List the variables that are d-connected to <span class="math inline">\(A\)</span> given <span class="math inline">\(\{B\}\)</span> in <span class="math inline">\(G\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\({C, F, H, I, E}\)</span></p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{C, F, H, I, E\}\)</span></p>
 <p><strong>(b)</strong> List the variables that are d-connected to <span class="math inline">\(A\)</span> given <span class="math inline">\(\{J\}\)</span> in <span class="math inline">\(G'\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\({G, D, B, E, H}\)</span></p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{G, D, B, E, I, H\}\)</span></p>
 </section>
 <section id="exercise-6.-d-separation" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-6.-d-separation">Exercise 6. d-Separation</h3>
@@ -917,12 +917,11 @@ Yes  Yes  Yes        1.00</code></pre>
 <p><strong>Answer:</strong></p>
 <p>Conditioning on <span class="math inline">\(J\)</span> opens the paths <span class="math inline">\(S \leftrightarrow A\)</span>. The following variables remain d-separated:</p>
 <ol type="1">
-<li><span class="math inline">\((S \perp\!\!\perp B \mid J)\)</span></li>
-<li><span class="math inline">\((S \perp\!\!\perp E \mid J)\)</span></li>
 <li><span class="math inline">\((S \perp\!\!\perp C \mid J)\)</span></li>
 <li><span class="math inline">\((B \perp\!\!\perp C \mid J)\)</span></li>
+<li><span class="math inline">\((E \perp\!\!\perp C \mid J)\)</span></li>
+<li><span class="math inline">\((A \perp\!\!\perp C \mid J)\)</span></li>
 <li><span class="math inline">\((B \perp\!\!\perp E \mid J)\)</span></li>
-<li><span class="math inline">\((C \perp\!\!\perp E \mid J)\)</span></li>
 </ol>
 <p><strong>(b)</strong> Compute the given probabilities using the graph and the probability tables:</p>
 <ol type="1">
@@ -1091,9 +1090,9 @@ P(M=1|B=1,J=0) = \frac{P(M=1, J=0|B=1)}{P(J=0|B=1)} = \frac{0.4914}{0.7532} = 0.
 </figure>
 </div>
 <p><strong>(a)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(W\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\({Z, S}\)</span></p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{Z, S\}\)</span></p>
 <p><strong>(b)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(S\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\emptyset\)</span></p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{emptyset\}\)</span></p>
 <p><strong>(c)</strong> Find all minimal sets <span class="math inline">\(A\)</span> (if any exists) that d-separate <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span>.</p>
 <p><strong>Answer:</strong> <span class="math inline">\(\{W,T\}, \{W, S\}\)</span></p>
 <p><strong>(d)</strong> [Harder] Draw a graph <span class="math inline">\(\mathcal{G}'\)</span> over the variables <span class="math inline">\(\{X, S, W, Y\}\)</span> such that:</p>
