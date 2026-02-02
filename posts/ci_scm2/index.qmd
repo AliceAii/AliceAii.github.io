@@ -417,7 +417,7 @@ Probability Distribution $P(u)$:
 **Answer:**
 
 ::: center
-![Exercise 4 DAG](p5.png){width="500"}
+![Exercise 4 DAG](p5.png){width="400"}
 :::
 
 ### Exercise 5. d-Connectedness
