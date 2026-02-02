@@ -675,11 +675,12 @@ Note
 <p><strong>Answer:</strong></p>
 <p>Define the event as: <span class="math inline">\(E\)</span> represents cancer diagnosed early; <span class="math inline">\(L\)</span> means cancer diagnosed lated; and <span class="math inline">\(C\)</span> presents patients goes to routine consultations twice a year. Therefore, we have:</p>
 <ul>
-<li><span class="math inline">\(P(E) = 0.70\)</span>, <span class="math inline">\(P(L) = 0.3\)</span>,<span class="math inline">\(P(C|E) = 0.60\)</span>, <span class="math inline">\(P(C^c|L) = 0.90\)</span>, <span class="math inline">\(P(C|L) = 0.1\)</span></li>
+<li>Given <span class="math inline">\(P(C=1|E=1) = 0.6\)</span>, <span class="math inline">\(P(E=0|E=0) = 0.9\)</span>, <span class="math inline">\(P(E=1) = 0.7\)</span></li>
 <li>Using Bayes’s Theorem, we have: <span class="math display">\[
 \begin{aligned}
-P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \cdot P(E) + P(C|L) \cdot P(L)} \\
-&amp;= \frac{(0.60)(0.70)}{(0.6)(0.7)+(0.1)(0.3)} = \frac{14}{15} \approx 0.933
+P(E=1 | C=1) &amp;= \frac{P(E=1, C=1)}{P(C=1)} = \frac{P(C=1 | E=1)P(E=1)}{P(C=1)} \\
+&amp;= \frac{P(C=1 | E=1)P(E=1)}{P(C=1 | E=1)P(E=1) + P(C=1 | E=0)P(E=0)} \\
+&amp;= \frac{(0.6)(0.7)}{(0.6)(0.7) + (1 - 0.9)(0.3)} = \frac{14}{15} \approx 0.933
 \end{aligned}
 \]</span></li>
 </ul>
@@ -712,7 +713,7 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <li><span class="math inline">\(P(x_1), P(x_2), P(x_1 | y),\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
 </ol>
 <p><strong>(b)</strong> Suppose we learned that <span class="math inline">\((X_1 \perp\!\!\!\perp X_2 | Y)\)</span> holds in <span class="math inline">\(P\)</span>. Now, which of the sets before are sufficient to compute the query <span class="math inline">\(Q\)</span>? Show how or explain why it is not possible.</p>
-<p><strong>Answer:</strong> To compute the query <span class="math inline">\(Q = P(y | x_1, x_2)\)</span>, we rely on the definition of conditional probability and Bayes’ Theorem: <span class="math display">\[Q = \frac{P(x_1, x_2 | y)P(y)}{P(x_1, x_2)}\]</span>.</p>
+<p><strong>Answer:</strong> To compute the query <span class="math inline">\(Q = P(y | x_1, x_2)\)</span>, we rely on the definition of conditional probability and Bayes’ Theorem: <span class="math display">\[P(y \mid x_1, x_2) = \frac{P(y, x_1, x_2)}{P(x_1, x_2)} = \frac{P(y)P(x_1, x_2 \mid y)}{P(x_1, x_2)}\]</span></p>
 <p>For (b) part, we have additional information: <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y)\)</span>.</p>
 <ol type="1">
 <li><span class="math inline">\(P(x_1, x_2), P(y), P(x_1 | y)\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
@@ -722,7 +723,7 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <li>Not possible. To compute <span class="math inline">\(Q\)</span>, we need joint conditional <span class="math inline">\(P(x_1, x_2 | y)\)</span>. Without knowing if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> are conditionally indenpendent given <span class="math inline">\(Y\)</span>, we cannot get <span class="math inline">\(P(x_1, x_2 | y)\)</span>.</li>
 </ol></li>
 <li><ol start="2" type="a">
-<li>Its possible now. With conditonal independence, we have <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y), Q = \frac{P(x_1 | y)P(x_2 | y)P(y)}{P(x_1, x_2)}\)</span>. The denominator is provided, and the numerator is reconstructed using the independence assumption.</li>
+<li>Yes, its possible now. With conditonal independence, we have <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y), Q = \frac{P(x_1 | y)P(x_2 | y)P(y)}{P(x_1, x_2)}\)</span>. The denominator is provided, and the numerator is reconstructed using the independence assumption.</li>
 </ol></li>
 </ul>
 <ol start="2" type="1">
@@ -744,7 +745,7 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <li>Not possible. Because (1) we cannot compute the required joint <span class="math inline">\(P(x_1, x_2 | y)\)</span> without a conditional independence assumption, and (2) we lack the marginal <span class="math inline">\(P(x_1, x_2)\)</span> for the denominator.</li>
 </ol></li>
 <li><ol start="2" type="a">
-<li>Not possible. We can now compute the numerator:<span class="math inline">\(P(x_1, x_2 | y) \cdot P(y) = P(x_1 | y) \cdot P(x_2 | y) \cdot P(y)\)</span> But we still cannot compute <span class="math inline">\(P(x_1, x_2)\)</span> for the denominator.Using the law of total probability: <span class="math inline">\(P(x_1, x_2) = \sum_{y} P(x_1, x_2 | y) \cdot P(y) = \sum_{y} P(x_1 | y) \cdot P(x_2 | y) \cdot P(y)\)</span>. This requires summing over all values of <span class="math inline">\(y\)</span>, but we only have <span class="math inline">\(P(y)\)</span> as a distribution, not the ability to enumerate and sum over all <span class="math inline">\(y\)</span> values in a way that gives us the specific joint <span class="math inline">\(P(x_1, x_2)\)</span> for our particular observed <span class="math inline">\((x_1, x_2)\)</span> pair.</li>
+<li>Yes, compute <span class="math inline">\(P(x_1, x_2) = \sum_{Y} P(x_1, x_2, y) = \sum_{Y} P(x_1, x_2 \mid y)P(y)\)</span> and <span class="math inline">\(P(x_1, x_2 \mid y)\)</span> as shown above. Then, all terms in the second expression from the previous question are estimable.</li>
 </ol></li>
 </ul>
 <ol start="4" type="1">
@@ -755,7 +756,7 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <li>Not possible. We lack <span class="math inline">\(P(y)\)</span> to compute the numerator, and without an independence assumption <span class="math inline">\((X_1 \perp\!\!\!\perp X_2)\)</span>, we cannot compute the joint denominator <span class="math inline">\(P(x_1, x_2)\)</span>.</li>
 </ol></li>
 <li><ol start="2" type="a">
-<li>Not possible. Even with conditional independence, we still don’t have <span class="math inline">\(P(y)\)</span>, which is key for computing the numerator <span class="math inline">\(P(x_1, x_2 | y)P(y)\)</span>.</li>
+<li>Not possible. Even with conditional independence, we still don’t have <span class="math inline">\(P(y)\)</span>.</li>
 </ol></li>
 </ul>
 <ol start="5" type="1">
@@ -766,7 +767,7 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <li>Not possible. It lacks <span class="math inline">\(P(y)\)</span>, we cannot compute <span class="math inline">\(P(x_1, x_2 | y)\)</span> from marginals <span class="math inline">\(P(x_1 | y), P(x_2 | y)\)</span>, we cannot obtain the <span class="math inline">\(P(x_1, x_2)\)</span> from the marginals <span class="math inline">\(P(x_1), P(x_2)\)</span> as well.</li>
 </ol></li>
 <li><ol start="2" type="a">
-<li>Not possible. We don’t ahve <span class="math inline">\(P(y)\)</span> and we cannot compute <span class="math inline">\(P(x_1, x_2)\)</span> from just <span class="math inline">\(P(x_1)\)</span> and <span class="math inline">\(P(x_2)\)</span>.</li>
+<li>Not possible. After considering <span class="math inline">\(P(x_1, x_2 \mid y) = P(x_1 \mid y)P(x_2 \mid y)\)</span> this is equivalent to the previous item and the same reason applies.</li>
 </ol></li>
 </ul>
 </section>
@@ -792,13 +793,16 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <p><strong>(b)</strong> Suppose we have access to the marginal distribution <span class="math inline">\(P(X, Y, Z_2)\)</span>. Is it possible to estimate <span class="math inline">\(Q\)</span>? If so, show how to do it. Otherwise, explain why that is not the case.</p>
 <p><strong>Answer:</strong></p>
 <p>Yes, it is possible to estimate <span class="math inline">\(Q\)</span>.</p>
-<ul>
-<li><p>Identify Independence: In graph <span class="math inline">\(G\)</span>, <span class="math inline">\(Z_1\)</span> is d-separated from <span class="math inline">\(Y\)</span> given <span class="math inline">\(\{X, Z_2\}\)</span>. This implies the conditional independence: <span class="math inline">\((Y \perp\!\!\!\perp Z_1 \mid X, Z_2)\)</span></p></li>
-<li><p>Rewrite <span class="math inline">\(P(y \mid x, z_1)\)</span>: Using the law of total probability and the independence above, we have: <span class="math display">\[P(y \mid x, z_1) = \sum_{z_2} P(y \mid x, z_1, z_2) P(z_2 \mid x, z_1)\]</span> Because <span class="math inline">\(Y \perp\!\!\!\perp Z_1 \mid X, Z_2\)</span>, we have <span class="math inline">\(P(y \mid x, z_1, z_2) = P(y \mid x, z_2)\)</span>.</p></li>
-<li><p>Substitution into Query <span class="math inline">\(Q\)</span>: <span class="math display">\[Q = \sum_{z_1} \left[ \sum_{z_2} P(y \mid x, z_2) P(z_2 \mid x, z_1) \right] P(z_1)\]</span></p></li>
-<li><p>Simplify via Marginalization: <span class="math display">\[Q = \sum_{z_2} P(y \mid x, z_2) \sum_{z_1} P(z_2 \mid x, z_1) P(z_1)\]</span> From the graph, <span class="math inline">\(Z_2 \perp\!\!\!\perp X \mid Z_1\)</span>. This allows us to simplify the inner term using the law of total probability: <span class="math display">\[\sum_{z_1} P(z_2 \mid z_1) P(z_1) = P(z_2)\]</span> Resulting in: <span class="math display">\[Q = \sum_{z_2} P(y \mid x, z_2) P(z_2)\]</span></p></li>
-</ul>
-<p>Since <span class="math inline">\(P(y \mid x, z_2)\)</span> and <span class="math inline">\(P(z_2)\)</span> can both be calculated from the marginal distribution <span class="math inline">\(P(X, Y, Z_2)\)</span>, the query <span class="math inline">\(Q\)</span> is estimable.</p>
+<p><span class="math display">\[
+\begin{aligned}
+Q &amp;= \sum_{Z_1} P(y \mid x, z_1)P(z_1) \\
+&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_1, z_2)P(z_2 \mid x, z_1)P(z_1) &amp;&amp; \text{Condition on } Z_2 \\
+&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid x, z_1)P(z_1) &amp;&amp; (Y \perp\!\!\!\perp Z_1 \mid Z_2, X) \\
+&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid z_1)P(z_1) &amp;&amp; (Z_2 \perp\!\!\!\perp X \mid Z_1) \\
+&amp;= \sum_{Z_2} P(y \mid x, z_2) \sum_{Z_1} P(z_2, z_1) &amp;&amp; \text{Chain rule and move summation in} \\
+&amp;= \sum_{Z_2} P(y \mid x, z_2)P(z_2) &amp;&amp; \text{Sum out } Z_1
+\end{aligned}
+\]</span></p>
 </section>
 <section id="exercise-4.-specifying-structural-causal-models" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-4.-specifying-structural-causal-models">Exercise 4. Specifying Structural Causal Models</h3>
@@ -819,62 +823,35 @@ P(E|C) &amp;= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \
 <p>Variables <span class="math inline">\(L, S, M, I\)</span> and <span class="math inline">\(C\)</span> are observable, while <span class="math inline">\(A\)</span> and <span class="math inline">\(D\)</span> are unobservable (other unobservables, which are not mentioned, may be present as well).</p>
 <p><strong>(a)</strong> Specify a structural causal model <span class="math inline">\(\mathcal{M} = \langle V, U, \mathcal{F}, P(U) \rangle\)</span> that captures this setting. Make a reasonable choice for the distribution of <span class="math inline">\(A\)</span> and the way <span class="math inline">\(M\)</span> is determined.</p>
 <p><strong>Answer:</strong></p>
-<p>Endogenous Variables (<span class="math inline">\(V\)</span>):</p>
+<p>Endogenous Variables (<span class="math inline">\(V\)</span>), <span class="math inline">\(V = \{L, S, M, I, C\}\)</span>.</p>
 <ul>
-<li><span class="math inline">\(L \in \{\text{phone}, \text{EHR system}\}\)</span></li>
-<li><span class="math inline">\(A \in \{\text{less than 40}, \text{40 or more}\}\)</span> <em>Unobservable</em></li>
-<li><span class="math inline">\(M \in \{\text{text-only}, \text{text+image}\}\)</span></li>
-<li><span class="math inline">\(S \in \{\text{No}, \text{Yes}\}\)</span></li>
-<li><span class="math inline">\(I \in \{\text{No}, \text{Yes}\}\)</span></li>
-<li><span class="math inline">\(D \in \{\text{No}, \text{Yes}\}\)</span> <em>Unobservable</em>.</li>
-<li><span class="math inline">\(C \in \{\text{No}, \text{Yes}\}\)</span></li>
+<li><strong><span class="math inline">\(L\)</span> (Location/Device)</strong>: <span class="math inline">\(L=1\)</span> represents ‘phone’ and <span class="math inline">\(L=0\)</span> represents ‘EHR system’.</li>
+<li><strong><span class="math inline">\(M\)</span> (Modality)</strong>: Defined by the function <span class="math inline">\(f_M = A \oplus U_m\)</span>.</li>
+<li><strong><span class="math inline">\(S\)</span> (Seen)</strong>: <span class="math inline">\(S=1\)</span> represents ‘alert seen’.</li>
+<li><strong><span class="math inline">\(I\)</span> (Importance)</strong>: <span class="math inline">\(I=1\)</span> represents ‘alert judged clinically relevant’.</li>
+<li><strong><span class="math inline">\(C\)</span> (Administered)</strong>: <span class="math inline">\(C=1\)</span> represents ‘drug administered’.</li>
 </ul>
-<p>Exogenous Variables (<span class="math inline">\(U\)</span>): <span class="math inline">\(U_L, U_S, U_M, U_I, U_C, U_A, U_D\)</span></p>
+<p>Exogenous Variables (<span class="math inline">\(U\)</span>), <span class="math inline">\(U = \{A, D, U_l, U_m, U_{s1}, U_{s2}, U_{s3}, U_{i1}, U_{i2}\}\)</span>.</p>
+<ul>
+<li><strong><span class="math inline">\(A\)</span> (Age)</strong>: <span class="math inline">\(A=1\)</span> represents ‘40 or more’ and <span class="math inline">\(A=0\)</span> represents ‘less than 40’.</li>
+<li><strong><span class="math inline">\(D\)</span> (Permission)</strong>: <span class="math inline">\(D=1\)</span> represents ‘has permission to administer the drug’.</li>
+</ul>
 <p>Structural Functions (<span class="math inline">\(\mathcal{F}\)</span>):</p>
 <p><span class="math display">\[
-\mathcal{M} = \begin{cases}
-A \leftarrow f_A(U_A) \\
-L \leftarrow f_L(U_L) \\
-M \leftarrow f_M(A, U_M) \\
-S \leftarrow f_S(A, L, U_S) \\
-I \leftarrow f_I(M, U_I) \\
-D \leftarrow f_D(U_D) \\
-C \leftarrow f_C(S, I, D, U_C)
+\mathcal{F} = \begin{cases}
+f_L = U_l \\
+f_M = A \oplus U_m \\
+f_S = (L \wedge U_{s1}) \vee (\neg L \wedge ((A \wedge U_{s2}) \vee (\neg A \wedge U_{s3}))) \\
+f_I = (M \wedge U_{i1}) \vee (\neg M \wedge U_{i2}) \\
+f_C = S \wedge I \wedge D
 \end{cases}
 \]</span></p>
-<p>Probability Distribution <span class="math inline">\(P(U)\)</span></p>
+<p>Probability Distribution <span class="math inline">\(P(u)\)</span>:</p>
 <ul>
-<li>Marginals</li>
+<li><strong>Marginals</strong>: <span class="math inline">\(P(D=1) = 0.4\)</span>, <span class="math inline">\(P(A=1) = 0.2\)</span>, <span class="math inline">\(P(U_l=1) = 1/2\)</span>, and <span class="math inline">\(P(U_m=1) = 1/4\)</span>.</li>
+<li><strong>Seen (<span class="math inline">\(S\)</span>) components</strong>: <span class="math inline">\(P(U_{s1}=1) = 1/3\)</span>, <span class="math inline">\(P(U_{s2}=1) = 1/5\)</span>, and <span class="math inline">\(P(U_{s3}=1) = 1/6\)</span>.</li>
+<li><strong>Importance (<span class="math inline">\(I\)</span>) components</strong>: <span class="math inline">\(P(U_{i1}=1) = 0.6\)</span> and <span class="math inline">\(P(U_{i2}=1) = 0.4\)</span>.</li>
 </ul>
-<pre><code>P(L = phone)   P(A = &lt;40)   P(D = Yes)
-    0.50          0.50         0.40</code></pre>
-<ul>
-<li>Conditionals</li>
-</ul>
-<p>M (Modality) given A (Age):</p>
-<pre><code>A      P(M = text+image | A)
-&lt;40           1.00
-≥40           0.00</code></pre>
-<p>S (Seen) given L (Location) and A (Age):</p>
-<pre><code>L      A      P(S = Yes | L, A)
-phone  &lt;40         1/3
-phone  ≥40         1/3
-EHR    &lt;40         1/5
-EHR    ≥40         1/6</code></pre>
-<p>I (Important relevant) given M (Modality):</p>
-<pre><code>M              P(I = Yes | M)
-text+image          0.60
-text-only           0.40</code></pre>
-<p>C (Clinician administers) given S, I, D:</p>
-<pre><code>S    I    D    P(C = Yes | S, I, D)
-No   No   No         0.00
-No   No   Yes        0.00
-No   Yes  No         0.00
-No   Yes  Yes        0.00
-Yes  No   No         0.00
-Yes  No   Yes        0.00
-Yes  Yes  No         0.00
-Yes  Yes  Yes        1.00</code></pre>
 <p><strong>(b)</strong> Draw the causal diagram corresponding to the given SCM.</p>
 <p><strong>Answer:</strong></p>
 <div class="center">
@@ -913,16 +890,104 @@ Yes  Yes  Yes        1.00</code></pre>
 </figure>
 </div>
 </div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(P(B=1)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(E=1)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(S=1)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(C=1)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0.02</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">0.80</td>
+<td style="text-align: center;">0.15</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(B\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(E\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(A=1|B,E)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(M=1|A,C)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(S\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(J=1|A,S)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.05</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.30</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.90</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.85</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.97</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.98</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.15</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.10</td>
+</tr>
+</tbody>
+</table>
 <p><strong>(a)</strong> List all d-separation statements that hold assuming that <span class="math inline">\(J=1\)</span>.</p>
 <p><strong>Answer:</strong></p>
 <p>Conditioning on <span class="math inline">\(J\)</span> opens the paths <span class="math inline">\(S \leftrightarrow A\)</span>. The following variables remain d-separated:</p>
-<ol type="1">
-<li><span class="math inline">\((S \perp\!\!\perp C \mid J)\)</span></li>
-<li><span class="math inline">\((B \perp\!\!\perp C \mid J)\)</span></li>
-<li><span class="math inline">\((E \perp\!\!\perp C \mid J)\)</span></li>
-<li><span class="math inline">\((A \perp\!\!\perp C \mid J)\)</span></li>
-<li><span class="math inline">\((B \perp\!\!\perp E \mid J)\)</span></li>
-</ol>
+<ul>
+<li><span class="math inline">\((S \perp\!\!\!\perp B, E \mid J, A)\)</span></li>
+<li><span class="math inline">\((C \perp\!\!\!\perp B, E, A, S \mid J)\)</span></li>
+<li><span class="math inline">\((M \perp\!\!\!\perp B, E, S \mid J, A, C)\)</span></li>
+</ul>
 <p><strong>(b)</strong> Compute the given probabilities using the graph and the probability tables:</p>
 <ol type="1">
 <li><span class="math inline">\(P(M=1)\)</span></li>
@@ -1092,10 +1157,10 @@ P(M=1|B=1,J=0) = \frac{P(M=1, J=0|B=1)}{P(J=0|B=1)} = \frac{0.4914}{0.7532} = 0.
 <p><strong>(a)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(W\)</span>.</p>
 <p><strong>Answer:</strong> <span class="math inline">\(\{Z, S\}\)</span></p>
 <p><strong>(b)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(S\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\{emptyset\}\)</span></p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{\emptyset\}\)</span></p>
 <p><strong>(c)</strong> Find all minimal sets <span class="math inline">\(A\)</span> (if any exists) that d-separate <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span>.</p>
 <p><strong>Answer:</strong> <span class="math inline">\(\{W,T\}, \{W, S\}\)</span></p>
-<p><strong>(d)</strong> [Harder] Draw a graph <span class="math inline">\(\mathcal{G}'\)</span> over the variables <span class="math inline">\(\{X, S, W, Y\}\)</span> such that:</p>
+<p><strong>(d)</strong> Draw a graph <span class="math inline">\(\mathcal{G}'\)</span> over the variables <span class="math inline">\(\{X, S, W, Y\}\)</span> such that:</p>
 <ul>
 <li><span class="math inline">\(\mathcal{G}'\)</span> has exactly the same independence as <span class="math inline">\(\mathcal{G}'\)</span> with respect to <span class="math inline">\(P(X, S, W, Y)\)</span>, and<br>
 </li>

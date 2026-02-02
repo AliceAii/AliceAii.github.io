@@ -220,13 +220,15 @@ Seventy percent of cancer cases in a certain population are diagnosed in an earl
 
 Define the event as: $E$ represents cancer diagnosed early; $L$ means cancer diagnosed lated; and $C$ presents patients goes to routine consultations twice a year. Therefore, we have:
 
--   $P(E) = 0.70$, $P(L) = 0.3$,$P(C|E) = 0.60$, $P(C^c|L) = 0.90$, $P(C|L) = 0.1$
--   Using Bayes's Theorem, we have: $$
-    \begin{aligned}
-    P(E|C) &= \frac{P(C|E) \cdot P(E)}{P(C)} = \frac{P(C|E) \cdot P(E)}{P(C|E) \cdot P(E) + P(C|L) \cdot P(L)} \\
-    &= \frac{(0.60)(0.70)}{(0.6)(0.7)+(0.1)(0.3)} = \frac{14}{15} \approx 0.933
-    \end{aligned}
-    $$
+- Given $P(C=1|E=1) = 0.6$, $P(E=0|E=0) = 0.9$, $P(E=1) = 0.7$
+- Using Bayes's Theorem, we have:
+$$
+\begin{aligned}
+P(E=1 | C=1) &= \frac{P(E=1, C=1)}{P(C=1)} = \frac{P(C=1 | E=1)P(E=1)}{P(C=1)} \\
+&= \frac{P(C=1 | E=1)P(E=1)}{P(C=1 | E=1)P(E=1) + P(C=1 | E=0)P(E=0)} \\
+&= \frac{(0.6)(0.7)}{(0.6)(0.7) + (1 - 0.9)(0.3)} = \frac{14}{15} \approx 0.933
+\end{aligned}
+$$
 
 **(b)** Construct a probability distribution over three random variables $X, Y, Z$ such that $(X \perp\!\!\!\perp Y)$ but $(X \perp\!\!\!\perp Y | Z)$ does not hold. You can either describe the full joint distribution or their conditionals.
 
@@ -263,7 +265,7 @@ Consider random variables $X_1, X_2$ and $Y$ and assume our goal is to compute t
 
 **(b)** Suppose we learned that $(X_1 \perp\!\!\!\perp X_2 | Y)$ holds in $P$. Now, which of the sets before are sufficient to compute the query $Q$? Show how or explain why it is not possible.
 
-**Answer:** To compute the query $Q = P(y | x_1, x_2)$, we rely on the definition of conditional probability and Bayes' Theorem: $$Q = \frac{P(x_1, x_2 | y)P(y)}{P(x_1, x_2)}$$.
+**Answer:** To compute the query $Q = P(y | x_1, x_2)$, we rely on the definition of conditional probability and Bayes' Theorem: $$P(y \mid x_1, x_2) = \frac{P(y, x_1, x_2)}{P(x_1, x_2)} = \frac{P(y)P(x_1, x_2 \mid y)}{P(x_1, x_2)}$$
 
 For (b) part, we have additional information: $P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y)$.
 
@@ -275,7 +277,7 @@ For (b) part, we have additional information: $P(x_1, x_2 | y) = P(x_1 | y)P(x_2
 
 -   
 
-    (b) Its possible now. With conditonal independence, we have $P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y), Q = \frac{P(x_1 | y)P(x_2 | y)P(y)}{P(x_1, x_2)}$. The denominator is provided, and the numerator is reconstructed using the independence assumption.
+    (b) Yes, its possible now. With conditonal independence, we have $P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y), Q = \frac{P(x_1 | y)P(x_2 | y)P(y)}{P(x_1, x_2)}$. The denominator is provided, and the numerator is reconstructed using the independence assumption.
 
 2.  $P(x_1, x_2), P(y),$ and $P(x_1, x_2 | y)$
 
@@ -295,7 +297,7 @@ For (b) part, we have additional information: $P(x_1, x_2 | y) = P(x_1 | y)P(x_2
 
 -   
 
-    (b) Not possible. We can now compute the numerator:$P(x_1, x_2 | y) \cdot P(y) = P(x_1 | y) \cdot P(x_2 | y) \cdot P(y)$ But we still cannot compute $P(x_1, x_2)$ for the denominator.Using the law of total probability: $P(x_1, x_2) = \sum_{y} P(x_1, x_2 | y) \cdot P(y) = \sum_{y} P(x_1 | y) \cdot P(x_2 | y) \cdot P(y)$. This requires summing over all values of $y$, but we only have $P(y)$ as a distribution, not the ability to enumerate and sum over all $y$ values in a way that gives us the specific joint $P(x_1, x_2)$ for our particular observed $(x_1, x_2)$ pair.
+    (b) Yes, compute $P(x_1, x_2) = \sum_{Y} P(x_1, x_2, y) = \sum_{Y} P(x_1, x_2 \mid y)P(y)$ and $P(x_1, x_2 \mid y)$ as shown above. Then, all terms in the second expression from the previous question are estimable.
 
 4.  $P(x_1), P(x_2),$ and $P(x_1, x_2 | y)$
 
@@ -305,7 +307,7 @@ For (b) part, we have additional information: $P(x_1, x_2 | y) = P(x_1 | y)P(x_2
 
 -   
 
-    (b) Not possible. Even with conditional independence, we still don't have $P(y)$, which is key for computing the numerator $P(x_1, x_2 | y)P(y)$.
+    (b) Not possible. Even with conditional independence, we still don't have $P(y)$.
 
 5.  $P(x_1), P(x_2), P(x_1 | y),$ and $P(x_2 | y)$
 
@@ -315,7 +317,7 @@ For (b) part, we have additional information: $P(x_1, x_2 | y) = P(x_1 | y)P(x_2
 
 -   
 
-    (b) Not possible. We don't ahve $P(y)$ and we cannot compute $P(x_1, x_2)$ from just $P(x_1)$ and $P(x_2)$.
+    (b) Not possible. After considering $P(x_1, x_2 \mid y) = P(x_1 \mid y)P(x_2 \mid y)$ this is equivalent to the previous item and the same reason applies.
 
 ### Exercise 3. Query Estimation
 
@@ -347,15 +349,16 @@ Intuitive: Even after observing $X$, knowledge of $Z_1$ still provides informati
 
 Yes, it is possible to estimate $Q$.
 
--   Identify Independence: In graph $G$, $Z_1$ is d-separated from $Y$ given $\{X, Z_2\}$. This implies the conditional independence: $(Y \perp\!\!\!\perp Z_1 \mid X, Z_2)$
-
--   Rewrite $P(y \mid x, z_1)$: Using the law of total probability and the independence above, we have: $$P(y \mid x, z_1) = \sum_{z_2} P(y \mid x, z_1, z_2) P(z_2 \mid x, z_1)$$ Because $Y \perp\!\!\!\perp Z_1 \mid X, Z_2$, we have $P(y \mid x, z_1, z_2) = P(y \mid x, z_2)$.
-
--   Substitution into Query $Q$: $$Q = \sum_{z_1} \left[ \sum_{z_2} P(y \mid x, z_2) P(z_2 \mid x, z_1) \right] P(z_1)$$
-
--   Simplify via Marginalization: $$Q = \sum_{z_2} P(y \mid x, z_2) \sum_{z_1} P(z_2 \mid x, z_1) P(z_1)$$ From the graph, $Z_2 \perp\!\!\!\perp X \mid Z_1$. This allows us to simplify the inner term using the law of total probability: $$\sum_{z_1} P(z_2 \mid z_1) P(z_1) = P(z_2)$$ Resulting in: $$Q = \sum_{z_2} P(y \mid x, z_2) P(z_2)$$
-
-Since $P(y \mid x, z_2)$ and $P(z_2)$ can both be calculated from the marginal distribution $P(X, Y, Z_2)$, the query $Q$ is estimable.
+$$
+\begin{aligned}
+Q &= \sum_{Z_1} P(y \mid x, z_1)P(z_1) \\
+&= \sum_{Z_1, Z_2} P(y \mid x, z_1, z_2)P(z_2 \mid x, z_1)P(z_1) && \text{Condition on } Z_2 \\
+&= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid x, z_1)P(z_1) && (Y \perp\!\!\!\perp Z_1 \mid Z_2, X) \\
+&= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid z_1)P(z_1) && (Z_2 \perp\!\!\!\perp X \mid Z_1) \\
+&= \sum_{Z_2} P(y \mid x, z_2) \sum_{Z_1} P(z_2, z_1) && \text{Chain rule and move summation in} \\
+&= \sum_{Z_2} P(y \mid x, z_2)P(z_2) && \text{Sum out } Z_1
+\end{aligned}
+$$
 
 ### Exercise 4. Specifying Structural Causal Models
 
@@ -377,82 +380,37 @@ Variables $L, S, M, I$ and $C$ are observable, while $A$ and $D$ are unobservabl
 
 **Answer:**
 
-Endogenous Variables ($V$):
+Endogenous Variables ($V$), $V = \{L, S, M, I, C\}$.
 
--   $L \in \{\text{phone}, \text{EHR system}\}$
--   $A \in \{\text{less than 40}, \text{40 or more}\}$ *Unobservable*
--   $M \in \{\text{text-only}, \text{text+image}\}$
--   $S \in \{\text{No}, \text{Yes}\}$
--   $I \in \{\text{No}, \text{Yes}\}$
--   $D \in \{\text{No}, \text{Yes}\}$ *Unobservable*.
--   $C \in \{\text{No}, \text{Yes}\}$
+* **$L$ (Location/Device)**: $L=1$ represents 'phone' and $L=0$ represents 'EHR system'.
+* **$M$ (Modality)**: Defined by the function $f_M = A \oplus U_m$.
+* **$S$ (Seen)**: $S=1$ represents 'alert seen'.
+* **$I$ (Importance)**: $I=1$ represents 'alert judged clinically relevant'.
+* **$C$ (Administered)**: $C=1$ represents 'drug administered'.
 
-Exogenous Variables ($U$): $U_L, U_S, U_M, U_I, U_C, U_A, U_D$
+Exogenous Variables ($U$), $U = \{A, D, U_l, U_m, U_{s1}, U_{s2}, U_{s3}, U_{i1}, U_{i2}\}$.
+
+* **$A$ (Age)**: $A=1$ represents '40 or more' and $A=0$ represents 'less than 40'.
+* **$D$ (Permission)**: $D=1$ represents 'has permission to administer the drug'.
 
 Structural Functions ($\mathcal{F}$):
 
 $$
-\mathcal{M} = \begin{cases} 
-A \leftarrow f_A(U_A) \\
-L \leftarrow f_L(U_L) \\
-M \leftarrow f_M(A, U_M) \\
-S \leftarrow f_S(A, L, U_S) \\
-I \leftarrow f_I(M, U_I) \\
-D \leftarrow f_D(U_D) \\
-C \leftarrow f_C(S, I, D, U_C)
+\mathcal{F} = \begin{cases} 
+f_L = U_l \\
+f_M = A \oplus U_m \\
+f_S = (L \wedge U_{s1}) \vee (\neg L \wedge ((A \wedge U_{s2}) \vee (\neg A \wedge U_{s3}))) \\
+f_I = (M \wedge U_{i1}) \vee (\neg M \wedge U_{i2}) \\
+f_C = S \wedge I \wedge D
 \end{cases}
 $$
 
-Probability Distribution $P(U)$
 
--   Marginals
+Probability Distribution $P(u)$:
 
-```         
-P(L = phone)   P(A = <40)   P(D = Yes)
-    0.50          0.50         0.40
-```
-
--   Conditionals
-
-M (Modality) given A (Age):
-
-```         
-A      P(M = text+image | A)
-<40           1.00
-≥40           0.00
-```
-
-S (Seen) given L (Location) and A (Age):
-
-```         
-L      A      P(S = Yes | L, A)
-phone  <40         1/3
-phone  ≥40         1/3
-EHR    <40         1/5
-EHR    ≥40         1/6
-```
-
-I (Important relevant) given M (Modality):
-
-```         
-M              P(I = Yes | M)
-text+image          0.60
-text-only           0.40
-```
-
-C (Clinician administers) given S, I, D:
-
-```         
-S    I    D    P(C = Yes | S, I, D)
-No   No   No         0.00
-No   No   Yes        0.00
-No   Yes  No         0.00
-No   Yes  Yes        0.00
-Yes  No   No         0.00
-Yes  No   Yes        0.00
-Yes  Yes  No         0.00
-Yes  Yes  Yes        1.00
-```
+* **Marginals**: $P(D=1) = 0.4$, $P(A=1) = 0.2$, $P(U_l=1) = 1/2$, and $P(U_m=1) = 1/4$.
+* **Seen ($S$) components**: $P(U_{s1}=1) = 1/3$, $P(U_{s2}=1) = 1/5$, and $P(U_{s3}=1) = 1/6$.
+* **Importance ($I$) components**: $P(U_{i1}=1) = 0.6$ and $P(U_{i2}=1) = 0.4$.
 
 **(b)** Draw the causal diagram corresponding to the given SCM.
 
@@ -486,25 +444,18 @@ Consider the following graphical model and conditional probability tables:
 ![Exercise 6 DAG](p3.png){width="400"}
 :::
 
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{cccc}
-$P(B=1)$ & $P(E=1)$ & $P(S=1)$ & $P(C=1)$ \\ \hline
-0.02 & 0.01 & 0.80 & 0.15 \\ 
-\end{tabular}
-\end{table}
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{ccccccccc}
-$B$ & $E$ & $P(A=1|BE)$ & $A$ & $C$ & $P(M=1|AC)$ & $A$ & $S$ & $P(J=1|AS)$ \\ \hline
-0 & 0 & 0.01 & 0 & 0 & 0.05 & 0 & 0 & 0 \\ 
-0 & 1 & 0.3 & 0 & 1 & 0 & 0 & 1 & 0 \\ 
-1 & 0 & 0.9 & 1 & 0 & 0.85 & 1 & 0 & 0.97 \\
-1 & 1 & 0.98 & 1 & 1 & 0.15 & 1 & 1 & 0.1 \\ 
-\end{tabular}
-\end{table}
+| $P(B=1)$ | $P(E=1)$ | $P(S=1)$ | $P(C=1)$ |
+|:---:|:---:|:---:|:---:|
+| 0.02 | 0.01 | 0.80 | 0.15 |
+
+| $B$ | $E$ | $P(A=1|B,E)$ | $A$ | $C$ | $P(M=1|A,C)$ | $A$ | $S$ | $P(J=1|A,S)$ |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 0 | 0 | 0.01 | 0 | 0 | 0.05 | 0 | 0 | 0.00 |
+| 0 | 1 | 0.30 | 0 | 1 | 0.00 | 0 | 1 | 0.00 |
+| 1 | 0 | 0.90 | 1 | 0 | 0.85 | 1 | 0 | 0.97 |
+| 1 | 1 | 0.98 | 1 | 1 | 0.15 | 1 | 1 | 0.10 |
+
+
 
 **(a)** List all d-separation statements that hold assuming that $J=1$.
 
@@ -512,11 +463,9 @@ $B$ & $E$ & $P(A=1|BE)$ & $A$ & $C$ & $P(M=1|AC)$ & $A$ & $S$ & $P(J=1|AS)$ \\ \
 
 Conditioning on $J$ opens the paths $S \leftrightarrow A$. The following variables remain d-separated:
 
-1.  $(S \perp\!\!\perp C \mid J)$
-2.  $(B \perp\!\!\perp C \mid J)$
-3.  $(E \perp\!\!\perp C \mid J)$
-4.  $(A \perp\!\!\perp C \mid J)$
-5.  $(B \perp\!\!\perp E \mid J)$
+* $(S \perp\!\!\!\perp B, E \mid J, A)$
+* $(C \perp\!\!\!\perp B, E, A, S \mid J)$
+* $(M \perp\!\!\!\perp B, E, S \mid J, A, C)$
 
 **(b)** Compute the given probabilities using the graph and the probability tables:
 
@@ -726,13 +675,13 @@ Let $G$ (shown below) be the causal diagram of some unknown model $M$ and let $P
 
 **(b)** Find a minimal set $A$ (if it exists) that d-separates $X$ and $S$.
 
-**Answer:** $\{emptyset\}$
+**Answer:** $\{\emptyset\}$
 
 **(c)** Find all minimal sets $A$ (if any exists) that d-separate $Z$ and $Y$.
 
 **Answer:** $\{W,T\}, \{W, S\}$
 
-**(d)** \[Harder\] Draw a graph $\mathcal{G}'$ over the variables $\{X, S, W, Y\}$ such that:
+**(d)** Draw a graph $\mathcal{G}'$ over the variables $\{X, S, W, Y\}$ such that:
 
 -   $\mathcal{G}'$ has exactly the same independence as $\mathcal{G}'$ with respect to $P(X, S, W, Y)$, and\
 -   $\mathcal{G}'$ has the minimum number of edges while satisfying this constraint in the previous bullet.
