@@ -7,7 +7,7 @@ toc: true
 toc-depth: 3
 toc-title: "Contents"
 code_folding: show
-image: "f6.png"
+image: "f7.png"
 output:
   html_document:
     mathjax: default
@@ -27,7 +27,7 @@ The answer, as we'll discover, is a resounding "it depends." This post takes you
 5. Some exercises to practice our knowledge
 
 ::: center
-![](f6.png)
+![](f7.png)
 :::
 
 ## 1. The Identification Problem
