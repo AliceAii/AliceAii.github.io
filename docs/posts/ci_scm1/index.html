@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shuhan (Alice) Ai">
+<meta name="dcterms.date" content="2026-01-25">
+
+<title>Structural Causal Models (SCM) Part 1: Pearl’s Causal Hierarchy and Causality Identification – Shuhan (Alice) Ai</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-de0ed3b9a49d5daa615839eefb10c6a7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shuhan (Alice) Ai</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentation.html"> 
+<span class="menu-text">Presentation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog_posts.html"> 
+<span class="menu-text">Blog Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AliceAii"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=jUyocCQAAAAJ&amp;hl=en&amp;oi=ao"> <i class="bi bi-google" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/shuhan-alice-ai-90146720b/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Structural Causal Models (SCM) Part 1: Pearl’s Causal Hierarchy and Causality Identification</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Causal Inference</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shuhan (Alice) Ai </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 25, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#pearls-causal-hierarchy-pch" id="toc-pearls-causal-hierarchy-pch" class="nav-link active" data-scroll-target="#pearls-causal-hierarchy-pch">1. Pearl’s Causal Hierarchy (PCH)</a>
+  <ul class="collapse">
+  <li><a href="#the-three-levels" id="toc-the-three-levels" class="nav-link" data-scroll-target="#the-three-levels">1.1 The Three Levels</a></li>
+  </ul></li>
+  <li><a href="#structural-causal-models" id="toc-structural-causal-models" class="nav-link" data-scroll-target="#structural-causal-models">2. Structural Causal Models</a>
+  <ul class="collapse">
+  <li><a href="#definition" id="toc-definition" class="nav-link" data-scroll-target="#definition">2.1 Definition</a></li>
+  <li><a href="#three-key-properties-of-scms" id="toc-three-key-properties-of-scms" class="nav-link" data-scroll-target="#three-key-properties-of-scms">2.2 Three Key Properties of SCMs</a></li>
+  <li><a href="#example-a-simple-scm" id="toc-example-a-simple-scm" class="nav-link" data-scroll-target="#example-a-simple-scm">2.3 Example: A Simple SCM</a></li>
+  </ul></li>
+  <li><a href="#conditional-independenceci-and-d-separation" id="toc-conditional-independenceci-and-d-separation" class="nav-link" data-scroll-target="#conditional-independenceci-and-d-separation">3. Conditional Independence(CI) and d-Separation</a>
+  <ul class="collapse">
+  <li><a href="#ci-definitions" id="toc-ci-definitions" class="nav-link" data-scroll-target="#ci-definitions">3.1 CI Definitions</a></li>
+  <li><a href="#d-separation-reading-independencies-from-graphs" id="toc-d-separation-reading-independencies-from-graphs" class="nav-link" data-scroll-target="#d-separation-reading-independencies-from-graphs">3.2 d-Separation: Reading Independencies from Graphs</a></li>
+  </ul></li>
+  <li><a href="#the-identification-problem" id="toc-the-identification-problem" class="nav-link" data-scroll-target="#the-identification-problem">4. The Identification Problem</a>
+  <ul class="collapse">
+  <li><a href="#the-truncated-factorization-formula" id="toc-the-truncated-factorization-formula" class="nav-link" data-scroll-target="#the-truncated-factorization-formula">4.1 The Truncated Factorization Formula</a></li>
+  <li><a href="#the-adjustment-formula" id="toc-the-adjustment-formula" class="nav-link" data-scroll-target="#the-adjustment-formula">4.2 The Adjustment Formula</a></li>
+  </ul></li>
+  <li><a href="#some-practical-exercises" id="toc-some-practical-exercises" class="nav-link" data-scroll-target="#some-practical-exercises">5. Some practical Exercises</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1.-basic-probabilities" id="toc-exercise-1.-basic-probabilities" class="nav-link" data-scroll-target="#exercise-1.-basic-probabilities">Exercise 1. Basic probabilities</a></li>
+  <li><a href="#exercise-2.-estimation-and-independence-relations" id="toc-exercise-2.-estimation-and-independence-relations" class="nav-link" data-scroll-target="#exercise-2.-estimation-and-independence-relations">Exercise 2. Estimation and Independence Relations</a></li>
+  <li><a href="#exercise-3.-query-estimation" id="toc-exercise-3.-query-estimation" class="nav-link" data-scroll-target="#exercise-3.-query-estimation">Exercise 3. Query Estimation</a></li>
+  <li><a href="#exercise-4.-specifying-structural-causal-models" id="toc-exercise-4.-specifying-structural-causal-models" class="nav-link" data-scroll-target="#exercise-4.-specifying-structural-causal-models">Exercise 4. Specifying Structural Causal Models</a></li>
+  <li><a href="#exercise-5.-d-connectedness" id="toc-exercise-5.-d-connectedness" class="nav-link" data-scroll-target="#exercise-5.-d-connectedness">Exercise 5. d-Connectedness</a></li>
+  <li><a href="#exercise-6.-d-separation" id="toc-exercise-6.-d-separation" class="nav-link" data-scroll-target="#exercise-6.-d-separation">Exercise 6. d-Separation</a></li>
+  <li><a href="#exercise-7.-d-separating-sets" id="toc-exercise-7.-d-separating-sets" class="nav-link" data-scroll-target="#exercise-7.-d-separating-sets">Exercise 7. d-Separating Sets</a></li>
+  </ul></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+
+<p>In the <a href="https://aliceaii.github.io/posts/ci_scm/">previous post</a>, we’ve learnt the foundations of Directed Acyclic Graphs (DAGs) and Structural Causal Models (SCMs). This tutorial builds on those foundations with a deeper dive into the SCM. By the end of this tutorial, you will understand:</p>
+<ul>
+<li>The three levels of Pearl’s Causal Hierarchy and why they matter</li>
+<li>How SCMs formally encode causal mechanisms</li>
+<li>How to use d-separation to read independencies from graphs</li>
+<li>When and how causal queries can be identified from data</li>
+<li>How to specify complete SCMs for real-world questions</li>
+</ul>
+<p><img src="f1.png" class="img-fluid"></p>
+<section id="pearls-causal-hierarchy-pch" class="level2">
+<h2 class="anchored" data-anchor-id="pearls-causal-hierarchy-pch">1. Pearl’s Causal Hierarchy (PCH)</h2>
+<p>A cornerstone of causal inference is the recognition that knowledge operates within a stratified structure of increasing complexity. Named after UCLA Professor <em>Judea Pearl</em>, this system is called the <strong>Pearl Causal Hierarchy (PCH)</strong>, also known as the ‘Ladder of Causation’.</p>
+<section id="the-three-levels" class="level3">
+<h3 class="anchored" data-anchor-id="the-three-levels">1.1 The Three Levels</h3>
+<p>Every Structural Causal Model (SCM) induces a three-level hierarchy:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 25%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Level</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Activity</th>
+<th style="text-align: left;">Typical Question</th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>L1</strong></td>
+<td style="text-align: left;">Associational</td>
+<td style="text-align: left;"><span class="math inline">\(P(y \mid x)\)</span></td>
+<td style="text-align: left;"><strong>Seeing</strong></td>
+<td style="text-align: left;">“What is?” How would seeing <span class="math inline">\(X\)</span> change my belief in <span class="math inline">\(Y\)</span>?</td>
+<td style="text-align: left;">Is high attendance associated with higher test scores?</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>L2</strong></td>
+<td style="text-align: left;">Interventional</td>
+<td style="text-align: left;"><span class="math inline">\(P(y \mid do(x))\)</span></td>
+<td style="text-align: left;"><strong>Doing</strong></td>
+<td style="text-align: left;">“What if?” What if I do <span class="math inline">\(X\)</span>?</td>
+<td style="text-align: left;">If we mandate after-school tutoring, will grades improve?</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>L3</strong></td>
+<td style="text-align: left;">Counterfactual</td>
+<td style="text-align: left;"><span class="math inline">\(P(y_x \mid x', y')\)</span></td>
+<td style="text-align: left;"><strong>Imagining</strong></td>
+<td style="text-align: left;">“Why?” What if I had acted differently?</td>
+<td style="text-align: left;">Given that the student failed, would they have passed if they had studied for one more hour?</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Level 1 (Observational/Associational)</strong>: This is the realm of traditional statistics and machine learning. We observe data and ask questions about correlations and predictions. “Does high classroom attendance predict higher test scores?” This is what most predictive analytics do, they identify patterns without necessarily explaining what causes them.</p>
+<p><strong>Level 2 (Interventional)</strong>: This level asks what happens when we <em>actively intervene</em> in the educational system. We move from <strong>seeing</strong> (<span class="math inline">\(P(y|x)\)</span>) to <strong>doing</strong> (<span class="math inline">\(P(y|do(x))\)</span>). When we merely observe that students who attend tutoring get good grades, that’s “seeing.” When we mandate that all students attend tutoring, we are “doing”, we force <span class="math inline">\(X\)</span> to take the value <span class="math inline">\(x\)</span>, changing the mechanism. This is the level of randomized controlled trials and new policy implementation.</p>
+<p><strong>Level 3 (Counterfactual)</strong>: This is the most powerful level, allowing us to reason about what would have happened under different circumstances, even for specific individuals. “Given that this specific student failed the exam, would they have passed if they had studied for one more hour?” This requires reasoning about alternative worlds—imagining a scenario that conflicts with the observed reality (the student didn’t study and did fail) to understand individual causality.</p>
+<p><strong>PCH - Comparing to Human Cognitive Capabilities:</strong></p>
+<ul>
+<li>human: sensors + agency + retrospection</li>
+<li>L1 represents the ability to observe the world and infer the ‘next’ stage</li>
+<li>L2 representes the ability to intervene in the world and change it</li>
+<li>L3 represents the ability to reflect about what we did (and didn’t do) and infer new behaviors</li>
+</ul>
+</section>
+</section>
+<section id="structural-causal-models" class="level2">
+<h2 class="anchored" data-anchor-id="structural-causal-models">2. Structural Causal Models</h2>
+<section id="definition" class="level3">
+<h3 class="anchored" data-anchor-id="definition">2.1 Definition</h3>
+<p>A <strong>Structural Causal Model (SCM)</strong> <span class="math inline">\(\mathcal{M}\)</span> is a 4-tuple <span class="math inline">\(\langle V, U, \mathcal{F}, P(U) \rangle\)</span>, where:</p>
+<ul>
+<li><span class="math inline">\(V = \{V_1, \ldots, V_n\}\)</span> are <strong>endogenous (observed) variables</strong></li>
+<li><span class="math inline">\(U = \{U_1, \ldots, U_m\}\)</span> are <strong>exogenous (unobserved) variables</strong><br>
+</li>
+<li><span class="math inline">\(\mathcal{F} = \{f_1, \ldots, f_n\}\)</span> are <strong>structural functions</strong> determining <span class="math inline">\(V\)</span>: <span class="math display">\[v_i \leftarrow f_i(pa_i, u_i), \quad Pa_i \subset V, \; U_i \subset U\]</span></li>
+<li><span class="math inline">\(P(U)\)</span> is a <strong>probability distribution</strong> over exogenous variables</li>
+</ul>
+</section>
+<section id="three-key-properties-of-scms" class="level3">
+<h3 class="anchored" data-anchor-id="three-key-properties-of-scms">2.2 Three Key Properties of SCMs</h3>
+<p>Every SCM <span class="math inline">\(\mathcal{M}\)</span> has three fundamental properties:</p>
+<p><strong>Property 1: SCM induces an observational distribution <span class="math inline">\(P(V)\)</span></strong></p>
+<p>The structural functions <span class="math inline">\(\mathcal{F}\)</span> can be seen as a mapping from <span class="math inline">\(U\)</span> to <span class="math inline">\(V\)</span>. The observational distribution over endogenous variables is:</p>
+<p><span class="math display">\[P_\mathcal{M}(V) = \sum_u P(U=u) \cdot \mathbf{1}[\mathcal{F}(u) = v]\]</span></p>
+<p>This is the joint distribution we would observe if we simply collected data without intervening. In other word, the probability of seeing any data point <span class="math inline">\(V\)</span> is determined by the probability of the background noise (<span class="math inline">\(U\)</span>) and the deterministic functions (<span class="math inline">\(\mathcal{F}\)</span>) that transform that noise into observable data.</p>
+<p><strong>Property 2: SCM defines a causal diagram</strong></p>
+<p>Every SCM induces a graphical model called a <strong>causal diagram</strong>, constructed as follows:</p>
+<ol type="1">
+<li>Add a vertex for every endogenous variable <span class="math inline">\(V_i \in V\)</span></li>
+<li>Add edge <span class="math inline">\(V_j \rightarrow V_i\)</span> if <span class="math inline">\(V_j\)</span> appears as argument of <span class="math inline">\(f_i\)</span></li>
+<li>Add bidirected edge <span class="math inline">\(V_i \leftrightarrow V_j\)</span> if the corresponding functions share an exogenous variable (i.e., <span class="math inline">\(U_i \cap U_j \neq \emptyset\)</span>)</li>
+</ol>
+<p><strong>Property 3: SCM spawns the Pearl Causal Hierarchy</strong></p>
+<p>The SCM generates distributions at all three levels of the PCH. The observational distribution <span class="math inline">\(P(v)\)</span> is L1. Interventional distributions <span class="math inline">\(P(v|do(x))\)</span> form L2. And counterfactual distributions <span class="math inline">\(P(y_x|x', y')\)</span> constitute L3.</p>
+</section>
+<section id="example-a-simple-scm" class="level3">
+<h3 class="anchored" data-anchor-id="example-a-simple-scm">2.3 Example: A Simple SCM</h3>
+<p>Consider a simplified model of an after-school reading program:</p>
+<ul>
+<li>Endogenous variables <span class="math inline">\(V\)</span>:<span class="math inline">\(X\)</span>: Program Participation (<span class="math inline">\(1 =\)</span> attended, <span class="math inline">\(0 =\)</span> did not attend); <span class="math inline">\(F\)</span>: Reading Fluency (<span class="math inline">\(1 =\)</span> improved, <span class="math inline">\(0 =\)</span> no improvement), and <span class="math inline">\(Y\)</span>: Final Exam Pass (<span class="math inline">\(1 =\)</span> passed, <span class="math inline">\(0 =\)</span> failed)</li>
+<li>Exogenous variables <span class="math inline">\(U\)</span>:<span class="math inline">\(U_m\)</span>: Student Motivation (determines if they sign up); <span class="math inline">\(U_p\)</span>: Prior Preparation (can improve fluency even without the program); <span class="math inline">\(U_t\)</span>: Test Taking Ability (can lead to passing even without fluency)</li>
+<li>Structural functions <span class="math inline">\(\mathcal{F}\)</span>: <span class="math display">\[\mathcal{M} = \begin{cases}
+X \leftarrow U_m \\
+F \leftarrow X \lor U_p \\
+Y \leftarrow (X \land F) \lor U_t
+\end{cases}\]</span></li>
+</ul>
+<p>Interpretation:</p>
+<ul>
+<li>Participation (<span class="math inline">\(X\)</span>): Determined solely by student motivation (<span class="math inline">\(U_m\)</span>).</li>
+<li>Fluency (<span class="math inline">\(F\)</span>): Occurs if the student attended the program (<span class="math inline">\(X\)</span>) OR had prior preparation (<span class="math inline">\(U_p\)</span>).</li>
+<li>Exam Pass (<span class="math inline">\(Y\)</span>): Occurs if the student attended the program AND improved fluency (<span class="math inline">\(X \land F\)</span>), or if they have high test-taking ability (<span class="math inline">\(U_t\)</span>).</li>
+</ul>
+</section>
+</section>
+<section id="conditional-independenceci-and-d-separation" class="level2">
+<h2 class="anchored" data-anchor-id="conditional-independenceci-and-d-separation">3. Conditional Independence(CI) and d-Separation</h2>
+<section id="ci-definitions" class="level3">
+<h3 class="anchored" data-anchor-id="ci-definitions">3.1 CI Definitions</h3>
+<p>Understanding when variables are independent is crucial for causal inference.</p>
+<p><strong>Marginal Independence</strong>: Variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>probabilistically independent</strong>, written <span class="math inline">\(X \perp\!\!\!\perp Y\)</span>, if: <span class="math display">\[P(Y = y \mid X = x) = P(Y = y)\]</span></p>
+<p>Equivalently: <span class="math inline">\(P(X, Y) = P(X) \cdot P(Y)\)</span></p>
+<p><strong>Conditional Independence</strong>: Variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>conditionally independent given <span class="math inline">\(Z\)</span></strong>, written <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span>, if: <span class="math display">\[P(Y = y \mid Z = z, X = x) = P(Y = y \mid Z = z)\]</span></p>
+<p>The structure of an SCM (captured in its causal diagram) constrains which conditional independencies must hold in the observational distribution. This connection between graphical structure and probabilistic independence is formalized through <strong>d-separation</strong>.</p>
+</section>
+<section id="d-separation-reading-independencies-from-graphs" class="level3">
+<h3 class="anchored" data-anchor-id="d-separation-reading-independencies-from-graphs">3.2 d-Separation: Reading Independencies from Graphs</h3>
+<p>Every path in a DAG can be decomposed into three types of triplets:</p>
+<section id="chain-mediation-x-rightarrow-z-rightarrow-y" class="level4">
+<h4 class="anchored" data-anchor-id="chain-mediation-x-rightarrow-z-rightarrow-y">Chain (Mediation): <span class="math inline">\(X \rightarrow Z \rightarrow Y\)</span></h4>
+<p>Information flows from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> through <span class="math inline">\(Z\)</span>.</p>
+<ul>
+<li><strong>Marginally</strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>associated</strong> (path is active)</li>
+<li><strong>Given <span class="math inline">\(Z\)</span></strong>: <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span> (path is <strong>blocked</strong>)</li>
+</ul>
+<p><em>Example</em>: Forgot insulin (<span class="math inline">\(X\)</span>) → High glucose (<span class="math inline">\(Z\)</span>) → Neuropathy (<span class="math inline">\(Y\)</span>). If we know glucose level, knowing about insulin doesn’t add information about neuropathy.</p>
+</section>
+<section id="fork-confounding-x-leftarrow-z-rightarrow-y" class="level4">
+<h4 class="anchored" data-anchor-id="fork-confounding-x-leftarrow-z-rightarrow-y">Fork (Confounding): <span class="math inline">\(X \leftarrow Z \rightarrow Y\)</span></h4>
+<p><span class="math inline">\(Z\)</span> is a common cause of both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
+<ul>
+<li><strong>Marginally</strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>associated</strong> (spurious correlation through <span class="math inline">\(Z\)</span>)</li>
+<li><strong>Given <span class="math inline">\(Z\)</span></strong>: <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span> (path is <strong>blocked</strong>)</li>
+</ul>
+<p><em>Example</em>: Age (<span class="math inline">\(Z\)</span>) causes both hearing impairment (<span class="math inline">\(X\)</span>) and osteoarthritis (<span class="math inline">\(Y\)</span>). If we know age, hearing and arthritis become independent.</p>
+</section>
+<section id="collider-selection-x-rightarrow-z-leftarrow-y" class="level4">
+<h4 class="anchored" data-anchor-id="collider-selection-x-rightarrow-z-leftarrow-y">Collider (Selection): <span class="math inline">\(X \rightarrow Z \leftarrow Y\)</span></h4>
+<p><span class="math inline">\(Z\)</span> is a common effect of both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
+<ul>
+<li><strong>Marginally</strong>: <span class="math inline">\(X \perp\!\!\!\perp Y\)</span> (path is <strong>blocked</strong> at the collider)</li>
+<li><strong>Given <span class="math inline">\(Z\)</span></strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> become <strong>associated</strong> (path is <strong>opened</strong>!)</li>
+</ul>
+<p><em>Example</em>: Talent (<span class="math inline">\(X\)</span>) and Beauty (<span class="math inline">\(Y\)</span>) both lead to Fame (<span class="math inline">\(Z\)</span>). Among famous people, talent and beauty become negatively correlated (“explaining away”).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Colliders behave <strong>opposite</strong> to chains and forks. Conditioning on a collider (or any of its descendants) <strong>opens</strong> a previously blocked path. This is the source of many biases including selection bias, Berkson’s paradox, and collider stratification bias.</p>
+</div>
+</div>
+</section>
+<section id="summary-table-active-vs.-inactive-triplets" class="level4">
+<h4 class="anchored" data-anchor-id="summary-table-active-vs.-inactive-triplets">Summary Table: Active vs.&nbsp;Inactive Triplets</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 27%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Structure</th>
+<th style="text-align: left;">Unconditioned</th>
+<th style="text-align: left;">Conditioned on <span class="math inline">\(Z\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Chain: <span class="math inline">\(X \rightarrow Z \rightarrow Y\)</span></td>
+<td style="text-align: left;">Active (associated)</td>
+<td style="text-align: left;"><strong>Blocked</strong> (independent)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fork: <span class="math inline">\(X \leftarrow Z \rightarrow Y\)</span></td>
+<td style="text-align: left;">Active (associated)</td>
+<td style="text-align: left;"><strong>Blocked</strong> (independent)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Collider: <span class="math inline">\(X \rightarrow Z \leftarrow Y\)</span></td>
+<td style="text-align: left;"><strong>Blocked</strong> (independent)</td>
+<td style="text-align: left;">Active (associated)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-d-separation-criterion" class="level4">
+<h4 class="anchored" data-anchor-id="the-d-separation-criterion">The d-Separation Criterion</h4>
+<p>To determine if <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span> using d-separation:</p>
+<ol type="1">
+<li><strong>Enumerate all paths</strong> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> in the graph</li>
+<li><strong>For each path</strong>, check if it is <strong>active</strong> or <strong>blocked</strong>:
+<ul>
+<li>A path is <strong>active</strong> if <em>every</em> triplet in it is active (given <span class="math inline">\(Z\)</span>)</li>
+<li>A path is <strong>blocked</strong> if <em>any</em> triplet in it is blocked</li>
+</ul></li>
+<li><strong>Conclusion</strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>d-separated</strong> by <span class="math inline">\(Z\)</span> (hence conditionally independent) if and only if <strong>all paths</strong> are blocked</li>
+</ol>
+</section>
+</section>
+</section>
+<section id="the-identification-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-identification-problem">4. The Identification Problem</h2>
+<p><strong>Definition (Causal Effect Identifiability)</strong>: The causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> is <strong>identifiable</strong> from a causal diagram <span class="math inline">\(G\)</span> if the quantity <span class="math inline">\(P(y \mid do(x))\)</span> can be computed uniquely from the observational distribution <span class="math inline">\(P(V)\)</span>.</p>
+<p>Formally: For every pair of SCMs <span class="math inline">\(\mathcal{M}_1\)</span> and <span class="math inline">\(\mathcal{M}_2\)</span> that induce the same graph <span class="math inline">\(G\)</span>, if <span class="math inline">\(P_{\mathcal{M}_1}(v) = P_{\mathcal{M}_2}(v) &gt; 0\)</span>, then <span class="math inline">\(P_{\mathcal{M}_1}(y \mid do(x)) = P_{\mathcal{M}_2}(y \mid do(x))\)</span>.</p>
+<p><strong>Intuition</strong>: Identifiability means that the causal effect is determined by (1) the causal structure (the graph) and (2) the observational distribution, without needing to know the specific form of the structural equations.</p>
+<section id="the-truncated-factorization-formula" class="level3">
+<h3 class="anchored" data-anchor-id="the-truncated-factorization-formula">4.1 The Truncated Factorization Formula</h3>
+<p>In a <strong>Markovian model</strong> (where no unobserved variable affects more than one observed variable), the observational distribution factorizes as:</p>
+<p><span class="math display">\[P(v) = \prod_{V_i \in V} P(v_i \mid pa_i)\]</span></p>
+<p>When we intervene with <span class="math inline">\(do(X=x)\)</span>, we delete the equation for <span class="math inline">\(X\)</span> and set <span class="math inline">\(X=x\)</span>. This gives the <strong>truncated factorization</strong>:</p>
+<p><span class="math display">\[P(v \mid do(x)) = \prod_{V_i \in V \setminus X} P(v_i \mid pa_i) \Big|_{X=x}\]</span></p>
+<p>The product excludes variables in <span class="math inline">\(X\)</span> (their equations are deleted), and all remaining terms are evaluated at <span class="math inline">\(X=x\)</span>.</p>
+<p><strong>Theorem (Identification in Markovian Models)</strong>: In any Markovian model, the causal effect <span class="math inline">\(P(y \mid do(x))\)</span> is identifiable for any <span class="math inline">\(X, Y \subseteq V\)</span> and is obtained from the truncated factorization.</p>
+</section>
+<section id="the-adjustment-formula" class="level3">
+<h3 class="anchored" data-anchor-id="the-adjustment-formula">4.2 The Adjustment Formula</h3>
+<p>A particularly useful result is the <strong>adjustment by parents</strong> formula:</p>
+<p><span class="math display">\[P(y \mid do(x)) = \sum_{pa_x} P(y \mid x, pa_x) \cdot P(pa_x)\]</span></p>
+<p>This says: to compute the causal effect, condition on <span class="math inline">\(X\)</span> and all parents of <span class="math inline">\(X\)</span>, then marginalize over the parents. This works because conditioning on parents blocks all backdoor paths.</p>
+</section>
+</section>
+<section id="some-practical-exercises" class="level2">
+<h2 class="anchored" data-anchor-id="some-practical-exercises">5. Some practical Exercises</h2>
+<section id="exercise-1.-basic-probabilities" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-1.-basic-probabilities">Exercise 1. Basic probabilities</h3>
+<p>Seventy percent of cancer cases in a certain population are diagnosed in an early stage. Of those diagnosed early, 60% of the patients went to routine consultations twice a year, whereas 90% of the patients diagnosed late did not.</p>
+<p><strong>(a)</strong> Suppose a certain person has developed cancer and goes to routine consultations. What is the probability that cancer will be diagnosed early?</p>
+<p><strong>Answer:</strong></p>
+<p>Define the event as: <span class="math inline">\(E\)</span> represents cancer diagnosed early; <span class="math inline">\(L\)</span> means cancer diagnosed lated; and <span class="math inline">\(C\)</span> presents patients goes to routine consultations twice a year. Therefore, we have:</p>
+<ul>
+<li>Given <span class="math inline">\(P(C=1|E=1) = 0.6\)</span>, <span class="math inline">\(P(E=0|E=0) = 0.9\)</span>, <span class="math inline">\(P(E=1) = 0.7\)</span></li>
+<li>Using Bayes’s Theorem, we have: <span class="math display">\[
+\begin{aligned}
+P(E=1 | C=1) &amp;= \frac{P(E=1, C=1)}{P(C=1)} = \frac{P(C=1 | E=1)P(E=1)}{P(C=1)} \\
+&amp;= \frac{P(C=1 | E=1)P(E=1)}{P(C=1 | E=1)P(E=1) + P(C=1 | E=0)P(E=0)} \\
+&amp;= \frac{(0.6)(0.7)}{(0.6)(0.7) + (1 - 0.9)(0.3)} = \frac{14}{15} \approx 0.933
+\end{aligned}
+\]</span></li>
+</ul>
+<p><strong>(b)</strong> Construct a probability distribution over three random variables <span class="math inline">\(X, Y, Z\)</span> such that <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span> but <span class="math inline">\((X \perp\!\!\!\perp Y | Z)\)</span> does not hold. You can either describe the full joint distribution or their conditionals.</p>
+<p><strong>Answer:</strong></p>
+<p>Let’s define two independent coin toss experiments, we have:</p>
+<ul>
+<li><span class="math inline">\(X \in \{0, 1\}\)</span> result of the first coin (1 represents heads), <span class="math inline">\(P(X = 1) = 0.5\)</span>;</li>
+<li><span class="math inline">\(Y \in \{0, 1\}\)</span>: result of the second coin (1 represents heads), <span class="math inline">\(P(Y = 1) = 0.5\)</span>; and</li>
+<li><span class="math inline">\(Z\)</span>: if at least one of <span class="math inline">\(X\)</span> or <span class="math inline">\(Y\)</span> is heads, then <span class="math inline">\(Z = 1\)</span>; otherwise <span class="math inline">\(Z = 0\)</span>.</li>
+</ul>
+<p><strong>Verify</strong> <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span>: Since <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are tossed independently, their joint distribution is equal to the product of their marginal distributions: <span class="math inline">\(P(X, Y) = P(X)P(Y)\)</span>, Therefore, <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span>.</p>
+<p><strong>Verify</strong> <span class="math inline">\((X \perp\!\!\!\perp | Z)\)</span>: When we observe <span class="math inline">\(Z = 1\)</span>, if we then know that <span class="math inline">\(X = 0\)</span>, then <span class="math inline">\(Y\)</span> must be equal to 1.</p>
+<ul>
+<li>Without any known information, <span class="math inline">\(P(Y = 1) = 0.5\)</span>.</li>
+<li>Under the condition where <span class="math inline">\(Z = 1\)</span> and <span class="math inline">\(X = 0\)</span> are known:<span class="math inline">\(P(Y = 1 | Z = 1, X = 0) = 1\)</span></li>
+</ul>
+<p>Since <span class="math inline">\(P(Y = 1 | Z = 1, X = 0) \neq P(Y = 1 | Z = 1)\)</span>, this indicates that given <span class="math inline">\(Z\)</span>, information about <span class="math inline">\(X\)</span> changes our knowledge of <span class="math inline">\(Y\)</span>.</p>
+<p>This <span class="math inline">\(X \rightarrow Z \leftarrow Y\)</span> collider structure proves that two originally unrelated variables can become correlated when conditioned on a common descendant (or its descendant).</p>
+</section>
+<section id="exercise-2.-estimation-and-independence-relations" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-2.-estimation-and-independence-relations">Exercise 2. Estimation and Independence Relations</h3>
+<p>Consider random variables <span class="math inline">\(X_1, X_2\)</span> and <span class="math inline">\(Y\)</span> and assume our goal is to compute the query <span class="math inline">\(Q = P(y | x_1, x_2)\)</span>. We do not have any prior information about the conditional independence relations among these variables.</p>
+<p><strong>(a)</strong> For every one of the following sets of distributions, show how to compute the query <span class="math inline">\(Q\)</span> based on them, or explain why this is not possible:</p>
+<ol type="1">
+<li><span class="math inline">\(P(x_1, x_2), P(y), P(x_1 | y)\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
+<li><span class="math inline">\(P(x_1, x_2), P(y),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
+<li><span class="math inline">\(P(x_1 | y), P(x_2 | y),\)</span> and <span class="math inline">\(P(y)\)</span></li>
+<li><span class="math inline">\(P(x_1), P(x_2),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
+<li><span class="math inline">\(P(x_1), P(x_2), P(x_1 | y),\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
+</ol>
+<p><strong>(b)</strong> Suppose we learned that <span class="math inline">\((X_1 \perp\!\!\!\perp X_2 | Y)\)</span> holds in <span class="math inline">\(P\)</span>. Now, which of the sets before are sufficient to compute the query <span class="math inline">\(Q\)</span>? Show how or explain why it is not possible.</p>
+<p><strong>Answer:</strong> To compute the query <span class="math inline">\(Q = P(y | x_1, x_2)\)</span>, we rely on the definition of conditional probability and Bayes’ Theorem: <span class="math display">\[P(y \mid x_1, x_2) = \frac{P(y, x_1, x_2)}{P(x_1, x_2)} = \frac{P(y)P(x_1, x_2 \mid y)}{P(x_1, x_2)}\]</span></p>
+<p>For (b) part, we have additional information: <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y)\)</span>.</p>
+<ol type="1">
+<li><span class="math inline">\(P(x_1, x_2), P(y), P(x_1 | y)\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>Not possible. To compute <span class="math inline">\(Q\)</span>, we need joint conditional <span class="math inline">\(P(x_1, x_2 | y)\)</span>. Without knowing if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> are conditionally indenpendent given <span class="math inline">\(Y\)</span>, we cannot get <span class="math inline">\(P(x_1, x_2 | y)\)</span>.</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Yes, its possible now. With conditonal independence, we have <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y), Q = \frac{P(x_1 | y)P(x_2 | y)P(y)}{P(x_1, x_2)}\)</span>. The denominator is provided, and the numerator is reconstructed using the independence assumption.</li>
+</ol></li>
+</ul>
+<ol start="2" type="1">
+<li><span class="math inline">\(P(x_1, x_2), P(y),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>Possible, all ther terms in the Bayes’ Theorem are explicitly provided in this set.</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Possible, same reason with (a). The independence doesn’t change anything here.</li>
+</ol></li>
+</ul>
+<ol start="3" type="1">
+<li><span class="math inline">\(P(x_1 | y), P(x_2 | y),\)</span> and <span class="math inline">\(P(y)\)</span></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>Not possible. Because (1) we cannot compute the required joint <span class="math inline">\(P(x_1, x_2 | y)\)</span> without a conditional independence assumption, and (2) we lack the marginal <span class="math inline">\(P(x_1, x_2)\)</span> for the denominator.</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Yes, compute <span class="math inline">\(P(x_1, x_2) = \sum_{Y} P(x_1, x_2, y) = \sum_{Y} P(x_1, x_2 \mid y)P(y)\)</span> and <span class="math inline">\(P(x_1, x_2 \mid y)\)</span> as shown above. Then, all terms in the second expression from the previous question are estimable.</li>
+</ol></li>
+</ul>
+<ol start="4" type="1">
+<li><span class="math inline">\(P(x_1), P(x_2),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>Not possible. We lack <span class="math inline">\(P(y)\)</span> to compute the numerator, and without an independence assumption <span class="math inline">\((X_1 \perp\!\!\!\perp X_2)\)</span>, we cannot compute the joint denominator <span class="math inline">\(P(x_1, x_2)\)</span>.</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Not possible. Even with conditional independence, we still don’t have <span class="math inline">\(P(y)\)</span>.</li>
+</ol></li>
+</ul>
+<ol start="5" type="1">
+<li><span class="math inline">\(P(x_1), P(x_2), P(x_1 | y),\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>Not possible. It lacks <span class="math inline">\(P(y)\)</span>, we cannot compute <span class="math inline">\(P(x_1, x_2 | y)\)</span> from marginals <span class="math inline">\(P(x_1 | y), P(x_2 | y)\)</span>, we cannot obtain the <span class="math inline">\(P(x_1, x_2)\)</span> from the marginals <span class="math inline">\(P(x_1), P(x_2)\)</span> as well.</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Not possible. After considering <span class="math inline">\(P(x_1, x_2 \mid y) = P(x_1 \mid y)P(x_2 \mid y)\)</span> this is equivalent to the previous item and the same reason applies.</li>
+</ol></li>
+</ul>
+</section>
+<section id="exercise-3.-query-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-3.-query-estimation">Exercise 3. Query Estimation</h3>
+<p>Consider the following graphical model <span class="math inline">\(G\)</span> below:</p>
+<p>Suppose we want to compute the query <span class="math inline">\(Q = \sum_{Z_1}P(y | x, z_1) P(z_1)\)</span>.</p>
+<div class="center">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p1.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 3 DAG</figcaption>
+</figure>
+</div>
+</div>
+<p><strong>(a)</strong> <span class="math inline">\(Q = P(y | x)\)</span> in <span class="math inline">\(G\)</span>? Justify your answer.</p>
+<p><strong>Answer:</strong></p>
+<p>No, <span class="math inline">\(Q \neq P(y|x)\)</span>. There are two paths from <span class="math inline">\(Z_1\)</span> to <span class="math inline">\(Y\)</span>:</p>
+<p>Path 1: <span class="math inline">\(Z_1 \to X \to Y\)</span>, when we condition on <span class="math inline">\(X\)</span>, this path is blocked.</p>
+<p>Path 2: <span class="math inline">\(Z_1 \to Z_2 \to Y\)</span>, when we condition on <span class="math inline">\(X\)</span>, this path is not blocked.</p>
+<p>Therefore: <span class="math inline">\(Q = \sum_{z_1} P(y|x, z_1)P(z_1) \neq P(y|x)\)</span>.</p>
+<p>Intuitive: Even after observing <span class="math inline">\(X\)</span>, knowledge of <span class="math inline">\(Z_1\)</span> still provides information about <span class="math inline">\(Y\)</span> through the path <span class="math inline">\(Z_1 \to Z_2 \to Y\)</span>. This means <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Y\)</span> are not conditionally independent given <span class="math inline">\(X\)</span> alone.</p>
+<p><strong>(b)</strong> Suppose we have access to the marginal distribution <span class="math inline">\(P(X, Y, Z_2)\)</span>. Is it possible to estimate <span class="math inline">\(Q\)</span>? If so, show how to do it. Otherwise, explain why that is not the case.</p>
+<p><strong>Answer:</strong></p>
+<p>Yes, it is possible to estimate <span class="math inline">\(Q\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+Q &amp;= \sum_{Z_1} P(y \mid x, z_1)P(z_1) \\
+&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_1, z_2)P(z_2 \mid x, z_1)P(z_1) &amp;&amp; \text{Condition on } Z_2 \\
+&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid x, z_1)P(z_1) &amp;&amp; (Y \perp\!\!\!\perp Z_1 \mid Z_2, X) \\
+&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid z_1)P(z_1) &amp;&amp; (Z_2 \perp\!\!\!\perp X \mid Z_1) \\
+&amp;= \sum_{Z_2} P(y \mid x, z_2) \sum_{Z_1} P(z_2, z_1) &amp;&amp; \text{Chain rule and move summation in} \\
+&amp;= \sum_{Z_2} P(y \mid x, z_2)P(z_2) &amp;&amp; \text{Sum out } Z_1
+\end{aligned}
+\]</span></p>
+</section>
+<section id="exercise-4.-specifying-structural-causal-models" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-4.-specifying-structural-causal-models">Exercise 4. Specifying Structural Causal Models</h3>
+<p>The following is a description of a clinical decision support (CDS) alert system used in a hospital:</p>
+<ul>
+<li>The delivery channel location of the alert (<span class="math inline">\(L\)</span>) could be via the clinician’s phone or via the EHR system and is chosen at random every time with equal likelihood.</li>
+<li>Based on the clinician’s age group (<span class="math inline">\(A\)</span>), either a text-only alert or a text+image alert is used as the alert modality (<span class="math inline">\(M\)</span>). The age group is either <em>‘less than 40’ or ‘40 or more’</em>.</li>
+<li>The clinician will see (<span class="math inline">\(S\)</span>) the alert with the following probabilities:
+<ol type="1">
+<li>If <span class="math inline">\(L = \text{phone}\)</span> with probability <span class="math inline">\(1/3\)</span>,</li>
+<li>If <span class="math inline">\(L = \text{EHR system}, A = \text{less than 40}\)</span> with probability <span class="math inline">\(1/5\)</span> and</li>
+<li>If <span class="math inline">\(L = \text{EHR system}, A = \text{'40 or more'}\)</span> with probability <span class="math inline">\(1/6\)</span>.</li>
+</ol></li>
+<li>The clinician will judge the alert to be clinically relevant (<span class="math inline">\(I\)</span>) 60% of the time if the modality is text+image, or 40% of the time if the modality is text-only.</li>
+<li>The clinician has permission to administer the drug (<span class="math inline">\(D\)</span>) in 40% of cases.</li>
+<li>The clinician will administer the drug (<span class="math inline">\(C\)</span>) if the alert is seen, judged relevant, and the clinician has permission to administer the drug.</li>
+</ul>
+<p>Variables <span class="math inline">\(L, S, M, I\)</span> and <span class="math inline">\(C\)</span> are observable, while <span class="math inline">\(A\)</span> and <span class="math inline">\(D\)</span> are unobservable (other unobservables, which are not mentioned, may be present as well).</p>
+<p><strong>(a)</strong> Specify a structural causal model <span class="math inline">\(\mathcal{M} = \langle V, U, \mathcal{F}, P(U) \rangle\)</span> that captures this setting. Make a reasonable choice for the distribution of <span class="math inline">\(A\)</span> and the way <span class="math inline">\(M\)</span> is determined.</p>
+<p><strong>Answer:</strong></p>
+<p>Endogenous Variables (<span class="math inline">\(V\)</span>), <span class="math inline">\(V = \{L, S, M, I, C\}\)</span>.</p>
+<ul>
+<li><strong><span class="math inline">\(L\)</span> (Location/Device)</strong>: <span class="math inline">\(L=1\)</span> represents ‘phone’ and <span class="math inline">\(L=0\)</span> represents ‘EHR system’.</li>
+<li><strong><span class="math inline">\(M\)</span> (Modality)</strong>: Defined by the function <span class="math inline">\(f_M = A \oplus U_m\)</span>.</li>
+<li><strong><span class="math inline">\(S\)</span> (Seen)</strong>: <span class="math inline">\(S=1\)</span> represents ‘alert seen’.</li>
+<li><strong><span class="math inline">\(I\)</span> (Importance)</strong>: <span class="math inline">\(I=1\)</span> represents ‘alert judged clinically relevant’.</li>
+<li><strong><span class="math inline">\(C\)</span> (Administered)</strong>: <span class="math inline">\(C=1\)</span> represents ‘drug administered’.</li>
+</ul>
+<p>Exogenous Variables (<span class="math inline">\(U\)</span>), <span class="math inline">\(U = \{A, D, U_l, U_m, U_{s1}, U_{s2}, U_{s3}, U_{i1}, U_{i2}\}\)</span>.</p>
+<ul>
+<li><strong><span class="math inline">\(A\)</span> (Age)</strong>: <span class="math inline">\(A=1\)</span> represents ‘40 or more’ and <span class="math inline">\(A=0\)</span> represents ‘less than 40’.</li>
+<li><strong><span class="math inline">\(D\)</span> (Permission)</strong>: <span class="math inline">\(D=1\)</span> represents ‘has permission to administer the drug’.</li>
+</ul>
+<p>Structural Functions (<span class="math inline">\(\mathcal{F}\)</span>):</p>
+<p><span class="math display">\[
+\mathcal{F} = \begin{cases}
+f_L = U_l \\
+f_M = A \oplus U_m \\
+f_S = (L \wedge U_{s1}) \vee (\neg L \wedge ((A \wedge U_{s2}) \vee (\neg A \wedge U_{s3}))) \\
+f_I = (M \wedge U_{i1}) \vee (\neg M \wedge U_{i2}) \\
+f_C = S \wedge I \wedge D
+\end{cases}
+\]</span></p>
+<p>Probability Distribution <span class="math inline">\(P(u)\)</span>:</p>
+<ul>
+<li><strong>Marginals</strong>: <span class="math inline">\(P(D=1) = 0.4\)</span>, <span class="math inline">\(P(A=1) = 0.2\)</span>, <span class="math inline">\(P(U_l=1) = 1/2\)</span>, and <span class="math inline">\(P(U_m=1) = 1/4\)</span>.</li>
+<li><strong>Seen (<span class="math inline">\(S\)</span>) components</strong>: <span class="math inline">\(P(U_{s1}=1) = 1/3\)</span>, <span class="math inline">\(P(U_{s2}=1) = 1/5\)</span>, and <span class="math inline">\(P(U_{s3}=1) = 1/6\)</span>.</li>
+<li><strong>Importance (<span class="math inline">\(I\)</span>) components</strong>: <span class="math inline">\(P(U_{i1}=1) = 0.6\)</span> and <span class="math inline">\(P(U_{i2}=1) = 0.4\)</span>.</li>
+</ul>
+<p><strong>(b)</strong> Draw the causal diagram corresponding to the given SCM.</p>
+<p><strong>Answer:</strong></p>
+<div class="center">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p5.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 4 DAG</figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="exercise-5.-d-connectedness" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-5.-d-connectedness">Exercise 5. d-Connectedness</h3>
+<p>Consider the two graphs below, <span class="math inline">\(\mathcal{G}\)</span> (left) and <span class="math inline">\(\mathcal{G'}\)</span> (right).</p>
+<div class="center">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p2.png" class="img-fluid figure-img" width="800"></p>
+<figcaption>Exercise 5 DAG</figcaption>
+</figure>
+</div>
+</div>
+<p><strong>(a)</strong> List the variables that are d-connected to <span class="math inline">\(A\)</span> given <span class="math inline">\(\{B\}\)</span> in <span class="math inline">\(G\)</span>.</p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{C, F, H, I, E\}\)</span></p>
+<p><strong>(b)</strong> List the variables that are d-connected to <span class="math inline">\(A\)</span> given <span class="math inline">\(\{J\}\)</span> in <span class="math inline">\(G'\)</span>.</p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{G, D, B, E, I, H\}\)</span></p>
+</section>
+<section id="exercise-6.-d-separation" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-6.-d-separation">Exercise 6. d-Separation</h3>
+<p>Consider the following graphical model and conditional probability tables:</p>
+<div class="center">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p3.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 6 DAG</figcaption>
+</figure>
+</div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(P(B=1)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(E=1)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(S=1)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(C=1)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0.02</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">0.80</td>
+<td style="text-align: center;">0.15</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(B\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(E\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(A=1|B,E)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(M=1|A,C)\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(S\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(P(J=1|A,S)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.05</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.30</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.90</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.85</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.97</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.98</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.15</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.10</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(a)</strong> List all d-separation statements that hold assuming that <span class="math inline">\(J=1\)</span>.</p>
+<p><strong>Answer:</strong></p>
+<p>Conditioning on <span class="math inline">\(J\)</span> opens the paths <span class="math inline">\(S \leftrightarrow A\)</span>. The following variables remain d-separated:</p>
+<ul>
+<li><span class="math inline">\((S \perp\!\!\!\perp B, E \mid J, A)\)</span></li>
+<li><span class="math inline">\((C \perp\!\!\!\perp B, E, A, S \mid J)\)</span></li>
+<li><span class="math inline">\((M \perp\!\!\!\perp B, E, S \mid J, A, C)\)</span></li>
+</ul>
+<p><strong>(b)</strong> Compute the given probabilities using the graph and the probability tables:</p>
+<ol type="1">
+<li><span class="math inline">\(P(M=1)\)</span></li>
+<li><span class="math inline">\(P(J=1|C=0)\)</span></li>
+<li><span class="math inline">\(P(E=1|M=1, B=0)\)</span></li>
+<li><span class="math inline">\(P(M=1|B=1, J=0)\)</span></li>
+</ol>
+<p><strong>Answer:</strong></p>
+<p><strong>1.</strong> <span class="math inline">\(P(M=1) = \sum_{A,C} P(M=1|A,C) \cdot P(A) \cdot P(C)\)</span></p>
+<p>Step 1: Compute <span class="math inline">\(P(A=1)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(A=1) &amp;= \sum_{B,E} P(A=1|B,E) \cdot P(B) \cdot P(E) \\
+&amp;= P(A=1|B=0,E=0) \cdot P(B=0) \cdot P(E=0) \\
+&amp;\quad + P(A=1|B=0,E=1) \cdot P(B=0) \cdot P(E=1) \\
+&amp;\quad + P(A=1|B=1,E=0) \cdot P(B=1) \cdot P(E=0) \\
+&amp;\quad + P(A=1|B=1,E=1) \cdot P(B=1) \cdot P(E=1) \\
+&amp;= 0.01 \times 0.98 \times 0.99 + 0.3 \times 0.98 \times 0.01 + 0.9 \times 0.02 \times 0.99 + 0.98 \times 0.02 \times 0.01 \\
+&amp;= 0.030658
+\end{aligned}
+\]</span></p>
+<p>Therefore: <span class="math inline">\(P(A=0) = 1 - 0.030658 = 0.969342\)</span></p>
+<p>Step 2: Compute <span class="math inline">\(P(M=1)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(M=1) &amp;= P(M=1|A=0,C=0) \cdot P(A=0) \cdot P(C=0) \\
+&amp;\quad + P(M=1|A=0,C=1) \cdot P(A=0) \cdot P(C=1) \\
+&amp;\quad + P(M=1|A=1,C=0) \cdot P(A=1) \cdot P(C=0) \\
+&amp;\quad + P(M=1|A=1,C=1) \cdot P(A=1) \cdot P(C=1) \\
+&amp;= 0.05 \times 0.969 \times 0.85 + 0 \times 0.969 \times 0.15 + 0.85 \times 0.0307 \times 0.85 + 0.15 \times 0.0307 \times 0.15 \\
+&amp;= 0.0640
+\end{aligned}
+\]</span></p>
+<p><strong>2.</strong> <span class="math inline">\(P(J=1) = \sum_{A,S} P(J=1|A,S) \cdot P(A) \cdot P(S)\)</span></p>
+<p>By examining the DAG, we can verify that <span class="math inline">\((J \perp\!\!\!\perp C)\)</span>: <span class="math inline">\(C\)</span> only affects <span class="math inline">\(M\)</span> and there is no path from <span class="math inline">\(C\)</span> to <span class="math inline">\(J\)</span> that is not blocked.</p>
+<p>Therefore: <span class="math inline">\((J=1|C=0) = P(J=1)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(J=1) &amp;= P(J=1|A=0,S=0) \cdot P(A=0) \cdot P(S=0) \\
+&amp;\quad + P(J=1|A=0,S=1) \cdot P(A=0) \cdot P(S=1) \\
+&amp;\quad + P(J=1|A=1,S=0) \cdot P(A=1) \cdot P(S=0) \\
+&amp;\quad + P(J=1|A=1,S=1) \cdot P(A=1) \cdot P(S=1) \\
+&amp;= 0 \times 0.969 \times 0.2 + 0 \times 0.969 \times 0.8 + 0.97 \times 0.0307 \times 0.2 + 0.1 \times 0.0307 \times 0.8 \\
+&amp;= 0.0084
+\end{aligned}
+\]</span></p>
+<p><strong>3.</strong> <span class="math inline">\(P(E=1|M=1, B=0) = \frac{P(M=1|E=1,B=0) \cdot P(E=1)}{P(M=1|B=0)}\)</span></p>
+<p>Compute <span class="math inline">\(P(A=1|B=0, E)\)</span>: <span class="math inline">\(P(A=1|B=0, E=0) = 0.01, \quad P(A=1|B=0, E=1) = 0.3\)</span></p>
+<p>Compute <span class="math inline">\(P(M=1|B=0, E)\)</span> for each value of <span class="math inline">\(E\)</span>:</p>
+<p><span class="math display">\[
+\small
+P(M=1|B=0,E) = \sum_{A,C} P(M=1|A,C) \cdot P(A|B=0,E) \cdot P(C)
+\]</span></p>
+<ul>
+<li><strong>For E=0:</strong> <span class="math display">\[
+  \small
+  \begin{aligned}
+  P(M=1|B=0,E=0) &amp;= 0.05 \times 0.99 \times 0.85 + 0 \times 0.99 \times 0.15 \\
+  &amp;\quad + 0.85 \times 0.01 \times 0.85 + 0.15 \times 0.01 \times 0.15 \\
+  &amp;= 0.0495
+  \end{aligned}
+  \]</span></li>
+<li><strong>For E=1:</strong> <span class="math display">\[
+  \small
+  \begin{aligned}
+  P(M=1|B=0,E=1) &amp;= 0.05 \times 0.7 \times 0.85 + 0 \times 0.7 \times 0.15 \\
+  &amp;\quad + 0.85 \times 0.3 \times 0.85 + 0.15 \times 0.3 \times 0.15 \\
+  &amp;= 0.2533
+  \end{aligned}
+  \]</span></li>
+</ul>
+<p>Compute <span class="math inline">\(P(M=1|B=0)\)</span>:</p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(M=1|B=0) &amp;= P(M=1|B=0,E=0) \cdot P(E=0) + P(M=1|B=0,E=1) \cdot P(E=1) \\
+&amp;= 0.049525 \times 0.99 + 0.2533 \times 0.01 \\
+&amp;= 0.05156
+\end{aligned}
+\]</span></p>
+<p>Apply Bayes’ Theorem: <span class="math display">\[
+\small
+P(E=1|M=1,B=0) = \frac{P(M=1|B=0,E=1) \cdot P(E=1)}{P(M=1|B=0)} = \frac{0.2533 \times 0.01}{0.05156} = 0.0491
+\]</span></p>
+<p><strong>4.</strong> <span class="math inline">\(P(M=1|B=1,J=0) = \frac{P(M=1, J=0|B=1)}{P(J=0|B=1)}\)</span></p>
+<p>Step 1: Compute <span class="math inline">\(P(A|B=1)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(A=1|B=1) &amp;= P(A=1|B=1,E=0) \cdot P(E=0) + P(A=1|B=1,E=1) \cdot P(E=1) \\
+&amp;= 0.9 \times 0.99 + 0.98 \times 0.01 \\
+&amp;= 0.891 + 0.0098 = 0.9008
+\end{aligned}
+\]</span></p>
+<p>Therefore: <span class="math inline">\(P(A=0|B=1) = 0.0992\)</span></p>
+<p>Step 2: Compute <span class="math inline">\(P(J=0|A)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(J=0|A=0) &amp;= P(J=0|A=0,S=0) \cdot P(S=0) + P(J=0|A=0,S=1) \cdot P(S=1) \\
+&amp;= 1 \times 0.2 + 1 \times 0.8 = 1
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(J=0|A=1) &amp;= P(J=0|A=1,S=0) \cdot P(S=0) + P(J=0|A=1,S=1) \cdot P(S=1) \\
+&amp;= 0.03 \times 0.2 + 0.9 \times 0.8 \\
+&amp;= 0.006 + 0.72 = 0.726
+\end{aligned}
+\]</span></p>
+<p>Step 3: Compute <span class="math inline">\(P(M=1|A)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(M=1|A=0) &amp;= P(M=1|A=0,C=0) \cdot P(C=0) + P(M=1|A=0,C=1) \cdot P(C=1) \\
+&amp;= 0.05 \times 0.85 + 0 \times 0.15 = 0.0425
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(M=1|A=1) &amp;= P(M=1|A=1,C=0) \cdot P(C=0) + P(M=1|A=1,C=1) \cdot P(C=1) \\
+&amp;= 0.85 \times 0.85 + 0.15 \times 0.15 \\
+&amp;= 0.7225 + 0.0225 = 0.745
+\end{aligned}
+\]</span></p>
+<p>Step 4: Compute <span class="math inline">\(P(M=1, J=0|B=1)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(M=1, J=0|B=1) &amp;= \sum_{A} P(M=1|A) \cdot P(J=0|A) \cdot P(A|B=1) \\
+&amp;= P(M=1|A=0) \cdot P(J=0|A=0) \cdot P(A=0|B=1) \\
+&amp;\quad + P(M=1|A=1) \cdot P(J=0|A=1) \cdot P(A=1|B=1) \\
+&amp;= 0.0425 \times 1 \times 0.0992 + 0.745 \times 0.726 \times 0.9008 \\
+&amp;= 0.004216 + 0.4872 = 0.4914
+\end{aligned}
+\]</span></p>
+<p>Step 5: Compute <span class="math inline">\(P(J=0|B=1)\)</span></p>
+<p><span class="math display">\[
+\small
+\begin{aligned}
+P(J=0|B=1) &amp;= \sum_{A} P(J=0|A) \cdot P(A|B=1) \\
+&amp;= P(J=0|A=0) \cdot P(A=0|B=1) + P(J=0|A=1) \cdot P(A=1|B=1) \\
+&amp;= 1 \times 0.0992 + 0.726 \times 0.9008 \\
+&amp;= 0.0992 + 0.654 = 0.7532
+\end{aligned}
+\]</span></p>
+<p>Step 6: Final Calculation</p>
+<p><span class="math display">\[
+\small
+P(M=1|B=1,J=0) = \frac{P(M=1, J=0|B=1)}{P(J=0|B=1)} = \frac{0.4914}{0.7532} = 0.652
+\]</span></p>
+</section>
+<section id="exercise-7.-d-separating-sets" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-7.-d-separating-sets">Exercise 7. d-Separating Sets</h3>
+<p>Let <span class="math inline">\(G\)</span> (shown below) be the causal diagram of some unknown model <span class="math inline">\(M\)</span> and let <span class="math inline">\(P\)</span> be <span class="math inline">\(M\)</span>’s observational distribution.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p4.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 7 DAG</figcaption>
+</figure>
+</div>
+<p><strong>(a)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(W\)</span>.</p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{Z, S\}\)</span></p>
+<p><strong>(b)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(S\)</span>.</p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{\emptyset\}\)</span></p>
+<p><strong>(c)</strong> Find all minimal sets <span class="math inline">\(A\)</span> (if any exists) that d-separate <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span>.</p>
+<p><strong>Answer:</strong> <span class="math inline">\(\{W,T\}, \{W, S\}\)</span></p>
+<p><strong>(d)</strong> Draw a graph <span class="math inline">\(\mathcal{G}'\)</span> over the variables <span class="math inline">\(\{X, S, W, Y\}\)</span> such that:</p>
+<ul>
+<li><span class="math inline">\(\mathcal{G}'\)</span> has exactly the same independence as <span class="math inline">\(\mathcal{G}'\)</span> with respect to <span class="math inline">\(P(X, S, W, Y)\)</span>, and<br>
+</li>
+<li><span class="math inline">\(\mathcal{G}'\)</span> has the minimum number of edges while satisfying this constraint in the previous bullet.</li>
+</ul>
+<p><em>Hint: In the first step, determine which graph is obtained if</em> <span class="math inline">\(Z\)</span> and <span class="math inline">\(T\)</span> are unobserved, and list the independences implied by this graph. In the second step, consider which of the edges can be removed without affecting any of the independences.</p>
+<p><strong>Answer:</strong></p>
+<div class="center">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p6.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 7(d) DAG</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li>Pearl, J. (2009). <em>Causality: Models, Reasoning, and Inference</em> (2nd ed.)</li>
+<li>Pearl, J., Glymour, M., &amp; Jewell, N. P. (2016). <em>Causal Inference in Statistics: A Primer</em></li>
+<li>Pearl, J., &amp; Mackenzie, D. (2018). <em>The book of why: the new science of cause and effect. Basic books</em></li>
+<li>Bareinboim, E., Correa, J. D., Ibeling, D., &amp; Icard, T. (2022). <em>On Pearl’s hierarchy and the foundations of causal inference. In Probabilistic and causal inference: the works of Judea Pearl.</em></li>
+</ul>
+<hr>
+<p><em>This tutorial is based on lecture and assignment materials from STATS C160/260: Causal Inference for Health Data taught by Professor <a href="https://dplecko.com/">Drago Plecko</a>, Winter 2026.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

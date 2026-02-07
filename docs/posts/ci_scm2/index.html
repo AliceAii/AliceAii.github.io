@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Shuhan (Alice) Ai">
-<meta name="dcterms.date" content="2026-01-25">
+<meta name="dcterms.date" content="2026-02-07">
 
-<title>Structural Causal Models (SCM) Part 1: Pearl’s Causal Hierarchy and Causality Identification – Shuhan (Alice) Ai</title>
+<title>SCM Part 2: From Back-door to Do-Calculus – Shuhan (Alice) Ai</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -74,6 +74,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -342,7 +345,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Structural Causal Models (SCM) Part 1: Pearl’s Causal Hierarchy and Causality Identification</h1>
+      <h1 class="title">SCM Part 2: From Back-door to Do-Calculus</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Causal Inference</div>
               </div>
@@ -362,7 +365,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">January 25, 2026</p>
+        <p class="date">February 7, 2026</p>
       </div>
     </div>
     
@@ -378,35 +381,42 @@ window.Quarto = {
     <h2 id="toc-title">Contents</h2>
    
   <ul>
-  <li><a href="#pearls-causal-hierarchy-pch" id="toc-pearls-causal-hierarchy-pch" class="nav-link active" data-scroll-target="#pearls-causal-hierarchy-pch">1. Pearl’s Causal Hierarchy (PCH)</a>
+  <li><a href="#the-identification-problem" id="toc-the-identification-problem" class="nav-link active" data-scroll-target="#the-identification-problem">1. The Identification Problem</a>
   <ul class="collapse">
-  <li><a href="#the-three-levels" id="toc-the-three-levels" class="nav-link" data-scroll-target="#the-three-levels">1.1 The Three Levels</a></li>
+  <li><a href="#what-does-identification-mean" id="toc-what-does-identification-mean" class="nav-link" data-scroll-target="#what-does-identification-mean">1.1 What Does “Identification” Mean?</a></li>
+  <li><a href="#the-truncated-factorization-formula" id="toc-the-truncated-factorization-formula" class="nav-link" data-scroll-target="#the-truncated-factorization-formula">1.2 The Truncated Factorization Formula</a></li>
+  <li><a href="#intuition-why-some-effects-are-identifiable-and-others-are-not" id="toc-intuition-why-some-effects-are-identifiable-and-others-are-not" class="nav-link" data-scroll-target="#intuition-why-some-effects-are-identifiable-and-others-are-not">1.3 Intuition: Why Some Effects Are Identifiable and Others Are Not</a></li>
   </ul></li>
-  <li><a href="#structural-causal-models" id="toc-structural-causal-models" class="nav-link" data-scroll-target="#structural-causal-models">2. Structural Causal Models</a>
+  <li><a href="#the-back-door-criterion" id="toc-the-back-door-criterion" class="nav-link" data-scroll-target="#the-back-door-criterion">2. The Back-door Criterion</a>
   <ul class="collapse">
-  <li><a href="#definition" id="toc-definition" class="nav-link" data-scroll-target="#definition">2.1 Definition</a></li>
-  <li><a href="#three-key-properties-of-scms" id="toc-three-key-properties-of-scms" class="nav-link" data-scroll-target="#three-key-properties-of-scms">2.2 Three Key Properties of SCMs</a></li>
-  <li><a href="#example-a-simple-scm" id="toc-example-a-simple-scm" class="nav-link" data-scroll-target="#example-a-simple-scm">2.3 Example: A Simple SCM</a></li>
+  <li><a href="#definition-and-intuition" id="toc-definition-and-intuition" class="nav-link" data-scroll-target="#definition-and-intuition">2.1 Definition and Intuition</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls">2.2 Common Pitfalls</a></li>
   </ul></li>
-  <li><a href="#conditional-independenceci-and-d-separation" id="toc-conditional-independenceci-and-d-separation" class="nav-link" data-scroll-target="#conditional-independenceci-and-d-separation">3. Conditional Independence(CI) and d-Separation</a>
+  <li><a href="#estimation-of-causal-effects" id="toc-estimation-of-causal-effects" class="nav-link" data-scroll-target="#estimation-of-causal-effects">3. Estimation of Causal Effects</a>
   <ul class="collapse">
-  <li><a href="#ci-definitions" id="toc-ci-definitions" class="nav-link" data-scroll-target="#ci-definitions">3.1 CI Definitions</a></li>
-  <li><a href="#d-separation-reading-independencies-from-graphs" id="toc-d-separation-reading-independencies-from-graphs" class="nav-link" data-scroll-target="#d-separation-reading-independencies-from-graphs">3.2 d-Separation: Reading Independencies from Graphs</a></li>
+  <li><a href="#inverse-propensity-weighting-ipw" id="toc-inverse-propensity-weighting-ipw" class="nav-link" data-scroll-target="#inverse-propensity-weighting-ipw">3.1 Inverse Propensity Weighting (IPW)</a></li>
+  <li><a href="#outcome-regression" id="toc-outcome-regression" class="nav-link" data-scroll-target="#outcome-regression">3.2 Outcome Regression</a></li>
+  <li><a href="#augmented-ipw-aipw" id="toc-augmented-ipw-aipw" class="nav-link" data-scroll-target="#augmented-ipw-aipw">3.3 Augmented IPW (AIPW)</a></li>
   </ul></li>
-  <li><a href="#the-identification-problem" id="toc-the-identification-problem" class="nav-link" data-scroll-target="#the-identification-problem">4. The Identification Problem</a>
+  <li><a href="#the-front-door-criterion" id="toc-the-front-door-criterion" class="nav-link" data-scroll-target="#the-front-door-criterion">4. The Front-door Criterion</a>
   <ul class="collapse">
-  <li><a href="#the-truncated-factorization-formula" id="toc-the-truncated-factorization-formula" class="nav-link" data-scroll-target="#the-truncated-factorization-formula">4.1 The Truncated Factorization Formula</a></li>
-  <li><a href="#the-adjustment-formula" id="toc-the-adjustment-formula" class="nav-link" data-scroll-target="#the-adjustment-formula">4.2 The Adjustment Formula</a></li>
+  <li><a href="#definition-and-formula" id="toc-definition-and-formula" class="nav-link" data-scroll-target="#definition-and-formula">4.1 Definition and Formula</a></li>
+  <li><a href="#intuition-a-two-step-argument" id="toc-intuition-a-two-step-argument" class="nav-link" data-scroll-target="#intuition-a-two-step-argument">4.2 Intuition: A Two-Step Argument</a></li>
+  <li><a href="#derivation-from-first-principles" id="toc-derivation-from-first-principles" class="nav-link" data-scroll-target="#derivation-from-first-principles">4.3 Derivation from First Principles</a></li>
   </ul></li>
-  <li><a href="#some-practical-exercises" id="toc-some-practical-exercises" class="nav-link" data-scroll-target="#some-practical-exercises">5. Some practical Exercises</a>
+  <li><a href="#do-calculus" id="toc-do-calculus" class="nav-link" data-scroll-target="#do-calculus">5. Do-Calculus</a>
   <ul class="collapse">
-  <li><a href="#exercise-1.-basic-probabilities" id="toc-exercise-1.-basic-probabilities" class="nav-link" data-scroll-target="#exercise-1.-basic-probabilities">Exercise 1. Basic probabilities</a></li>
-  <li><a href="#exercise-2.-estimation-and-independence-relations" id="toc-exercise-2.-estimation-and-independence-relations" class="nav-link" data-scroll-target="#exercise-2.-estimation-and-independence-relations">Exercise 2. Estimation and Independence Relations</a></li>
-  <li><a href="#exercise-3.-query-estimation" id="toc-exercise-3.-query-estimation" class="nav-link" data-scroll-target="#exercise-3.-query-estimation">Exercise 3. Query Estimation</a></li>
-  <li><a href="#exercise-4.-specifying-structural-causal-models" id="toc-exercise-4.-specifying-structural-causal-models" class="nav-link" data-scroll-target="#exercise-4.-specifying-structural-causal-models">Exercise 4. Specifying Structural Causal Models</a></li>
-  <li><a href="#exercise-5.-d-connectedness" id="toc-exercise-5.-d-connectedness" class="nav-link" data-scroll-target="#exercise-5.-d-connectedness">Exercise 5. d-Connectedness</a></li>
-  <li><a href="#exercise-6.-d-separation" id="toc-exercise-6.-d-separation" class="nav-link" data-scroll-target="#exercise-6.-d-separation">Exercise 6. d-Separation</a></li>
-  <li><a href="#exercise-7.-d-separating-sets" id="toc-exercise-7.-d-separating-sets" class="nav-link" data-scroll-target="#exercise-7.-d-separating-sets">Exercise 7. d-Separating Sets</a></li>
+  <li><a href="#the-three-rules" id="toc-the-three-rules" class="nav-link" data-scroll-target="#the-three-rules">5.1 The Three Rules</a></li>
+  <li><a href="#soundness-and-completeness" id="toc-soundness-and-completeness" class="nav-link" data-scroll-target="#soundness-and-completeness">5.2 Soundness and Completeness</a></li>
+  </ul></li>
+  <li><a href="#some-practical-exercises" id="toc-some-practical-exercises" class="nav-link" data-scroll-target="#some-practical-exercises">6. Some practical Exercises</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1.-applying-the-backdoor-criterion" id="toc-exercise-1.-applying-the-backdoor-criterion" class="nav-link" data-scroll-target="#exercise-1.-applying-the-backdoor-criterion">Exercise 1. Applying the Backdoor Criterion</a></li>
+  <li><a href="#exercise-2.-back-door-adjustment-i" id="toc-exercise-2.-back-door-adjustment-i" class="nav-link" data-scroll-target="#exercise-2.-back-door-adjustment-i">Exercise 2. Back-door Adjustment I</a></li>
+  <li><a href="#exercise-3.-back-door-adjustment-ii" id="toc-exercise-3.-back-door-adjustment-ii" class="nav-link" data-scroll-target="#exercise-3.-back-door-adjustment-ii">Exercise 3. Back-door Adjustment II</a></li>
+  <li><a href="#exercise-4.-do-calculus-rules" id="toc-exercise-4.-do-calculus-rules" class="nav-link" data-scroll-target="#exercise-4.-do-calculus-rules">Exercise 4. Do-Calculus Rules</a></li>
+  <li><a href="#exercise-5.-changing-the-granularity-of-the-model" id="toc-exercise-5.-changing-the-granularity-of-the-model" class="nav-link" data-scroll-target="#exercise-5.-changing-the-granularity-of-the-model">Exercise 5. Changing the Granularity of the Model</a></li>
+  <li><a href="#exercise-6.-many-paths-lead-to-id" id="toc-exercise-6.-many-paths-lead-to-id" class="nav-link" data-scroll-target="#exercise-6.-many-paths-lead-to-id">Exercise 6. Many Paths Lead to ID</a></li>
   </ul></li>
   <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
   </ul>
@@ -420,774 +430,761 @@ window.Quarto = {
 
 
 
-<p>In the <a href="https://aliceaii.github.io/posts/ci_scm/">previous post</a>, we’ve learnt the foundations of Directed Acyclic Graphs (DAGs) and Structural Causal Models (SCMs). This tutorial builds on those foundations with a deeper dive into the SCM. By the end of this tutorial, you will understand:</p>
-<ul>
-<li>The three levels of Pearl’s Causal Hierarchy and why they matter</li>
-<li>How SCMs formally encode causal mechanisms</li>
-<li>How to use d-separation to read independencies from graphs</li>
-<li>When and how causal queries can be identified from data</li>
-<li>How to specify complete SCMs for real-world questions</li>
-</ul>
-<p><img src="f1.png" class="img-fluid"></p>
-<section id="pearls-causal-hierarchy-pch" class="level2">
-<h2 class="anchored" data-anchor-id="pearls-causal-hierarchy-pch">1. Pearl’s Causal Hierarchy (PCH)</h2>
-<p>A cornerstone of causal inference is the recognition that knowledge operates within a stratified structure of increasing complexity. Named after UCLA Professor <em>Judea Pearl</em>, this system is called the <strong>Pearl Causal Hierarchy (PCH)</strong>, also known as the ‘Ladder of Causation’.</p>
-<section id="the-three-levels" class="level3">
-<h3 class="anchored" data-anchor-id="the-three-levels">1.1 The Three Levels</h3>
-<p>Every Structural Causal Model (SCM) induces a three-level hierarchy:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 12%">
-<col style="width: 14%">
-<col style="width: 25%">
-<col style="width: 26%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: center;">Level</th>
-<th style="text-align: left;">Name</th>
-<th style="text-align: left;">Symbol</th>
-<th style="text-align: left;">Activity</th>
-<th style="text-align: left;">Typical Question</th>
-<th style="text-align: left;">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;"><strong>L1</strong></td>
-<td style="text-align: left;">Associational</td>
-<td style="text-align: left;"><span class="math inline">\(P(y \mid x)\)</span></td>
-<td style="text-align: left;"><strong>Seeing</strong></td>
-<td style="text-align: left;">“What is?” How would seeing <span class="math inline">\(X\)</span> change my belief in <span class="math inline">\(Y\)</span>?</td>
-<td style="text-align: left;">Is high attendance associated with higher test scores?</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><strong>L2</strong></td>
-<td style="text-align: left;">Interventional</td>
-<td style="text-align: left;"><span class="math inline">\(P(y \mid do(x))\)</span></td>
-<td style="text-align: left;"><strong>Doing</strong></td>
-<td style="text-align: left;">“What if?” What if I do <span class="math inline">\(X\)</span>?</td>
-<td style="text-align: left;">If we mandate after-school tutoring, will grades improve?</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><strong>L3</strong></td>
-<td style="text-align: left;">Counterfactual</td>
-<td style="text-align: left;"><span class="math inline">\(P(y_x \mid x', y')\)</span></td>
-<td style="text-align: left;"><strong>Imagining</strong></td>
-<td style="text-align: left;">“Why?” What if I had acted differently?</td>
-<td style="text-align: left;">Given that the student failed, would they have passed if they had studied for one more hour?</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Level 1 (Observational/Associational)</strong>: This is the realm of traditional statistics and machine learning. We observe data and ask questions about correlations and predictions. “Does high classroom attendance predict higher test scores?” This is what most predictive analytics do, they identify patterns without necessarily explaining what causes them.</p>
-<p><strong>Level 2 (Interventional)</strong>: This level asks what happens when we <em>actively intervene</em> in the educational system. We move from <strong>seeing</strong> (<span class="math inline">\(P(y|x)\)</span>) to <strong>doing</strong> (<span class="math inline">\(P(y|do(x))\)</span>). When we merely observe that students who attend tutoring get good grades, that’s “seeing.” When we mandate that all students attend tutoring, we are “doing”, we force <span class="math inline">\(X\)</span> to take the value <span class="math inline">\(x\)</span>, changing the mechanism. This is the level of randomized controlled trials and new policy implementation.</p>
-<p><strong>Level 3 (Counterfactual)</strong>: This is the most powerful level, allowing us to reason about what would have happened under different circumstances, even for specific individuals. “Given that this specific student failed the exam, would they have passed if they had studied for one more hour?” This requires reasoning about alternative worlds—imagining a scenario that conflicts with the observed reality (the student didn’t study and did fail) to understand individual causality.</p>
-<p><strong>PCH - Comparing to Human Cognitive Capabilities:</strong></p>
-<ul>
-<li>human: sensors + agency + retrospection</li>
-<li>L1 represents the ability to observe the world and infer the ‘next’ stage</li>
-<li>L2 representes the ability to intervene in the world and change it</li>
-<li>L3 represents the ability to reflect about what we did (and didn’t do) and infer new behaviors</li>
-</ul>
-</section>
-</section>
-<section id="structural-causal-models" class="level2">
-<h2 class="anchored" data-anchor-id="structural-causal-models">2. Structural Causal Models</h2>
-<section id="definition" class="level3">
-<h3 class="anchored" data-anchor-id="definition">2.1 Definition</h3>
-<p>A <strong>Structural Causal Model (SCM)</strong> <span class="math inline">\(\mathcal{M}\)</span> is a 4-tuple <span class="math inline">\(\langle V, U, \mathcal{F}, P(U) \rangle\)</span>, where:</p>
-<ul>
-<li><span class="math inline">\(V = \{V_1, \ldots, V_n\}\)</span> are <strong>endogenous (observed) variables</strong></li>
-<li><span class="math inline">\(U = \{U_1, \ldots, U_m\}\)</span> are <strong>exogenous (unobserved) variables</strong><br>
-</li>
-<li><span class="math inline">\(\mathcal{F} = \{f_1, \ldots, f_n\}\)</span> are <strong>structural functions</strong> determining <span class="math inline">\(V\)</span>: <span class="math display">\[v_i \leftarrow f_i(pa_i, u_i), \quad Pa_i \subset V, \; U_i \subset U\]</span></li>
-<li><span class="math inline">\(P(U)\)</span> is a <strong>probability distribution</strong> over exogenous variables</li>
-</ul>
-</section>
-<section id="three-key-properties-of-scms" class="level3">
-<h3 class="anchored" data-anchor-id="three-key-properties-of-scms">2.2 Three Key Properties of SCMs</h3>
-<p>Every SCM <span class="math inline">\(\mathcal{M}\)</span> has three fundamental properties:</p>
-<p><strong>Property 1: SCM induces an observational distribution <span class="math inline">\(P(V)\)</span></strong></p>
-<p>The structural functions <span class="math inline">\(\mathcal{F}\)</span> can be seen as a mapping from <span class="math inline">\(U\)</span> to <span class="math inline">\(V\)</span>. The observational distribution over endogenous variables is:</p>
-<p><span class="math display">\[P_\mathcal{M}(V) = \sum_u P(U=u) \cdot \mathbf{1}[\mathcal{F}(u) = v]\]</span></p>
-<p>This is the joint distribution we would observe if we simply collected data without intervening. In other word, the probability of seeing any data point <span class="math inline">\(V\)</span> is determined by the probability of the background noise (<span class="math inline">\(U\)</span>) and the deterministic functions (<span class="math inline">\(\mathcal{F}\)</span>) that transform that noise into observable data.</p>
-<p><strong>Property 2: SCM defines a causal diagram</strong></p>
-<p>Every SCM induces a graphical model called a <strong>causal diagram</strong>, constructed as follows:</p>
+<p>In the <a href="https://aliceaii.github.io/posts/ci_scm1/">previous post</a>, we explored the foundations of Structural Causal Models (SCMs) and how they allow us to formalize causal relationships. We learned that SCMs provide the mathematical machinery to distinguish between <em>seeing</em> (observational data) and <em>doing</em> (interventions).</p>
+<p>But <strong>Can we always compute causal effects from observational data?</strong></p>
+<p>The answer, as we’ll discover, is a resounding “it depends.” This post takes you on a journey through the identification problem—determining when and how we can express causal effects using only observational data. We’ll cover:</p>
 <ol type="1">
-<li>Add a vertex for every endogenous variable <span class="math inline">\(V_i \in V\)</span></li>
-<li>Add edge <span class="math inline">\(V_j \rightarrow V_i\)</span> if <span class="math inline">\(V_j\)</span> appears as argument of <span class="math inline">\(f_i\)</span></li>
-<li>Add bidirected edge <span class="math inline">\(V_i \leftrightarrow V_j\)</span> if the corresponding functions share an exogenous variable (i.e., <span class="math inline">\(U_i \cap U_j \neq \emptyset\)</span>)</li>
+<li><strong>The Back-door Criterion</strong>: The workhorse of causal identification</li>
+<li><strong>Estimation Methods</strong>: IPW, regression, and doubly-robust approaches<br>
+</li>
+<li><strong>Front-door Adjustment</strong>: Beyond back-door criterion, an alternative when confounders are unmeasured</li>
+<li><strong>Do-Calculus</strong>: The toolkit for causal identification</li>
+<li>Some exercises to practice our knowledge</li>
 </ol>
-<p><strong>Property 3: SCM spawns the Pearl Causal Hierarchy</strong></p>
-<p>The SCM generates distributions at all three levels of the PCH. The observational distribution <span class="math inline">\(P(v)\)</span> is L1. Interventional distributions <span class="math inline">\(P(v|do(x))\)</span> form L2. And counterfactual distributions <span class="math inline">\(P(y_x|x', y')\)</span> constitute L3.</p>
-</section>
-<section id="example-a-simple-scm" class="level3">
-<h3 class="anchored" data-anchor-id="example-a-simple-scm">2.3 Example: A Simple SCM</h3>
-<p>Consider a simplified model of an after-school reading program:</p>
-<ul>
-<li>Endogenous variables <span class="math inline">\(V\)</span>:<span class="math inline">\(X\)</span>: Program Participation (<span class="math inline">\(1 =\)</span> attended, <span class="math inline">\(0 =\)</span> did not attend); <span class="math inline">\(F\)</span>: Reading Fluency (<span class="math inline">\(1 =\)</span> improved, <span class="math inline">\(0 =\)</span> no improvement), and <span class="math inline">\(Y\)</span>: Final Exam Pass (<span class="math inline">\(1 =\)</span> passed, <span class="math inline">\(0 =\)</span> failed)</li>
-<li>Exogenous variables <span class="math inline">\(U\)</span>:<span class="math inline">\(U_m\)</span>: Student Motivation (determines if they sign up); <span class="math inline">\(U_p\)</span>: Prior Preparation (can improve fluency even without the program); <span class="math inline">\(U_t\)</span>: Test Taking Ability (can lead to passing even without fluency)</li>
-<li>Structural functions <span class="math inline">\(\mathcal{F}\)</span>: <span class="math display">\[\mathcal{M} = \begin{cases}
-X \leftarrow U_m \\
-F \leftarrow X \lor U_p \\
-Y \leftarrow (X \land F) \lor U_t
-\end{cases}\]</span></li>
-</ul>
-<p>Interpretation:</p>
-<ul>
-<li>Participation (<span class="math inline">\(X\)</span>): Determined solely by student motivation (<span class="math inline">\(U_m\)</span>).</li>
-<li>Fluency (<span class="math inline">\(F\)</span>): Occurs if the student attended the program (<span class="math inline">\(X\)</span>) OR had prior preparation (<span class="math inline">\(U_p\)</span>).</li>
-<li>Exam Pass (<span class="math inline">\(Y\)</span>): Occurs if the student attended the program AND improved fluency (<span class="math inline">\(X \land F\)</span>), or if they have high test-taking ability (<span class="math inline">\(U_t\)</span>).</li>
-</ul>
-</section>
-</section>
-<section id="conditional-independenceci-and-d-separation" class="level2">
-<h2 class="anchored" data-anchor-id="conditional-independenceci-and-d-separation">3. Conditional Independence(CI) and d-Separation</h2>
-<section id="ci-definitions" class="level3">
-<h3 class="anchored" data-anchor-id="ci-definitions">3.1 CI Definitions</h3>
-<p>Understanding when variables are independent is crucial for causal inference.</p>
-<p><strong>Marginal Independence</strong>: Variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>probabilistically independent</strong>, written <span class="math inline">\(X \perp\!\!\!\perp Y\)</span>, if: <span class="math display">\[P(Y = y \mid X = x) = P(Y = y)\]</span></p>
-<p>Equivalently: <span class="math inline">\(P(X, Y) = P(X) \cdot P(Y)\)</span></p>
-<p><strong>Conditional Independence</strong>: Variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>conditionally independent given <span class="math inline">\(Z\)</span></strong>, written <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span>, if: <span class="math display">\[P(Y = y \mid Z = z, X = x) = P(Y = y \mid Z = z)\]</span></p>
-<p>The structure of an SCM (captured in its causal diagram) constrains which conditional independencies must hold in the observational distribution. This connection between graphical structure and probabilistic independence is formalized through <strong>d-separation</strong>.</p>
-</section>
-<section id="d-separation-reading-independencies-from-graphs" class="level3">
-<h3 class="anchored" data-anchor-id="d-separation-reading-independencies-from-graphs">3.2 d-Separation: Reading Independencies from Graphs</h3>
-<p>Every path in a DAG can be decomposed into three types of triplets:</p>
-<section id="chain-mediation-x-rightarrow-z-rightarrow-y" class="level4">
-<h4 class="anchored" data-anchor-id="chain-mediation-x-rightarrow-z-rightarrow-y">Chain (Mediation): <span class="math inline">\(X \rightarrow Z \rightarrow Y\)</span></h4>
-<p>Information flows from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> through <span class="math inline">\(Z\)</span>.</p>
-<ul>
-<li><strong>Marginally</strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>associated</strong> (path is active)</li>
-<li><strong>Given <span class="math inline">\(Z\)</span></strong>: <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span> (path is <strong>blocked</strong>)</li>
-</ul>
-<p><em>Example</em>: Forgot insulin (<span class="math inline">\(X\)</span>) → High glucose (<span class="math inline">\(Z\)</span>) → Neuropathy (<span class="math inline">\(Y\)</span>). If we know glucose level, knowing about insulin doesn’t add information about neuropathy.</p>
-</section>
-<section id="fork-confounding-x-leftarrow-z-rightarrow-y" class="level4">
-<h4 class="anchored" data-anchor-id="fork-confounding-x-leftarrow-z-rightarrow-y">Fork (Confounding): <span class="math inline">\(X \leftarrow Z \rightarrow Y\)</span></h4>
-<p><span class="math inline">\(Z\)</span> is a common cause of both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
-<ul>
-<li><strong>Marginally</strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>associated</strong> (spurious correlation through <span class="math inline">\(Z\)</span>)</li>
-<li><strong>Given <span class="math inline">\(Z\)</span></strong>: <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span> (path is <strong>blocked</strong>)</li>
-</ul>
-<p><em>Example</em>: Age (<span class="math inline">\(Z\)</span>) causes both hearing impairment (<span class="math inline">\(X\)</span>) and osteoarthritis (<span class="math inline">\(Y\)</span>). If we know age, hearing and arthritis become independent.</p>
-</section>
-<section id="collider-selection-x-rightarrow-z-leftarrow-y" class="level4">
-<h4 class="anchored" data-anchor-id="collider-selection-x-rightarrow-z-leftarrow-y">Collider (Selection): <span class="math inline">\(X \rightarrow Z \leftarrow Y\)</span></h4>
-<p><span class="math inline">\(Z\)</span> is a common effect of both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
-<ul>
-<li><strong>Marginally</strong>: <span class="math inline">\(X \perp\!\!\!\perp Y\)</span> (path is <strong>blocked</strong> at the collider)</li>
-<li><strong>Given <span class="math inline">\(Z\)</span></strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> become <strong>associated</strong> (path is <strong>opened</strong>!)</li>
-</ul>
-<p><em>Example</em>: Talent (<span class="math inline">\(X\)</span>) and Beauty (<span class="math inline">\(Y\)</span>) both lead to Fame (<span class="math inline">\(Z\)</span>). Among famous people, talent and beauty become negatively correlated (“explaining away”).</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="center">
+<p><img src="f6.png" class="img-fluid"></p>
+</div>
+<section id="the-identification-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-identification-problem">1. The Identification Problem</h2>
+<p>A cornerstone of causal inference is the recognition that knowledge operates within a stratified structure of increasing complexity. Named after UCLA Professor <em>Judea Pearl</em>, this system is called the <strong>Pearl Causal Hierarchy (PCH)</strong>, also known as the ‘Ladder of Causation’.</p>
+<section id="what-does-identification-mean" class="level3">
+<h3 class="anchored" data-anchor-id="what-does-identification-mean">1.1 What Does “Identification” Mean?</h3>
+<p>Imagine you’re a physician trying to determine whether a new drug (Treatment <span class="math inline">\(X\)</span>) actually <em>causes</em> improved patient outcomes (<span class="math inline">\(Y\)</span>). You have access to observational data—records of who took the drug and what happened to them.</p>
+<p>The “catch” is <strong>confounding</strong>: Patients who chose to take the drug might be healthier, wealthier, or younger than those who didn’t. In the data, <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are “correlated,” but we don’t know if <span class="math inline">\(X\)</span> is <em>driving</em> <span class="math inline">\(Y\)</span> or if a third variable <span class="math inline">\(Z\)</span> is driving both.</p>
+<blockquote class="blockquote">
+<p><strong>The Identification Problem:</strong> Can we compute the effect of an intervention, <span class="math inline">\(P(y \mid do(x))\)</span>, using only the observational data <span class="math inline">\(P(\mathbf{v})\)</span> and the qualitative assumptions encoded in our causal graph <span class="math inline">\(G\)</span>?</p>
+</blockquote>
+<p><strong>Causal Effect Identifiability:</strong> The causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> is said to be <strong>identifiable</strong> from a causal diagram <span class="math inline">\(G\)</span> if the quantity <span class="math inline">\(P(y \mid do(x))\)</span> can be computed uniquely from a positive probability of the observed variables.</p>
+<p>Formally, for every pair of models <span class="math inline">\(M_1\)</span> and <span class="math inline">\(M_2\)</span> inducing <span class="math inline">\(G\)</span>: <span class="math display">\[
+P_{M_1}(y \mid do(x)) = P_{M_2}(y \mid do(x)) \quad \text{whenever} \quad P_{M_1}(\mathbf{v}) = P_{M_2}(\mathbf{v}) &gt; 0
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Colliders behave <strong>opposite</strong> to chains and forks. Conditioning on a collider (or any of its descendants) <strong>opens</strong> a previously blocked path. This is the source of many biases including selection bias, Berkson’s paradox, and collider stratification bias.</p>
+<p><strong>The Input-Output View</strong></p>
+<p>Think of causal inference as a transformation:</p>
+<ul>
+<li><strong>Input (Observed):</strong> The causal graph <span class="math inline">\(G\)</span> and observational distribution <span class="math inline">\(P(\mathbf{v})\)</span><br>
+</li>
+<li><strong>Output (Unobserved):</strong> The interventional distribution <span class="math inline">\(P(\mathbf{v} \mid do(x))\)</span></li>
+</ul>
+<p>When the effect is identifiable, this mapping is a <strong>function</strong>—the same input always produces the same output, regardless of which underlying SCM generated it.</p>
 </div>
 </div>
 </section>
-<section id="summary-table-active-vs.-inactive-triplets" class="level4">
-<h4 class="anchored" data-anchor-id="summary-table-active-vs.-inactive-triplets">Summary Table: Active vs.&nbsp;Inactive Triplets</h4>
+<section id="the-truncated-factorization-formula" class="level3">
+<h3 class="anchored" data-anchor-id="the-truncated-factorization-formula">1.2 The Truncated Factorization Formula</h3>
+<p>There are two formula that connects interventions to probability distributions. From the previous post, we know that for a <strong>Markovian model</strong> (no hidden confounders):</p>
+<p><span class="math display">\[
+P(v|do(x)) = \prod_{V_i \in V \setminus X} P(v_i|pa_i) \Big|_{X=x}
+\]</span></p>
+<p>This is the truncated factorization formula—we simply remove the term <span class="math inline">\(P(x|pa_X)\)</span> from the standard factorization. Graphically, this corresponds to deleting all arrows pointing into <span class="math inline">\(X\)</span>.</p>
+<p>For <strong>Semi-Markovian models</strong> (with hidden confounders), the formula generalizes to:</p>
+<p><span class="math display">\[
+P(v|do(x)) = \sum_u \prod_{V_i \in V \setminus X} P(v_i|pa_i, u_i) P(u) \Big|_{X=x}
+\]</span></p>
+<p>The challenge is that this formula involves the unobserved variables <span class="math inline">\(U\)</span>, which we cannot compute directly from data. This is where identification criteria come to the rescue.</p>
+</section>
+<section id="intuition-why-some-effects-are-identifiable-and-others-are-not" class="level3">
+<h3 class="anchored" data-anchor-id="intuition-why-some-effects-are-identifiable-and-others-are-not">1.3 Intuition: Why Some Effects Are Identifiable and Others Are Not</h3>
+<p>Consider two scenarios that illustrate the difference between identifiable and non-identifiable effects.</p>
+<section id="scenario-a-observable-confounder-identifiable" class="level4">
+<h4 class="anchored" data-anchor-id="scenario-a-observable-confounder-identifiable">Scenario A: Observable Confounder (Identifiable)</h4>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    Z((Z)) --&gt; X((X))
+    Z --&gt; Y((Y))
+    X --&gt; Y
+</pre>
+</div>
+<p></p><figcaption> Identifiable case: Observable confounder Z</figcaption> </figure><p></p>
+</div>
+</div>
+</div>
+<p>Here, information flows from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> along two pathways:</p>
+<ol type="1">
+<li><strong>Causal pathway <span class="math inline">\(p_1\)</span>:</strong> <span class="math inline">\(X \to Y\)</span> (the direct effect we want)</li>
+<li><strong>Spurious pathway <span class="math inline">\(p_2\)</span>:</strong> <span class="math inline">\(X \leftarrow Z \to Y\)</span> (confounding we must remove)</li>
+</ol>
+<p><strong>Solution:</strong> To isolate the causal effect, we condition on <span class="math inline">\(Z\)</span> to block the spurious pathway <span class="math inline">\(p_2\)</span>, then average over it:</p>
+<p><span class="math display">\[
+P(y \mid do(x)) = \sum_z P(z) P(y \mid x, z)
+\]</span></p>
+<p>This works because <span class="math inline">\(Z\)</span> is <strong>observed</strong>—we can measure it and adjust for it.</p>
+</section>
+<section id="scenario-b-latent-confounder-non-identifiable" class="level4">
+<h4 class="anchored" data-anchor-id="scenario-b-latent-confounder-non-identifiable">Scenario B: Latent Confounder (Non-Identifiable)</h4>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    U["Uxy"] -.-&gt; X((X))
+    U -.-&gt; Y((Y))
+    X --&gt; Y
+</pre>
+</div>
+<p></p><figcaption> Non-identifiable case: Latent confounder U_xy</figcaption> </figure><p></p>
+</div>
+</div>
+</div>
+<p>The same flow of information exists:</p>
+<ol type="1">
+<li><strong>Causal pathway <span class="math inline">\(p_1\)</span>:</strong> <span class="math inline">\(X \to Y\)</span></li>
+<li><strong>Spurious pathway <span class="math inline">\(p_2\)</span>:</strong> <span class="math inline">\(X \leftarrow U_{xy} \to Y\)</span></li>
+</ol>
+<p><strong>Problem:</strong> We <strong>do not see</strong> the latent confounder <span class="math inline">\(U_{xy}\)</span>, and therefore <strong>cannot block</strong> <span class="math inline">\(p_2\)</span>. This makes the effect <strong>non-identifiable</strong>—we cannot separate the causal signal (<span class="math inline">\(p_1\)</span>) from the confounding noise (<span class="math inline">\(p_2\)</span>) using observational data alone.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Identification is about whether we have enough <strong>observable structure</strong> in the graph to separate causal pathways from spurious pathways. When confounders are hidden, we lose this ability—unless other graphical structures (like the front-door criterion) come to our rescue.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="the-back-door-criterion" class="level2">
+<h2 class="anchored" data-anchor-id="the-back-door-criterion">2. The Back-door Criterion</h2>
+<section id="definition-and-intuition" class="level3">
+<h3 class="anchored" data-anchor-id="definition-and-intuition">2.1 Definition and Intuition</h3>
+<p>The back-door criterion is perhaps one of the most widely used tool for causal identification. It provides sufficient conditions for when we can adjust for a set of covariates to eliminate confounding bias.</p>
+<p><strong>Definition of Back-door Criterion: </strong> A set of variables <span class="math inline">\(Z\)</span> satisfies the <strong>back-door criterion</strong> relative to an ordered pair <span class="math inline">\((X, Y)\)</span> in a DAG <span class="math inline">\(G\)</span> if:</p>
+<ol type="1">
+<li><strong>No descendant condition</strong>: No node in <span class="math inline">\(Z\)</span> is a descendant of <span class="math inline">\(X\)</span></li>
+<li><strong>Blocking condition</strong>: <span class="math inline">\(Z\)</span> blocks every path between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> that contains an arrow <em>into</em> <span class="math inline">\(X\)</span> (called “back-door paths”)</li>
+</ol>
+<p><strong>The Back-door Adjustment Formula: </strong></p>
+<p>When <span class="math inline">\(Z\)</span> satisfies the back-door criterion, we can identify the causal effect using, this <strong>adjustment formula</strong> (also called the <strong>standardization formula</strong>):</p>
+<p><span class="math display">\[
+P(y|do(x)) = \sum_z P(y|x, z)P(z)
+\]</span></p>
+<blockquote class="blockquote">
+<p>Interpretation: we compute the effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> at each level of <span class="math inline">\(Z\)</span>, then average over the <em>natural</em> distribution of <span class="math inline">\(Z\)</span> (not conditioned on <span class="math inline">\(X\)</span>).</p>
+</blockquote>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Intuitive Understanding of back-door adjustment:</strong></p>
+<p>The back-door adjustment “breaks” the confounding by:</p>
+<ol type="1">
+<li><strong>Conditioning on <span class="math inline">\(Z\)</span></strong>: Within each stratum of <span class="math inline">\(Z\)</span>, the back-door paths are blocked</li>
+<li><strong>Weighting by <span class="math inline">\(P(z)\)</span></strong>: We use the marginal distribution of <span class="math inline">\(Z\)</span>, not <span class="math inline">\(P(z|x)\)</span>, which removes the spurious association introduced by treatment selection</li>
+</ol>
+</div>
+</div>
+</section>
+<section id="common-pitfalls" class="level3">
+<h3 class="anchored" data-anchor-id="common-pitfalls">2.2 Common Pitfalls</h3>
+<p>Pitfall 1: Conditioning on Descendants of Treatment</p>
+<p>Pitfall 2: Conditioning on Colliders</p>
+<p>Pitfall 3: Conditioning on Descendants of Colliders</p>
+<div class="center">
+<p><img src="bcd.png" class="img-fluid"></p>
+</div>
+</section>
+</section>
+<section id="estimation-of-causal-effects" class="level2">
+<h2 class="anchored" data-anchor-id="estimation-of-causal-effects">3. Estimation of Causal Effects</h2>
+<p>Once we’ve identified a valid adjustment formula, we need to <em>estimate</em> causal effect from observational data. This section covers three estimation approaches.</p>
+<section id="inverse-propensity-weighting-ipw" class="level3">
+<h3 class="anchored" data-anchor-id="inverse-propensity-weighting-ipw">3.1 Inverse Propensity Weighting (IPW)</h3>
+<p>IPW can rewrites the back-door formula. <span class="math display">\[E[Y|do(X=x)] = \sum_z E[Y|x, z]P(z) = \sum_{z,y} y \frac{P(y, x, z)}{P(x|z)}\]</span> The term <span class="math inline">\(\pi(z) = P(X=1|Z=z)\)</span> is called the <strong>propensity score</strong>—the probability of receiving treatment given covariates.</p>
+<p>The IPW estimator for <span class="math inline">\(E[Y|do(X=x)]\)</span> is:</p>
+<p><span class="math display">\[\hat{E}[Y|do(X=x)] = \frac{1}{N} \sum_{i=1}^{N} \frac{Y_i \cdot \mathbf{1}(X_i = x)}{\hat{\pi}_x(Z_i)}\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\hat{\pi}_x(z) = \hat{P}(X=x|Z=z)\)</span> is the estimated <strong>propensity score</strong></li>
+<li><span class="math inline">\(\mathbf{1}(X_i = x)\)</span> is an indicator selecting units with treatment <span class="math inline">\(x\)</span></li>
+</ul>
+<p>For the Average Treatment Effect (ATE):</p>
+<p><span class="math display">\[
+\begin{aligned}
+\widehat{ATE}_{IPW} &amp;= \hat{E}(y | do(\mathbf{X}=1)) - \hat{E}(y | do(\mathbf{X}=0)) \\
+&amp;= \frac{1}{N} \sum_{i=1}^{N} \left( \frac{\mathbf{Y}_i \cdot \mathbb{1}(\mathbf{X}_i = 1)}{\pi(\mathbf{Z}_i)} - \frac{\mathbf{Y}_i \cdot \mathbb{1}(\mathbf{X}_i = 0)}{1 - \pi(\mathbf{Z}_i)} \right) \\
+&amp;= \frac{1}{N} \sum_{i=1}^{N} \left( \frac{X_i Y_i}{\hat{\pi}(Z_i)} - \frac{(1-X_i) Y_i}{1 - \hat{\pi}(Z_i)} \right)
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Intuition: Creating a Pseudo-Population</strong></p>
+<p>IPW creates a “pseudo-population” where treatment assignment is independent of confounders. Individuals with low propensity scores who received treatment are upweighted, while those with high propensity scores are downweighted.</p>
+<p>This mimics what would happen in a randomized experiment where <span class="math inline">\(Z\)</span> doesn’t influence <span class="math inline">\(X\)</span>.</p>
+</div>
+</div>
+<section id="positivity-assumption" class="level4">
+<h4 class="anchored" data-anchor-id="positivity-assumption">Positivity Assumption</h4>
+<p>IPW requires <strong>positivity</strong>: <span class="math inline">\(0 &lt; P(X=1|Z=z) &lt; 1\)</span> for all <span class="math inline">\(z\)</span>. Without this, some individuals have zero probability of receiving treatment, and we can’t extrapolate their counterfactual outcomes.</p>
+</section>
+</section>
+<section id="outcome-regression" class="level3">
+<h3 class="anchored" data-anchor-id="outcome-regression">3.2 Outcome Regression</h3>
+<p>An alternative approach focuses on modeling the outcome directly.</p>
+<p>Instead of reweighting, we:</p>
+<ol type="1">
+<li>Fit a model <span class="math inline">\(\hat{\mu}_x(z) = \hat{E}[Y|X=x, Z=z]\)</span> for the expected outcome given treatment and covariates</li>
+<li>Predict what would happen under each treatment for everyone</li>
+<li>Average to get the causal effect</li>
+</ol>
+<p><span class="math display">\[\hat{E}[Y|do(X=x)] = \frac{1}{N} \sum_{i=1}^{N} \hat{\mu}_x(Z_i)\]</span></p>
+<p>For the ATE:</p>
+<p><span class="math display">\[\widehat{ATE}_{reg} = \hat{E}(y | do(\mathbf{X}=1)) - \hat{E}(y | do(\mathbf{X}=0)) = \frac{1}{N} \sum_{i=1}^{N} \left( \hat{\mu}_{x1}(\mathbf{Z_i}) - \hat{\mu}_{x0}(\mathbf{Z_i}) \right)\]</span> <strong>Comparison with IPW:</strong></p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 32%">
-<col style="width: 27%">
-<col style="width: 40%">
-</colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Structure</th>
-<th style="text-align: left;">Unconditioned</th>
-<th style="text-align: left;">Conditioned on <span class="math inline">\(Z\)</span></th>
+<th>Aspect</th>
+<th>IPW</th>
+<th>Outcome Regression</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Chain: <span class="math inline">\(X \rightarrow Z \rightarrow Y\)</span></td>
-<td style="text-align: left;">Active (associated)</td>
-<td style="text-align: left;"><strong>Blocked</strong> (independent)</td>
+<td>Model</td>
+<td>Propensity score <span class="math inline">\(P(X|Z)\)</span></td>
+<td>Outcome <span class="math inline">\(E[Y|X,Z]\)</span></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Fork: <span class="math inline">\(X \leftarrow Z \rightarrow Y\)</span></td>
-<td style="text-align: left;">Active (associated)</td>
-<td style="text-align: left;"><strong>Blocked</strong> (independent)</td>
+<td>Positivity</td>
+<td>Required</td>
+<td>Not strictly required</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Collider: <span class="math inline">\(X \rightarrow Z \leftarrow Y\)</span></td>
-<td style="text-align: left;"><strong>Blocked</strong> (independent)</td>
-<td style="text-align: left;">Active (associated)</td>
+<td>High-dimensional Z</td>
+<td>Challenging</td>
+<td>More flexible</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="the-d-separation-criterion" class="level4">
-<h4 class="anchored" data-anchor-id="the-d-separation-criterion">The d-Separation Criterion</h4>
-<p>To determine if <span class="math inline">\(X \perp\!\!\!\perp Y \mid Z\)</span> using d-separation:</p>
-<ol type="1">
-<li><strong>Enumerate all paths</strong> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> in the graph</li>
-<li><strong>For each path</strong>, check if it is <strong>active</strong> or <strong>blocked</strong>:
+<section id="augmented-ipw-aipw" class="level3">
+<h3 class="anchored" data-anchor-id="augmented-ipw-aipw">3.3 Augmented IPW (AIPW)</h3>
+<p><strong>Double Robustness:</strong></p>
+<p>The AIPW estimator is <strong>consistent</strong> if <strong>either</strong>:</p>
 <ul>
-<li>A path is <strong>active</strong> if <em>every</em> triplet in it is active (given <span class="math inline">\(Z\)</span>)</li>
-<li>A path is <strong>blocked</strong> if <em>any</em> triplet in it is blocked</li>
-</ul></li>
-<li><strong>Conclusion</strong>: <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>d-separated</strong> by <span class="math inline">\(Z\)</span> (hence conditionally independent) if and only if <strong>all paths</strong> are blocked</li>
+<li>The propensity model <span class="math inline">\(\hat{\pi}(z)\)</span> is correctly specified, <strong>OR</strong></li>
+<li>The outcome model <span class="math inline">\(\hat{\mu}_x(z)\)</span> is correctly specified</li>
+</ul>
+<p>You only need to get <em>one</em> of the two models right.</p>
+<p><strong>The AIPW Estimator:</strong></p>
+<p>The AIPW estimator improves upon IPW by incorporating an outcome model <span class="math inline">\(\mu_x(Z)\)</span>, making it “doubly robust”. Let the influence function for a single treatment arm be defined as:</p>
+<p><span class="math display">\[\phi(V) = \frac{\mathbb{1}(X=x)(Y - \hat{\mu}_x(Z))}{\hat{\pi}_x(Z)} + \hat{\mu}_x(Z)\]</span></p>
+<p>The AIPW estimator is:</p>
+<p><span class="math display">\[\hat{E}[Y|do(X=x)] = \frac{1}{N} \sum_{i=1}^{N} \phi(V_i)\]</span></p>
+<p>The AIPW estimator for the ATE is the difference between these counterfactual means:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\widehat{ATE}_{AIPW} &amp;= \hat{E}[Y|do(X=1)] - \hat{E}[Y|do(X=0)] \\
+&amp;= \frac{1}{N} \sum_{i=1}^{N} \left( \left[ \frac{X_i(Y_i - \mu_{x_1}(\mathbf{Z}_i))}{\pi(\mathbf{Z}_i)} + \mu_{x_1}(\mathbf{Z}_i) \right] - \left[ \frac{(1 - X_i)(Y_i - \mu_{x_0}(\mathbf{Z}_i))}{1 - \pi(\mathbf{Z}_i)} + \mu_{x_0}(\mathbf{Z}_i) \right] \right)
+\end{aligned}
+\]</span></p>
+</section>
+</section>
+<section id="the-front-door-criterion" class="level2">
+<h2 class="anchored" data-anchor-id="the-front-door-criterion">4. The Front-door Criterion</h2>
+<section id="definition-and-formula" class="level3">
+<h3 class="anchored" data-anchor-id="definition-and-formula">4.1 Definition and Formula</h3>
+<p>A set of variables <span class="math inline">\(M\)</span> satisfies the <strong>front-door criterion</strong> relative to <span class="math inline">\((X, Y)\)</span> if:</p>
+<ol type="1">
+<li><span class="math inline">\(M\)</span> intercepts all directed paths from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span></li>
+<li>There are no unblocked back-door paths from <span class="math inline">\(X\)</span> to <span class="math inline">\(M\)</span></li>
+<li>All back-door paths from <span class="math inline">\(M\)</span> to <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(X\)</span></li>
 </ol>
+<p>When these conditions hold:</p>
+<p><span class="math display">\[
+P(y|do(x)) = \sum_m P(m|x) \sum_{x'} P(y|x', m) P(x')
+\]</span></p>
+</section>
+<section id="intuition-a-two-step-argument" class="level3">
+<h3 class="anchored" data-anchor-id="intuition-a-two-step-argument">4.2 Intuition: A Two-Step Argument</h3>
+<p>The front-door formula breaks the problem into two steps:</p>
+<ol type="1">
+<li><p><strong>Effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(M\)</span></strong>: Since there are no back-door paths from <span class="math inline">\(X\)</span> to <span class="math inline">\(M\)</span>, we have <span class="math inline">\(P(m|do(x)) = P(m|x)\)</span> (association = causation!)</p></li>
+<li><p><strong>Effect of <span class="math inline">\(M\)</span> on <span class="math inline">\(Y\)</span></strong>: The back-door paths from <span class="math inline">\(M\)</span> to <span class="math inline">\(Y\)</span> go through <span class="math inline">\(X\)</span>, so we can adjust for <span class="math inline">\(X\)</span>: <span class="math inline">\(P(y|do(m)) = \sum_{x'} P(y|m, x')P(x')\)</span></p></li>
+</ol>
+<p>Combining these via the composition of effects yields the formula.</p>
+</section>
+<section id="derivation-from-first-principles" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-from-first-principles">4.3 Derivation from First Principles</h3>
+<p>Let’s derive the front-door formula step by step for the graph:</p>
+<div class="center">
+<p><img src="fdc.png" class="img-fluid"></p>
+</div>
+<p><strong>The interventional distribution</strong> under <span class="math inline">\(do(X=x)\)</span>: <span class="math display">\[P(v|do(x)) = \sum_u P(z|x, u_z)P(y|z, u_{xy}, u_y)P(u)\]</span></p>
+<p><strong>Key observations</strong> from the graph structure: 1. <span class="math inline">\((U_{xy} \perp\!\!\!\perp Z | X)\)</span>: The confounders affecting <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> don’t influence <span class="math inline">\(Z\)</span> given <span class="math inline">\(X\)</span> 2. <span class="math inline">\((Y \perp\!\!\!\perp X | Z, U_{xy})\)</span>: Given <span class="math inline">\(Z\)</span> and the unobserved confounders, <span class="math inline">\(Y\)</span> doesn’t depend on <span class="math inline">\(X\)</span></p>
+<p><strong>Simplification</strong>: <span class="math display">\[P(z|x) = \sum_{u_z} P(z|x, u_z)P(u_z)\]</span> (marginalizing out <span class="math inline">\(U_z\)</span>)</p>
+<p>For <span class="math inline">\(P(y|z, u_{xy})\)</span>, we need to introduce <span class="math inline">\(X'\)</span> as an auxiliary variable: <span class="math display">\[P(y|z, u_{xy}) = \sum_{x'} P(y|z, x', u_{xy})P(x'|u_{xy}) = \sum_{x'} P(y|z, x')P(x')\]</span></p>
+<p>The last equality uses <span class="math inline">\((Y \perp\!\!\!\perp X | Z, U_{xy})\)</span> and marginalizes <span class="math inline">\(U_{xy}\)</span>.</p>
+<p><strong>Final result</strong>: <span class="math display">\[P(y|do(x)) = \sum_z P(z|x) \sum_{x'} P(y|z, x')P(x')\]</span></p>
 </section>
 </section>
+<section id="do-calculus" class="level2">
+<h2 class="anchored" data-anchor-id="do-calculus">5. Do-Calculus</h2>
+<p><strong>Motivation:</strong> Both back-door and front-door are special cases of a more general framework: <strong>do-calculus</strong>. Developed by Judea Pearl, do-calculus provides three rules that are sound and complete for determining identifiability.</p>
+<p>The key insight of do-calculus is: transform a causal query <span class="math inline">\(P(y|do(x))\)</span> into an expression involving <strong>only observational quantities</strong> (no <span class="math inline">\(do(\cdot)\)</span> operators). If we can do this, the effect is <strong>identifiable</strong>. If we can’t, it’s <strong>not identifiable</strong>.</p>
+<section id="the-three-rules" class="level3">
+<h3 class="anchored" data-anchor-id="the-three-rules">5.1 The Three Rules</h3>
+<p>Do-calculus consists of three rules that manipulate expressions involving <span class="math inline">\(do(\cdot)\)</span>. Each rule is valid under specific graphical conditions involving <strong>mutilated graphs</strong>.</p>
+<p><strong>Graph Notation:</strong></p>
+<p>Before stating the rules, we need some notation:</p>
+<ul>
+<li><span class="math inline">\(G_{\overline{X}}\)</span>: Graph <span class="math inline">\(G\)</span> with all arrows <strong>into</strong> <span class="math inline">\(X\)</span> removed</li>
+<li><span class="math inline">\(G_{\underline{X}}\)</span>: Graph <span class="math inline">\(G\)</span> with all arrows <strong>out of</strong> <span class="math inline">\(X\)</span> removed</li>
+<li><span class="math inline">\(G_{\overline{X}\underline{Z}}\)</span>: Both operations combined</li>
+</ul>
+<p><strong>Rule 1: Adding/Removing Observations</strong> <span class="math display">\[P(y|do(x), z, w) = P(y|do(x), w) \quad \text{if } (Y \perp\!\!\!\perp Z | X, W)_{G_{\overline{X}}}\]</span></p>
+<p><em>When can we ignore an observation?</em> When <span class="math inline">\(Y\)</span> is independent of <span class="math inline">\(Z\)</span> given <span class="math inline">\((X, W)\)</span> in the graph where we’ve removed arrows into <span class="math inline">\(X\)</span>.</p>
+<p><strong>Rule 2: Action/Observation Exchange</strong> <span class="math display">\[P(y|do(x), do(z), w) = P(y|do(x), z, w) \quad \text{if } (Y \perp\!\!\!\perp Z | X, W)_{G_{\overline{X}\underline{Z}}}\]</span></p>
+<p><em>When can we replace an intervention with an observation?</em> When <span class="math inline">\(Y\)</span> is independent of <span class="math inline">\(Z\)</span> given <span class="math inline">\((X, W)\)</span> in the graph where we’ve removed arrows into <span class="math inline">\(X\)</span> and out of <span class="math inline">\(Z\)</span>.</p>
+<p><strong>Rule 3: Adding/Removing Actions</strong> <span class="math display">\[P(y|do(x), do(z), w) = P(y|do(x), w) \quad \text{if } (Y \perp\!\!\!\perp Z | X, W)_{G_{\overline{X}\overline{Z(W)}}}\]</span></p>
+<p>where <span class="math inline">\(Z(W) = Z \setminus an(W)_{G_{\overline{X}}}\)</span> is the subset of <span class="math inline">\(Z\)</span> that are not ancestors of <span class="math inline">\(W\)</span>.</p>
+<p><em>When can we remove an intervention entirely?</em> When <span class="math inline">\(Y\)</span> is independent of <span class="math inline">\(Z\)</span> given <span class="math inline">\((X, W)\)</span> in a specific mutilated graph.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Intuition of the Rules:</strong></p>
+<p><strong>Rule 1</strong> says: if <span class="math inline">\(Z\)</span> doesn’t affect <span class="math inline">\(Y\)</span> in the interventional world (where <span class="math inline">\(X\)</span> is set), then observing <span class="math inline">\(Z\)</span> doesn’t matter.</p>
+<p><strong>Rule 2</strong> says: if there’s no back-door path from <span class="math inline">\(Z\)</span> to <span class="math inline">\(Y\)</span> (after accounting for <span class="math inline">\(X\)</span>), then intervening on <span class="math inline">\(Z\)</span> is the same as observing <span class="math inline">\(Z\)</span>.</p>
+<p><strong>Rule 3</strong> says: if <span class="math inline">\(Z\)</span> has no causal effect on <span class="math inline">\(Y\)</span> (given <span class="math inline">\(X\)</span> and <span class="math inline">\(W\)</span>), then intervening on <span class="math inline">\(Z\)</span> doesn’t change anything.</p>
+</div>
+</div>
 </section>
-<section id="the-identification-problem" class="level2">
-<h2 class="anchored" data-anchor-id="the-identification-problem">4. The Identification Problem</h2>
-<p><strong>Definition (Causal Effect Identifiability)</strong>: The causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> is <strong>identifiable</strong> from a causal diagram <span class="math inline">\(G\)</span> if the quantity <span class="math inline">\(P(y \mid do(x))\)</span> can be computed uniquely from the observational distribution <span class="math inline">\(P(V)\)</span>.</p>
-<p>Formally: For every pair of SCMs <span class="math inline">\(\mathcal{M}_1\)</span> and <span class="math inline">\(\mathcal{M}_2\)</span> that induce the same graph <span class="math inline">\(G\)</span>, if <span class="math inline">\(P_{\mathcal{M}_1}(v) = P_{\mathcal{M}_2}(v) &gt; 0\)</span>, then <span class="math inline">\(P_{\mathcal{M}_1}(y \mid do(x)) = P_{\mathcal{M}_2}(y \mid do(x))\)</span>.</p>
-<p><strong>Intuition</strong>: Identifiability means that the causal effect is determined by (1) the causal structure (the graph) and (2) the observational distribution, without needing to know the specific form of the structural equations.</p>
-<section id="the-truncated-factorization-formula" class="level3">
-<h3 class="anchored" data-anchor-id="the-truncated-factorization-formula">4.1 The Truncated Factorization Formula</h3>
-<p>In a <strong>Markovian model</strong> (where no unobserved variable affects more than one observed variable), the observational distribution factorizes as:</p>
-<p><span class="math display">\[P(v) = \prod_{V_i \in V} P(v_i \mid pa_i)\]</span></p>
-<p>When we intervene with <span class="math inline">\(do(X=x)\)</span>, we delete the equation for <span class="math inline">\(X\)</span> and set <span class="math inline">\(X=x\)</span>. This gives the <strong>truncated factorization</strong>:</p>
-<p><span class="math display">\[P(v \mid do(x)) = \prod_{V_i \in V \setminus X} P(v_i \mid pa_i) \Big|_{X=x}\]</span></p>
-<p>The product excludes variables in <span class="math inline">\(X\)</span> (their equations are deleted), and all remaining terms are evaluated at <span class="math inline">\(X=x\)</span>.</p>
-<p><strong>Theorem (Identification in Markovian Models)</strong>: In any Markovian model, the causal effect <span class="math inline">\(P(y \mid do(x))\)</span> is identifiable for any <span class="math inline">\(X, Y \subseteq V\)</span> and is obtained from the truncated factorization.</p>
-</section>
-<section id="the-adjustment-formula" class="level3">
-<h3 class="anchored" data-anchor-id="the-adjustment-formula">4.2 The Adjustment Formula</h3>
-<p>A particularly useful result is the <strong>adjustment by parents</strong> formula:</p>
-<p><span class="math display">\[P(y \mid do(x)) = \sum_{pa_x} P(y \mid x, pa_x) \cdot P(pa_x)\]</span></p>
-<p>This says: to compute the causal effect, condition on <span class="math inline">\(X\)</span> and all parents of <span class="math inline">\(X\)</span>, then marginalize over the parents. This works because conditioning on parents blocks all backdoor paths.</p>
+<section id="soundness-and-completeness" class="level3">
+<h3 class="anchored" data-anchor-id="soundness-and-completeness">5.2 Soundness and Completeness</h3>
+<p>The remarkable property of do-calculus is it unified the causal identification:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Theorem: Soundness and Completeness</strong></p>
+<p>The quantity <span class="math inline">\(Q = P(y|do(x))\)</span> is identifiable from <span class="math inline">\(P(v)\)</span> and <span class="math inline">\(G\)</span> <strong>if and only if</strong> there exists a sequence of applications of the rules of do-calculus and probability axioms that reduces <span class="math inline">\(Q\)</span> into a do-free expression.</p>
+</div>
+</div>
+<p>This means do-calculus is <strong>complete</strong>—if an effect can be identified, do-calculus will find a way.</p>
+<p>Let’s use do-calculus to prove that the back-door adjustment formula works.</p>
+<p><strong>Given</strong>: <span class="math inline">\(Z\)</span> satisfies the back-door criterion relative to <span class="math inline">\((X, Y)\)</span></p>
+<p><strong>Goal</strong>: Show <span class="math inline">\(P(y|do(x)) = \sum_z P(y|x, z)P(z)\)</span></p>
+<p><strong>Proof</strong>:</p>
+<p><em>Step 1</em>: Expand using probability axioms <span class="math display">\[P(y|do(x)) = \sum_z P(y|do(x), z) P(z|do(x))\]</span></p>
+<p><em>Step 2</em>: Apply Rule 3 to <span class="math inline">\(P(z|do(x))\)</span></p>
+<p>We need <span class="math inline">\((Z \perp\!\!\!\perp X)_{G_{\overline{X}}}\)</span>. In <span class="math inline">\(G_{\overline{X}}\)</span>, arrows into <span class="math inline">\(X\)</span> are removed. Since <span class="math inline">\(Z\)</span> contains no descendants of <span class="math inline">\(X\)</span> (back-door condition 1), and back-door paths are cut, <span class="math inline">\(Z\)</span> and <span class="math inline">\(X\)</span> are d-separated.</p>
+<p><span class="math display">\[P(z|do(x)) = P(z)\]</span></p>
+<p><em>Step 3</em>: Apply Rule 2 to <span class="math inline">\(P(y|do(x), z)\)</span></p>
+<p>We need <span class="math inline">\((Y \perp\!\!\!\perp X | Z)_{G_{\underline{X}}}\)</span>. In <span class="math inline">\(G_{\underline{X}}\)</span>, arrows out of <span class="math inline">\(X\)</span> are removed, cutting the causal path. The only remaining paths are back-door paths, which are blocked by <span class="math inline">\(Z\)</span> (back-door condition 2).</p>
+<p><span class="math display">\[P(y|do(x), z) = P(y|x, z)\]</span></p>
+<p><em>Step 4</em>: Combine <span class="math display">\[P(y|do(x)) = \sum_z P(y|x, z) P(z)\]</span></p>
 </section>
 </section>
 <section id="some-practical-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="some-practical-exercises">5. Some practical Exercises</h2>
-<section id="exercise-1.-basic-probabilities" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-1.-basic-probabilities">Exercise 1. Basic probabilities</h3>
-<p>Seventy percent of cancer cases in a certain population are diagnosed in an early stage. Of those diagnosed early, 60% of the patients went to routine consultations twice a year, whereas 90% of the patients diagnosed late did not.</p>
-<p><strong>(a)</strong> Suppose a certain person has developed cancer and goes to routine consultations. What is the probability that cancer will be diagnosed early?</p>
-<p><strong>Answer:</strong></p>
-<p>Define the event as: <span class="math inline">\(E\)</span> represents cancer diagnosed early; <span class="math inline">\(L\)</span> means cancer diagnosed lated; and <span class="math inline">\(C\)</span> presents patients goes to routine consultations twice a year. Therefore, we have:</p>
-<ul>
-<li>Given <span class="math inline">\(P(C=1|E=1) = 0.6\)</span>, <span class="math inline">\(P(E=0|E=0) = 0.9\)</span>, <span class="math inline">\(P(E=1) = 0.7\)</span></li>
-<li>Using Bayes’s Theorem, we have: <span class="math display">\[
-\begin{aligned}
-P(E=1 | C=1) &amp;= \frac{P(E=1, C=1)}{P(C=1)} = \frac{P(C=1 | E=1)P(E=1)}{P(C=1)} \\
-&amp;= \frac{P(C=1 | E=1)P(E=1)}{P(C=1 | E=1)P(E=1) + P(C=1 | E=0)P(E=0)} \\
-&amp;= \frac{(0.6)(0.7)}{(0.6)(0.7) + (1 - 0.9)(0.3)} = \frac{14}{15} \approx 0.933
-\end{aligned}
-\]</span></li>
-</ul>
-<p><strong>(b)</strong> Construct a probability distribution over three random variables <span class="math inline">\(X, Y, Z\)</span> such that <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span> but <span class="math inline">\((X \perp\!\!\!\perp Y | Z)\)</span> does not hold. You can either describe the full joint distribution or their conditionals.</p>
-<p><strong>Answer:</strong></p>
-<p>Let’s define two independent coin toss experiments, we have:</p>
-<ul>
-<li><span class="math inline">\(X \in \{0, 1\}\)</span> result of the first coin (1 represents heads), <span class="math inline">\(P(X = 1) = 0.5\)</span>;</li>
-<li><span class="math inline">\(Y \in \{0, 1\}\)</span>: result of the second coin (1 represents heads), <span class="math inline">\(P(Y = 1) = 0.5\)</span>; and</li>
-<li><span class="math inline">\(Z\)</span>: if at least one of <span class="math inline">\(X\)</span> or <span class="math inline">\(Y\)</span> is heads, then <span class="math inline">\(Z = 1\)</span>; otherwise <span class="math inline">\(Z = 0\)</span>.</li>
-</ul>
-<p><strong>Verify</strong> <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span>: Since <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are tossed independently, their joint distribution is equal to the product of their marginal distributions: <span class="math inline">\(P(X, Y) = P(X)P(Y)\)</span>, Therefore, <span class="math inline">\((X \perp\!\!\!\perp Y)\)</span>.</p>
-<p><strong>Verify</strong> <span class="math inline">\((X \perp\!\!\!\perp | Z)\)</span>: When we observe <span class="math inline">\(Z = 1\)</span>, if we then know that <span class="math inline">\(X = 0\)</span>, then <span class="math inline">\(Y\)</span> must be equal to 1.</p>
-<ul>
-<li>Without any known information, <span class="math inline">\(P(Y = 1) = 0.5\)</span>.</li>
-<li>Under the condition where <span class="math inline">\(Z = 1\)</span> and <span class="math inline">\(X = 0\)</span> are known:<span class="math inline">\(P(Y = 1 | Z = 1, X = 0) = 1\)</span></li>
-</ul>
-<p>Since <span class="math inline">\(P(Y = 1 | Z = 1, X = 0) \neq P(Y = 1 | Z = 1)\)</span>, this indicates that given <span class="math inline">\(Z\)</span>, information about <span class="math inline">\(X\)</span> changes our knowledge of <span class="math inline">\(Y\)</span>.</p>
-<p>This <span class="math inline">\(X \rightarrow Z \leftarrow Y\)</span> collider structure proves that two originally unrelated variables can become correlated when conditioned on a common descendant (or its descendant).</p>
-</section>
-<section id="exercise-2.-estimation-and-independence-relations" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-2.-estimation-and-independence-relations">Exercise 2. Estimation and Independence Relations</h3>
-<p>Consider random variables <span class="math inline">\(X_1, X_2\)</span> and <span class="math inline">\(Y\)</span> and assume our goal is to compute the query <span class="math inline">\(Q = P(y | x_1, x_2)\)</span>. We do not have any prior information about the conditional independence relations among these variables.</p>
-<p><strong>(a)</strong> For every one of the following sets of distributions, show how to compute the query <span class="math inline">\(Q\)</span> based on them, or explain why this is not possible:</p>
-<ol type="1">
-<li><span class="math inline">\(P(x_1, x_2), P(y), P(x_1 | y)\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
-<li><span class="math inline">\(P(x_1, x_2), P(y),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
-<li><span class="math inline">\(P(x_1 | y), P(x_2 | y),\)</span> and <span class="math inline">\(P(y)\)</span></li>
-<li><span class="math inline">\(P(x_1), P(x_2),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
-<li><span class="math inline">\(P(x_1), P(x_2), P(x_1 | y),\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
-</ol>
-<p><strong>(b)</strong> Suppose we learned that <span class="math inline">\((X_1 \perp\!\!\!\perp X_2 | Y)\)</span> holds in <span class="math inline">\(P\)</span>. Now, which of the sets before are sufficient to compute the query <span class="math inline">\(Q\)</span>? Show how or explain why it is not possible.</p>
-<p><strong>Answer:</strong> To compute the query <span class="math inline">\(Q = P(y | x_1, x_2)\)</span>, we rely on the definition of conditional probability and Bayes’ Theorem: <span class="math display">\[P(y \mid x_1, x_2) = \frac{P(y, x_1, x_2)}{P(x_1, x_2)} = \frac{P(y)P(x_1, x_2 \mid y)}{P(x_1, x_2)}\]</span></p>
-<p>For (b) part, we have additional information: <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y)\)</span>.</p>
-<ol type="1">
-<li><span class="math inline">\(P(x_1, x_2), P(y), P(x_1 | y)\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
-</ol>
-<ul>
-<li><ol type="a">
-<li>Not possible. To compute <span class="math inline">\(Q\)</span>, we need joint conditional <span class="math inline">\(P(x_1, x_2 | y)\)</span>. Without knowing if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> are conditionally indenpendent given <span class="math inline">\(Y\)</span>, we cannot get <span class="math inline">\(P(x_1, x_2 | y)\)</span>.</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>Yes, its possible now. With conditonal independence, we have <span class="math inline">\(P(x_1, x_2 | y) = P(x_1 | y)P(x_2 | y), Q = \frac{P(x_1 | y)P(x_2 | y)P(y)}{P(x_1, x_2)}\)</span>. The denominator is provided, and the numerator is reconstructed using the independence assumption.</li>
-</ol></li>
-</ul>
-<ol start="2" type="1">
-<li><span class="math inline">\(P(x_1, x_2), P(y),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
-</ol>
-<ul>
-<li><ol type="a">
-<li>Possible, all ther terms in the Bayes’ Theorem are explicitly provided in this set.</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>Possible, same reason with (a). The independence doesn’t change anything here.</li>
-</ol></li>
-</ul>
-<ol start="3" type="1">
-<li><span class="math inline">\(P(x_1 | y), P(x_2 | y),\)</span> and <span class="math inline">\(P(y)\)</span></li>
-</ol>
-<ul>
-<li><ol type="a">
-<li>Not possible. Because (1) we cannot compute the required joint <span class="math inline">\(P(x_1, x_2 | y)\)</span> without a conditional independence assumption, and (2) we lack the marginal <span class="math inline">\(P(x_1, x_2)\)</span> for the denominator.</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>Yes, compute <span class="math inline">\(P(x_1, x_2) = \sum_{Y} P(x_1, x_2, y) = \sum_{Y} P(x_1, x_2 \mid y)P(y)\)</span> and <span class="math inline">\(P(x_1, x_2 \mid y)\)</span> as shown above. Then, all terms in the second expression from the previous question are estimable.</li>
-</ol></li>
-</ul>
-<ol start="4" type="1">
-<li><span class="math inline">\(P(x_1), P(x_2),\)</span> and <span class="math inline">\(P(x_1, x_2 | y)\)</span></li>
-</ol>
-<ul>
-<li><ol type="a">
-<li>Not possible. We lack <span class="math inline">\(P(y)\)</span> to compute the numerator, and without an independence assumption <span class="math inline">\((X_1 \perp\!\!\!\perp X_2)\)</span>, we cannot compute the joint denominator <span class="math inline">\(P(x_1, x_2)\)</span>.</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>Not possible. Even with conditional independence, we still don’t have <span class="math inline">\(P(y)\)</span>.</li>
-</ol></li>
-</ul>
-<ol start="5" type="1">
-<li><span class="math inline">\(P(x_1), P(x_2), P(x_1 | y),\)</span> and <span class="math inline">\(P(x_2 | y)\)</span></li>
-</ol>
-<ul>
-<li><ol type="a">
-<li>Not possible. It lacks <span class="math inline">\(P(y)\)</span>, we cannot compute <span class="math inline">\(P(x_1, x_2 | y)\)</span> from marginals <span class="math inline">\(P(x_1 | y), P(x_2 | y)\)</span>, we cannot obtain the <span class="math inline">\(P(x_1, x_2)\)</span> from the marginals <span class="math inline">\(P(x_1), P(x_2)\)</span> as well.</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>Not possible. After considering <span class="math inline">\(P(x_1, x_2 \mid y) = P(x_1 \mid y)P(x_2 \mid y)\)</span> this is equivalent to the previous item and the same reason applies.</li>
-</ol></li>
-</ul>
-</section>
-<section id="exercise-3.-query-estimation" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-3.-query-estimation">Exercise 3. Query Estimation</h3>
-<p>Consider the following graphical model <span class="math inline">\(G\)</span> below:</p>
-<p>Suppose we want to compute the query <span class="math inline">\(Q = \sum_{Z_1}P(y | x, z_1) P(z_1)\)</span>.</p>
-<div class="center">
+<h2 class="anchored" data-anchor-id="some-practical-exercises">6. Some practical Exercises</h2>
+<section id="exercise-1.-applying-the-backdoor-criterion" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-1.-applying-the-backdoor-criterion">Exercise 1. Applying the Backdoor Criterion</h3>
+<p>Consider the following definition:</p>
+<p><strong>Definition 1 (Minimal adjustment set).</strong> A minimal adjustment set <span class="math inline">\(Z\)</span> relative to a pair of variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is a set of variables that satisfies the back-door criterion to find the causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span>, such that no proper subset of <span class="math inline">\(Z\)</span> satisfies the criterion.</p>
+<p>Consider SCMs compatible with the graphs in (a), (b), and (c). Find a minimal adjustment set to compute the causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> and write the corresponding expression for <span class="math inline">\(P(y|do(x))\)</span>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="p1.png" class="img-fluid figure-img" width="400"></p>
+<p><img src="f1.png" class="img-fluid figure-img" width="800"></p>
+<figcaption>Exercise 1 DAG</figcaption>
+</figure>
+</div>
+<p><strong>Answer:</strong></p>
+<ol type="a">
+<li><span class="math inline">\(\mathbf{Z} = \emptyset\)</span> is a minimal backdoor admissible set.</li>
+</ol>
+<p><span class="math display">\[
+P(y \mid do(x)) = P(y \mid x)
+\]</span></p>
+<ol start="2" type="a">
+<li><p>There is not set <span class="math inline">\(\mathbf{Z}\)</span> that satisfies the backdoor criterion in this model.</p></li>
+<li><p>A minimal set is <span class="math inline">\(\mathbf{Z} = \{Z_3, Z_4\}\)</span>.</p></li>
+</ol>
+<p><span class="math display">\[
+P(y \mid do(x)) = \sum_{Z_3, Z_4} P(y \mid x, z_3, z_4)P(z_3, z_4)
+\]</span></p>
+</section>
+<section id="exercise-2.-back-door-adjustment-i" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-2.-back-door-adjustment-i">Exercise 2. Back-door Adjustment I</h3>
+<p><strong>A.</strong> Construct a causal diagram <span class="math inline">\(G\)</span> such that a set <span class="math inline">\(Z\)</span> does not satisfy the Back-door criterion relative to <span class="math inline">\((X, Y)\)</span>, but the adjustment formula with the same <span class="math inline">\(Z\)</span> still holds: <span class="math display">\[P(y|do(x))=\sum_{z}P(y|x,z)P(z)\]</span> for every SCM <span class="math inline">\(M\)</span> with causal diagram <span class="math inline">\(G\)</span>. For the constructed example, prove that the adjustment formula holds using do-calculus.</p>
+<p><strong>Answer:</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p2.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 2 DAG</figcaption>
+</figure>
+</div>
+<p><strong>Analysis of the Back-door Criterion</strong></p>
+<p>The Back-door Criterion requires a set of <span class="math inline">\(Z\)</span> to satisfy two conditions relative to <span class="math inline">\((X, Y)\)</span>: (1) No node in <span class="math inline">\(Z\)</span> is a descendant of <span class="math inline">\(X\)</span>. (2) <span class="math inline">\(Z\)</span> blocks every path between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> that contains an arrow into <span class="math inline">\(X\)</span>. In the diagram <span class="math inline">\(G\)</span>, <span class="math inline">\(Z\)</span> is a child of <span class="math inline">\(X\)</span> (<span class="math inline">\(X \rightarrow Z\)</span>).Therefore, <span class="math inline">\(Z\)</span> is a descendant of <span class="math inline">\(X\)</span>. Condition 1 is violated. Thus, <span class="math inline">\(Z\)</span> does not satisfy the Back-door criterion.</p>
+<p><strong>Proof using Do-Calculus</strong></p>
+<p>Step 1: Apply Rule 2 (Action to Observation) Rule 2 states that <span class="math inline">\(P(y|do(x)) = P(y|x)\)</span> if <span class="math inline">\(Y \perp\!\!\!\perp_{G_{\underline{X}}} X\)</span>.</p>
+<ul>
+<li><span class="math inline">\(G_{\underline{X}}\)</span> is the graph where arrows originating from <span class="math inline">\(X\)</span> are removed.</li>
+<li>Removing <span class="math inline">\(X \rightarrow Y\)</span> and <span class="math inline">\(X \rightarrow Z\)</span> leaves <span class="math inline">\(X\)</span> isolated.</li>
+<li>Thus, <span class="math inline">\(Y\)</span> is independent of <span class="math inline">\(X\)</span> in <span class="math inline">\(G_{\underline{X}}\)</span>. <span class="math display">\[P(y|do(x)) = P(y|x)\]</span></li>
+</ul>
+<p>Step 2: Introduce <span class="math inline">\(Z\)</span> via Probability Axioms: We can multiply by the sum over the marginal distribution of any variable <span class="math inline">\(Z\)</span>:<span class="math display">\[P(y|x) = \sum_{z} P(y|x)P(z)\]</span></p>
+<p>Step 3: Apply Conditional Independence (Rule 1): We need to show <span class="math inline">\(P(y|x) = P(y|x, z)\)</span>.Rule 1 states <span class="math inline">\(P(y|do(x), z) = P(y|do(x))\)</span> if <span class="math inline">\((Y \perp\!\!\!\perp Z | X)_{G_{\overline{X}}}\)</span>.</p>
+<ul>
+<li>Since we already converted <span class="math inline">\(do(x)\)</span> to <span class="math inline">\(x\)</span> in Step 1, we simply check standard d-separation in the original graph (which is compatible with <span class="math inline">\(G_{\overline{X}}\)</span> since there are no arrows into <span class="math inline">\(X\)</span>).</li>
+<li>In <span class="math inline">\(G\)</span> (<span class="math inline">\(Z \leftarrow X \rightarrow Y\)</span>), <span class="math inline">\(X\)</span> is a fork. Conditioning on <span class="math inline">\(X\)</span> blocks the path between <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span>.</li>
+<li>Therefore, <span class="math inline">\(Y \perp\!\!\!\perp Z \mid X\)</span>, implying <span class="math inline">\(P(y|x) = P(y|x, z)\)</span>.</li>
+</ul>
+<p>Step 4: Substitute <span class="math inline">\(P(y|x, z)\)</span> back into the equation from Step 2:<span class="math display">\[P(y|do(x)) = \sum_{z} P(y|x, z)P(z)\]</span></p>
+<p>Mathematically:</p>
+<p><span class="math inline">\(\mathbf{Z} = \{Z\}\)</span> does not satisfy the back-door criterion, but</p>
+<p><span class="math display">\[
+\begin{align*}
+P(y \mid do(x)) &amp;= P(y \mid x) &amp;&amp; \text{Rule 2: } (Y \perp\!\!\perp X)_{\mathcal{G}_{\underline{X}}} \\
+&amp;= P(y \mid x) \sum_{z} P(z) &amp;&amp; \text{Multiply by 1} \\
+&amp;= \sum_{z} P(y \mid x)P(z) &amp;&amp; \text{Move term into the sum} \\
+&amp;= \sum_{z} P(y \mid x, z)P(z) &amp;&amp; (Y \perp\!\!\perp Z \mid X)
+\end{align*}
+\]</span></p>
+<p><strong>B.</strong> Consider the causal diagrams provided in the assignment. For each case find a minimal back-door admissible (if one exists) set to compute the causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span>, and write the corresponding expression for <span class="math inline">\(P(y|do(x))\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="f2.png" class="img-fluid figure-img" width="600"></p>
+<figcaption>Exercise 2 DAG</figcaption>
+</figure>
+</div>
+<p><strong>Answer:</strong></p>
+<ul>
+<li><ol type="i">
+<li>There is no set that satisfies the backdoor criterion in this model.</li>
+</ol></li>
+<li><ol start="2" type="i">
+<li>A minimal set is <span class="math inline">\(\mathbf{Z} = \{Z_3, Z_4\}\)</span>. <span class="math display">\[
+P(y \mid do(x)) = \sum_{Z_3, Z_4} P(y \mid x, z_3, z_4)P(z_3, z_4)
+\]</span></li>
+</ol></li>
+</ul>
+<p><strong>C.</strong> Prove the Back-door criterion using do-calculus.</p>
+<p><strong>Answer:</strong></p>
+<p>Suppose <span class="math inline">\(\mathbf{Z}\)</span> satisfies the Back-door criterion relative to <span class="math inline">\(\mathbf{X}\)</span> and <span class="math inline">\(\mathbf{Y}\)</span> in <span class="math inline">\(\mathcal{G}\)</span>.</p>
+<p><span class="math display">\[
+\begin{align}
+P(y \mid do(x)) &amp;= \sum_{\mathbf{z}} P(y \mid do(x), \mathbf{z})P(\mathbf{z} \mid do(x)) &amp;&amp; \text{Condition on } \mathbf{Z}  \\
+&amp;= \sum_{\mathbf{z}} P(y \mid do(x), \mathbf{z})P(\mathbf{z}) &amp;&amp; \text{Rule 3: } (\mathbf{Z} \perp\!\!\perp \mathbf{X})_{\mathcal{G}_{\overline{\mathbf{X}}}}  \\
+&amp;= \sum_{\mathbf{z}} P(y \mid x, \mathbf{z})P(\mathbf{z}) &amp;&amp; \text{Rule 2: } (\mathbf{Y} \perp\!\!\perp \mathbf{X} \mid \mathbf{Z})_{\mathcal{G}_{\underline{\mathbf{X}}}}
+\end{align}
+\]</span></p>
+<p>Conditioning holds for any probability distribution. Rule 3 is licensed by the separation statement <span class="math inline">\((\mathbf{Z} \perp\!\!\perp \mathbf{X})\)</span> in <span class="math inline">\(\mathcal{G}_{\overline{\mathbf{X}}}\)</span>. By condition (a) of the BD criterion, we know that no variable in <span class="math inline">\(\mathbf{Z}\)</span> is a descendant of <span class="math inline">\(\mathbf{X}\)</span> and since all paths with arrows into <span class="math inline">\(\mathbf{X}\)</span> are disconnected in <span class="math inline">\(\mathcal{G}_{\overline{\mathbf{X}}}\)</span> any path between <span class="math inline">\(X \in \mathbf{X}\)</span> and <span class="math inline">\(Z \in \mathbf{Z}\)</span> starts with an arrow going out of <span class="math inline">\(X\)</span> and find a collider before reaching <span class="math inline">\(Z\)</span>, otherwise <span class="math inline">\(Z\)</span> would be a descendant of <span class="math inline">\(\mathbf{X}\)</span>. But such collider must be inactive because nothing is being conditioned on. We conclude there is no path contradicting the required separation.</p>
+<p>For Rule 2 we need <span class="math inline">\((\mathbf{Y} \perp\!\!\perp \mathbf{X} \mid \mathbf{Z})_{\mathcal{G}_{\underline{\mathbf{X}}}}\)</span> which is precisely condition (b), since in <span class="math inline">\(\mathcal{G}_{\underline{\mathbf{X}}}\)</span> only the backdoor paths remain.</p>
+</section>
+<section id="exercise-3.-back-door-adjustment-ii" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-3.-back-door-adjustment-ii">Exercise 3. Back-door Adjustment II</h3>
+<p><strong>A.</strong> Consider the causal diagrams provided in the assignment. For each case find a minimal back-door admissible (if one exists) set to compute the causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span>, and write the corresponding expression for <span class="math inline">\(P(y|do(x))\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="f3.png" class="img-fluid figure-img" width="600"></p>
 <figcaption>Exercise 3 DAG</figcaption>
 </figure>
 </div>
-</div>
-<p><strong>(a)</strong> <span class="math inline">\(Q = P(y | x)\)</span> in <span class="math inline">\(G\)</span>? Justify your answer.</p>
 <p><strong>Answer:</strong></p>
-<p>No, <span class="math inline">\(Q \neq P(y|x)\)</span>. There are two paths from <span class="math inline">\(Z_1\)</span> to <span class="math inline">\(Y\)</span>:</p>
-<p>Path 1: <span class="math inline">\(Z_1 \to X \to Y\)</span>, when we condition on <span class="math inline">\(X\)</span>, this path is blocked.</p>
-<p>Path 2: <span class="math inline">\(Z_1 \to Z_2 \to Y\)</span>, when we condition on <span class="math inline">\(X\)</span>, this path is not blocked.</p>
-<p>Therefore: <span class="math inline">\(Q = \sum_{z_1} P(y|x, z_1)P(z_1) \neq P(y|x)\)</span>.</p>
-<p>Intuitive: Even after observing <span class="math inline">\(X\)</span>, knowledge of <span class="math inline">\(Z_1\)</span> still provides information about <span class="math inline">\(Y\)</span> through the path <span class="math inline">\(Z_1 \to Z_2 \to Y\)</span>. This means <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Y\)</span> are not conditionally independent given <span class="math inline">\(X\)</span> alone.</p>
-<p><strong>(b)</strong> Suppose we have access to the marginal distribution <span class="math inline">\(P(X, Y, Z_2)\)</span>. Is it possible to estimate <span class="math inline">\(Q\)</span>? If so, show how to do it. Otherwise, explain why that is not the case.</p>
-<p><strong>Answer:</strong></p>
-<p>Yes, it is possible to estimate <span class="math inline">\(Q\)</span>.</p>
-<p><span class="math display">\[
-\begin{aligned}
-Q &amp;= \sum_{Z_1} P(y \mid x, z_1)P(z_1) \\
-&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_1, z_2)P(z_2 \mid x, z_1)P(z_1) &amp;&amp; \text{Condition on } Z_2 \\
-&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid x, z_1)P(z_1) &amp;&amp; (Y \perp\!\!\!\perp Z_1 \mid Z_2, X) \\
-&amp;= \sum_{Z_1, Z_2} P(y \mid x, z_2)P(z_2 \mid z_1)P(z_1) &amp;&amp; (Z_2 \perp\!\!\!\perp X \mid Z_1) \\
-&amp;= \sum_{Z_2} P(y \mid x, z_2) \sum_{Z_1} P(z_2, z_1) &amp;&amp; \text{Chain rule and move summation in} \\
-&amp;= \sum_{Z_2} P(y \mid x, z_2)P(z_2) &amp;&amp; \text{Sum out } Z_1
-\end{aligned}
-\]</span></p>
-</section>
-<section id="exercise-4.-specifying-structural-causal-models" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-4.-specifying-structural-causal-models">Exercise 4. Specifying Structural Causal Models</h3>
-<p>The following is a description of a clinical decision support (CDS) alert system used in a hospital:</p>
-<ul>
-<li>The delivery channel location of the alert (<span class="math inline">\(L\)</span>) could be via the clinician’s phone or via the EHR system and is chosen at random every time with equal likelihood.</li>
-<li>Based on the clinician’s age group (<span class="math inline">\(A\)</span>), either a text-only alert or a text+image alert is used as the alert modality (<span class="math inline">\(M\)</span>). The age group is either <em>‘less than 40’ or ‘40 or more’</em>.</li>
-<li>The clinician will see (<span class="math inline">\(S\)</span>) the alert with the following probabilities:
-<ol type="1">
-<li>If <span class="math inline">\(L = \text{phone}\)</span> with probability <span class="math inline">\(1/3\)</span>,</li>
-<li>If <span class="math inline">\(L = \text{EHR system}, A = \text{less than 40}\)</span> with probability <span class="math inline">\(1/5\)</span> and</li>
-<li>If <span class="math inline">\(L = \text{EHR system}, A = \text{'40 or more'}\)</span> with probability <span class="math inline">\(1/6\)</span>.</li>
-</ol></li>
-<li>The clinician will judge the alert to be clinically relevant (<span class="math inline">\(I\)</span>) 60% of the time if the modality is text+image, or 40% of the time if the modality is text-only.</li>
-<li>The clinician has permission to administer the drug (<span class="math inline">\(D\)</span>) in 40% of cases.</li>
-<li>The clinician will administer the drug (<span class="math inline">\(C\)</span>) if the alert is seen, judged relevant, and the clinician has permission to administer the drug.</li>
-</ul>
-<p>Variables <span class="math inline">\(L, S, M, I\)</span> and <span class="math inline">\(C\)</span> are observable, while <span class="math inline">\(A\)</span> and <span class="math inline">\(D\)</span> are unobservable (other unobservables, which are not mentioned, may be present as well).</p>
-<p><strong>(a)</strong> Specify a structural causal model <span class="math inline">\(\mathcal{M} = \langle V, U, \mathcal{F}, P(U) \rangle\)</span> that captures this setting. Make a reasonable choice for the distribution of <span class="math inline">\(A\)</span> and the way <span class="math inline">\(M\)</span> is determined.</p>
-<p><strong>Answer:</strong></p>
-<p>Endogenous Variables (<span class="math inline">\(V\)</span>), <span class="math inline">\(V = \{L, S, M, I, C\}\)</span>.</p>
-<ul>
-<li><strong><span class="math inline">\(L\)</span> (Location/Device)</strong>: <span class="math inline">\(L=1\)</span> represents ‘phone’ and <span class="math inline">\(L=0\)</span> represents ‘EHR system’.</li>
-<li><strong><span class="math inline">\(M\)</span> (Modality)</strong>: Defined by the function <span class="math inline">\(f_M = A \oplus U_m\)</span>.</li>
-<li><strong><span class="math inline">\(S\)</span> (Seen)</strong>: <span class="math inline">\(S=1\)</span> represents ‘alert seen’.</li>
-<li><strong><span class="math inline">\(I\)</span> (Importance)</strong>: <span class="math inline">\(I=1\)</span> represents ‘alert judged clinically relevant’.</li>
-<li><strong><span class="math inline">\(C\)</span> (Administered)</strong>: <span class="math inline">\(C=1\)</span> represents ‘drug administered’.</li>
-</ul>
-<p>Exogenous Variables (<span class="math inline">\(U\)</span>), <span class="math inline">\(U = \{A, D, U_l, U_m, U_{s1}, U_{s2}, U_{s3}, U_{i1}, U_{i2}\}\)</span>.</p>
-<ul>
-<li><strong><span class="math inline">\(A\)</span> (Age)</strong>: <span class="math inline">\(A=1\)</span> represents ‘40 or more’ and <span class="math inline">\(A=0\)</span> represents ‘less than 40’.</li>
-<li><strong><span class="math inline">\(D\)</span> (Permission)</strong>: <span class="math inline">\(D=1\)</span> represents ‘has permission to administer the drug’.</li>
-</ul>
-<p>Structural Functions (<span class="math inline">\(\mathcal{F}\)</span>):</p>
-<p><span class="math display">\[
-\mathcal{F} = \begin{cases}
-f_L = U_l \\
-f_M = A \oplus U_m \\
-f_S = (L \wedge U_{s1}) \vee (\neg L \wedge ((A \wedge U_{s2}) \vee (\neg A \wedge U_{s3}))) \\
-f_I = (M \wedge U_{i1}) \vee (\neg M \wedge U_{i2}) \\
-f_C = S \wedge I \wedge D
-\end{cases}
-\]</span></p>
-<p>Probability Distribution <span class="math inline">\(P(u)\)</span>:</p>
-<ul>
-<li><strong>Marginals</strong>: <span class="math inline">\(P(D=1) = 0.4\)</span>, <span class="math inline">\(P(A=1) = 0.2\)</span>, <span class="math inline">\(P(U_l=1) = 1/2\)</span>, and <span class="math inline">\(P(U_m=1) = 1/4\)</span>.</li>
-<li><strong>Seen (<span class="math inline">\(S\)</span>) components</strong>: <span class="math inline">\(P(U_{s1}=1) = 1/3\)</span>, <span class="math inline">\(P(U_{s2}=1) = 1/5\)</span>, and <span class="math inline">\(P(U_{s3}=1) = 1/6\)</span>.</li>
-<li><strong>Importance (<span class="math inline">\(I\)</span>) components</strong>: <span class="math inline">\(P(U_{i1}=1) = 0.6\)</span> and <span class="math inline">\(P(U_{i2}=1) = 0.4\)</span>.</li>
-</ul>
-<p><strong>(b)</strong> Draw the causal diagram corresponding to the given SCM.</p>
-<p><strong>Answer:</strong></p>
-<div class="center">
+<ol type="i">
+<li><p><span class="math inline">\(\mathbf{Z} = \{Z_2, Z_3\}\)</span>, <span class="math display">\[P(y|do(x)) = \sum_{z_2, z_3} P(y|x, z_2, z_3)P(z_2, z_3)\]</span></p></li>
+<li><p>There is not set <span class="math inline">\(\mathbf{Z}\)</span> that satisfies the backdoor criterion in this model.</p></li>
+</ol>
+<p><strong>B.</strong> Consider the causal diagram <span class="math inline">\(G\)</span> provided in the assignment (where <span class="math inline">\(X=\{X_{1},X_{2}\}\)</span>). The goal is to identify the effect of <span class="math inline">\(X=\{X_{1},X_{2}\}\)</span> on <span class="math inline">\(Y\)</span>. - First, determine whether there exists a set <span class="math inline">\(Z\)</span> that satisfies the back-door criterion. - Second, using the rules of do-calculus, show that: <span class="math display">\[P(y|do(x_{1},x_{2}))=\sum_{z_{1},z_{2}}P(y|x_{1},x_{2},z_{1},z_{2})P(z_{1},z_{2})\]</span></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="p5.png" class="img-fluid figure-img" width="400"></p>
+<p><img src="f4.png" class="img-fluid figure-img" width="300"></p>
+<figcaption>Exercise 3 DAG</figcaption>
+</figure>
+</div>
+<p><strong>Answer:</strong></p>
+<p>There is no set <span class="math inline">\(Z\)</span> that satisfies the back-door criterion for <span class="math inline">\(X=\{X_1, X_2\}\)</span> because all potential adjusters (<span class="math inline">\(Z_1, Z_2\)</span>) are descendants of the treatment <span class="math inline">\(X_1\)</span>.</p>
+<p>Derive the probability <span class="math inline">\(P(y|do(x_1, x_2))\)</span> using the 3 rules of do-calculus.</p>
+<p><strong>Step 1:</strong> Expansion via Probability Axioms</p>
+<p>We start by expanding the term over the variables <span class="math inline">\(Z_1, Z_2\)</span> using the Law of Total Probability:</p>
+<p><span class="math display">\[
+P(y|do(x_1, x_2)) = \sum_{z_1, z_2} P(y|do(x_1, x_2), z_1, z_2) P(z_1, z_2|do(x_1, x_2))
+\]</span></p>
+<p><strong>Step 2:</strong> Analyze the First Term <span class="math inline">\(P(y|do(x_1, x_2), z_1, z_2)\)</span></p>
+<p>We apply <strong>Rule 2 (Action/Observation exchange)</strong>. We check if <span class="math inline">\(Y \perp\!\!\!\perp \mid Z\)</span> in the graph <span class="math inline">\(G_{\underline{X}}\)</span> (where arrows <em>originating</em> from <span class="math inline">\(X\)</span> are removed).</p>
+<ul>
+<li>Removing arrows <span class="math inline">\(X_1 \rightarrow Z_1\)</span>, <span class="math inline">\(X_1 \rightarrow Y\)</span>, and <span class="math inline">\(X_2 \rightarrow Y\)</span> leaves only the back-door path <span class="math inline">\(X_2 \leftarrow Z_2 \dashrightarrow Y\)</span>.</li>
+<li>By conditioning on <span class="math inline">\(Z_2\)</span> (which is in our set <span class="math inline">\(Z\)</span>), this back-door path is blocked.</li>
+<li>Therefore, the intervention <span class="math inline">\(do(X)\)</span> can be exchanged for observation <span class="math inline">\(X\)</span>:</li>
+</ul>
+<p><span class="math display">\[
+P(y|do(x_1, x_2), z_1, z_2) = P(y|x_1, x_2, z_1, z_2)
+\]</span></p>
+<p><strong>Step 3:</strong> Analyze the Second Term <span class="math inline">\(P(z_1, z_2|do(x_1, x_2))\)</span></p>
+<p>We apply <strong>Rule 3 (Adding/Removing of Actions)</strong>.</p>
+<ol type="1">
+<li><strong>Removing</strong> <span class="math inline">\(do(x_2)\)</span>:
+<ul>
+<li>In the graph, arrows point <span class="math inline">\(Z_2 \rightarrow X_2\)</span>. There is no path from <span class="math inline">\(X_2\)</span> to <span class="math inline">\(Z_1\)</span> or <span class="math inline">\(Z_2\)</span>.</li>
+<li>Thus, <span class="math inline">\(Z\)</span> is independent of <span class="math inline">\(X_2\)</span> in the graph where arrows into <span class="math inline">\(X_2\)</span> are removed.</li>
+<li><span class="math inline">\(P(z_1, z_2|do(x_1), do(x_2)) = P(z_1, z_2|do(x_1))\)</span>.</li>
+</ul></li>
+<li><strong>Handling</strong> <span class="math inline">\(do(x_1)\)</span>:
+<ul>
+<li>In the graph <span class="math inline">\(G\)</span>, <span class="math inline">\(X_1\)</span> is a parent of <span class="math inline">\(Z_1\)</span> (<span class="math inline">\(X_1 \rightarrow Z_1\)</span>).</li>
+<li>Under the intervention <span class="math inline">\(do(x_1)\)</span>, the relationship <span class="math inline">\(X_1 \rightarrow Z_1\)</span> remains intact (since <span class="math inline">\(X_1\)</span> is a root node).</li>
+<li>Therefore, we replace the intervention with the observation:</li>
+<li><span class="math inline">\(P(z_1, z_2|do(x_1)) = P(z_1, z_2|x_1)\)</span>.</li>
+</ul></li>
+</ol>
+<p><strong>Step 4:</strong> Final Expression</p>
+<p>Substituting these results back into the expansion from Step 1:</p>
+<p><span class="math display">\[\begin{aligned}
+P(y|do(x_1, x_2)) &amp;= \sum_{z_1, z_2} \underbrace{P(y|do(x_1, x_2), z_1, z_2)}_{\text{Step 2}} \underbrace{P(z_1, z_2|do(x_1, x_2))}_{\text{Step 3}} \\
+&amp;= \sum_{z_1, z_2} P(y|x_1, x_2, z_1, z_2) P(z_1, z_2|x_1)
+\end{aligned}\]</span></p>
+<p>Mathematically:</p>
+<p><span class="math display">\[
+\begin{align}
+P(y \mid do(x_1, x_2)) &amp; \\
+&amp;= P(y \mid do(x_1, x_2, z_1)) &amp;&amp; \text{R3: } (Y \perp\!\!\perp Z_1 \mid X_1, X_2)_{\mathcal{G}_{\overline{X_1 X_2 Z_1}}} \\
+&amp;= \sum_{z_2} P(y \mid z_2, do(x_1, x_2, z_1))P(z_2 \mid do(x_1, x_2, z_1)) &amp;&amp; \text{marginalize } Z_2  \\
+&amp;= \sum_{z_2} P(y \mid x_1, x_2, z_1, z_2)P(z_2 \mid do(x_1, x_2, z_1)) &amp;&amp; \text{R2: } (Y \perp\!\!\perp X_1, X_2, Z_1 \mid Z_2)_{\mathcal{G}_{\overline{Z_2}\underline{X_1 X_2 Z_1}}} \\
+&amp;= \sum_{z_2} P(y \mid x_1, x_2, z_1, z_2)P(z_2 \mid do(z_1)) &amp;&amp; \text{R3: } (Z_2 \perp\!\!\perp X_1, X_2 \mid Z_1)_{\mathcal{G}_{\overline{Z_1 X_1 X_2}}} \\
+&amp;= \sum_{z_2} P(y \mid x_1, x_2, z_1, z_2)P(z_2 \mid z_1) &amp;&amp; \text{R2: } (Z_2 \perp\!\!\perp Z_1)_{\mathcal{G}_{\underline{Z_1}}} \\
+&amp;= \sum_{z_1, z_2} P(y \mid x_1, x_2, z_1, z_2)P(z_2 \mid z_1)P(z_1)  \\
+&amp;= \sum_{z_1, z_2} P(y \mid x_1, x_2, z_1, z_2)P(z_1, z_2)
+\end{align}
+\]</span></p>
+</section>
+<section id="exercise-4.-do-calculus-rules" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-4.-do-calculus-rules">Exercise 4. Do-Calculus Rules</h3>
+<p>Consider the causal diagram involving <span class="math inline">\(X, Y, Z, W\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="f5.png" class="img-fluid figure-img" width="300"></p>
 <figcaption>Exercise 4 DAG</figcaption>
 </figure>
 </div>
-</div>
-</section>
-<section id="exercise-5.-d-connectedness" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-5.-d-connectedness">Exercise 5. d-Connectedness</h3>
-<p>Consider the two graphs below, <span class="math inline">\(\mathcal{G}\)</span> (left) and <span class="math inline">\(\mathcal{G'}\)</span> (right).</p>
-<div class="center">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="p2.png" class="img-fluid figure-img" width="800"></p>
-<figcaption>Exercise 5 DAG</figcaption>
-</figure>
-</div>
-</div>
-<p><strong>(a)</strong> List the variables that are d-connected to <span class="math inline">\(A\)</span> given <span class="math inline">\(\{B\}\)</span> in <span class="math inline">\(G\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\{C, F, H, I, E\}\)</span></p>
-<p><strong>(b)</strong> List the variables that are d-connected to <span class="math inline">\(A\)</span> given <span class="math inline">\(\{J\}\)</span> in <span class="math inline">\(G'\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\{G, D, B, E, I, H\}\)</span></p>
-</section>
-<section id="exercise-6.-d-separation" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-6.-d-separation">Exercise 6. d-Separation</h3>
-<p>Consider the following graphical model and conditional probability tables:</p>
-<div class="center">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="p3.png" class="img-fluid figure-img" width="400"></p>
-<figcaption>Exercise 6 DAG</figcaption>
-</figure>
-</div>
-</div>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th style="text-align: center;"><span class="math inline">\(P(B=1)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(P(E=1)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(P(S=1)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(P(C=1)\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">0.02</td>
-<td style="text-align: center;">0.01</td>
-<td style="text-align: center;">0.80</td>
-<td style="text-align: center;">0.15</td>
-</tr>
-</tbody>
-</table>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: center;"><span class="math inline">\(B\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(E\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(P(A=1|B,E)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(C\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(P(M=1|A,C)\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(A\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(S\)</span></th>
-<th style="text-align: center;"><span class="math inline">\(P(J=1|A,S)\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0.01</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0.05</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0.30</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0.00</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0.90</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0.85</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0.97</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0.98</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0.15</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0.10</td>
-</tr>
-</tbody>
-</table>
-<p><strong>(a)</strong> List all d-separation statements that hold assuming that <span class="math inline">\(J=1\)</span>.</p>
+<p><strong>A.</strong> Explain why neither <span class="math inline">\(Z\)</span>, <span class="math inline">\(W\)</span>, nor <span class="math inline">\(\{Z, W\}\)</span> are back-door admissible sets for the causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span>.</p>
 <p><strong>Answer:</strong></p>
-<p>Conditioning on <span class="math inline">\(J\)</span> opens the paths <span class="math inline">\(S \leftrightarrow A\)</span>. The following variables remain d-separated:</p>
+<p>To be <strong>back-door admissible</strong>, a set <span class="math inline">\(S\)</span> must block all “back-door” paths (paths with an arrow into <span class="math inline">\(X\)</span>) between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> without opening any colliders.</p>
+<p><strong>1. Why</strong> <span class="math inline">\(\{Z\}\)</span> is not admissible:</p>
 <ul>
-<li><span class="math inline">\((S \perp\!\!\!\perp B, E \mid J, A)\)</span></li>
-<li><span class="math inline">\((C \perp\!\!\!\perp B, E, A, S \mid J)\)</span></li>
-<li><span class="math inline">\((M \perp\!\!\!\perp B, E, S \mid J, A, C)\)</span></li>
+<li>There is a back-door path: <span class="math inline">\(X \leftrightarrow W \leftrightarrow Y\)</span> (where dashed lines represent hidden confounding paths, effectively <span class="math inline">\(X \leftarrow U_1 \rightarrow W \leftarrow U_2 \rightarrow Y\)</span>).</li>
+<li>Conditioning on <span class="math inline">\(Z\)</span> does not block this path because <span class="math inline">\(Z\)</span> is not on the path.</li>
 </ul>
-<p><strong>(b)</strong> Compute the given probabilities using the graph and the probability tables:</p>
-<ol type="1">
-<li><span class="math inline">\(P(M=1)\)</span></li>
-<li><span class="math inline">\(P(J=1|C=0)\)</span></li>
-<li><span class="math inline">\(P(E=1|M=1, B=0)\)</span></li>
-<li><span class="math inline">\(P(M=1|B=1, J=0)\)</span></li>
-</ol>
-<p><strong>Answer:</strong></p>
-<p><strong>1.</strong> <span class="math inline">\(P(M=1) = \sum_{A,C} P(M=1|A,C) \cdot P(A) \cdot P(C)\)</span></p>
-<p>Step 1: Compute <span class="math inline">\(P(A=1)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(A=1) &amp;= \sum_{B,E} P(A=1|B,E) \cdot P(B) \cdot P(E) \\
-&amp;= P(A=1|B=0,E=0) \cdot P(B=0) \cdot P(E=0) \\
-&amp;\quad + P(A=1|B=0,E=1) \cdot P(B=0) \cdot P(E=1) \\
-&amp;\quad + P(A=1|B=1,E=0) \cdot P(B=1) \cdot P(E=0) \\
-&amp;\quad + P(A=1|B=1,E=1) \cdot P(B=1) \cdot P(E=1) \\
-&amp;= 0.01 \times 0.98 \times 0.99 + 0.3 \times 0.98 \times 0.01 + 0.9 \times 0.02 \times 0.99 + 0.98 \times 0.02 \times 0.01 \\
-&amp;= 0.030658
-\end{aligned}
-\]</span></p>
-<p>Therefore: <span class="math inline">\(P(A=0) = 1 - 0.030658 = 0.969342\)</span></p>
-<p>Step 2: Compute <span class="math inline">\(P(M=1)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(M=1) &amp;= P(M=1|A=0,C=0) \cdot P(A=0) \cdot P(C=0) \\
-&amp;\quad + P(M=1|A=0,C=1) \cdot P(A=0) \cdot P(C=1) \\
-&amp;\quad + P(M=1|A=1,C=0) \cdot P(A=1) \cdot P(C=0) \\
-&amp;\quad + P(M=1|A=1,C=1) \cdot P(A=1) \cdot P(C=1) \\
-&amp;= 0.05 \times 0.969 \times 0.85 + 0 \times 0.969 \times 0.15 + 0.85 \times 0.0307 \times 0.85 + 0.15 \times 0.0307 \times 0.15 \\
-&amp;= 0.0640
-\end{aligned}
-\]</span></p>
-<p><strong>2.</strong> <span class="math inline">\(P(J=1) = \sum_{A,S} P(J=1|A,S) \cdot P(A) \cdot P(S)\)</span></p>
-<p>By examining the DAG, we can verify that <span class="math inline">\((J \perp\!\!\!\perp C)\)</span>: <span class="math inline">\(C\)</span> only affects <span class="math inline">\(M\)</span> and there is no path from <span class="math inline">\(C\)</span> to <span class="math inline">\(J\)</span> that is not blocked.</p>
-<p>Therefore: <span class="math inline">\((J=1|C=0) = P(J=1)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(J=1) &amp;= P(J=1|A=0,S=0) \cdot P(A=0) \cdot P(S=0) \\
-&amp;\quad + P(J=1|A=0,S=1) \cdot P(A=0) \cdot P(S=1) \\
-&amp;\quad + P(J=1|A=1,S=0) \cdot P(A=1) \cdot P(S=0) \\
-&amp;\quad + P(J=1|A=1,S=1) \cdot P(A=1) \cdot P(S=1) \\
-&amp;= 0 \times 0.969 \times 0.2 + 0 \times 0.969 \times 0.8 + 0.97 \times 0.0307 \times 0.2 + 0.1 \times 0.0307 \times 0.8 \\
-&amp;= 0.0084
-\end{aligned}
-\]</span></p>
-<p><strong>3.</strong> <span class="math inline">\(P(E=1|M=1, B=0) = \frac{P(M=1|E=1,B=0) \cdot P(E=1)}{P(M=1|B=0)}\)</span></p>
-<p>Compute <span class="math inline">\(P(A=1|B=0, E)\)</span>: <span class="math inline">\(P(A=1|B=0, E=0) = 0.01, \quad P(A=1|B=0, E=1) = 0.3\)</span></p>
-<p>Compute <span class="math inline">\(P(M=1|B=0, E)\)</span> for each value of <span class="math inline">\(E\)</span>:</p>
-<p><span class="math display">\[
-\small
-P(M=1|B=0,E) = \sum_{A,C} P(M=1|A,C) \cdot P(A|B=0,E) \cdot P(C)
-\]</span></p>
+<p><strong>2. Why</strong> <span class="math inline">\(\{W\}\)</span> is not admissible:</p>
 <ul>
-<li><strong>For E=0:</strong> <span class="math display">\[
-  \small
-  \begin{aligned}
-  P(M=1|B=0,E=0) &amp;= 0.05 \times 0.99 \times 0.85 + 0 \times 0.99 \times 0.15 \\
-  &amp;\quad + 0.85 \times 0.01 \times 0.85 + 0.15 \times 0.01 \times 0.15 \\
-  &amp;= 0.0495
-  \end{aligned}
-  \]</span></li>
-<li><strong>For E=1:</strong> <span class="math display">\[
-  \small
-  \begin{aligned}
-  P(M=1|B=0,E=1) &amp;= 0.05 \times 0.7 \times 0.85 + 0 \times 0.7 \times 0.15 \\
-  &amp;\quad + 0.85 \times 0.3 \times 0.85 + 0.15 \times 0.3 \times 0.15 \\
-  &amp;= 0.2533
-  \end{aligned}
-  \]</span></li>
+<li>Consider the same back-door path <span class="math inline">\(X \leftrightarrow W \leftrightarrow Y\)</span>.</li>
+<li>The node <span class="math inline">\(W\)</span> acts as a <strong>collider</strong> on this path. The implicit structure of the bidirected edges is <span class="math inline">\(X \leftarrow U_1 \rightarrow \mathbf{W} \leftarrow U_2 \rightarrow Y\)</span>, meaning arrows point <em>into</em> <span class="math inline">\(W\)</span>.</li>
+<li>Conditioning on a collider <strong>opens</strong> the path (creating a dependency between the hidden confounders).</li>
 </ul>
-<p>Compute <span class="math inline">\(P(M=1|B=0)\)</span>:</p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(M=1|B=0) &amp;= P(M=1|B=0,E=0) \cdot P(E=0) + P(M=1|B=0,E=1) \cdot P(E=1) \\
-&amp;= 0.049525 \times 0.99 + 0.2533 \times 0.01 \\
-&amp;= 0.05156
-\end{aligned}
-\]</span></p>
-<p>Apply Bayes’ Theorem: <span class="math display">\[
-\small
-P(E=1|M=1,B=0) = \frac{P(M=1|B=0,E=1) \cdot P(E=1)}{P(M=1|B=0)} = \frac{0.2533 \times 0.01}{0.05156} = 0.0491
-\]</span></p>
-<p><strong>4.</strong> <span class="math inline">\(P(M=1|B=1,J=0) = \frac{P(M=1, J=0|B=1)}{P(J=0|B=1)}\)</span></p>
-<p>Step 1: Compute <span class="math inline">\(P(A|B=1)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(A=1|B=1) &amp;= P(A=1|B=1,E=0) \cdot P(E=0) + P(A=1|B=1,E=1) \cdot P(E=1) \\
-&amp;= 0.9 \times 0.99 + 0.98 \times 0.01 \\
-&amp;= 0.891 + 0.0098 = 0.9008
-\end{aligned}
-\]</span></p>
-<p>Therefore: <span class="math inline">\(P(A=0|B=1) = 0.0992\)</span></p>
-<p>Step 2: Compute <span class="math inline">\(P(J=0|A)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(J=0|A=0) &amp;= P(J=0|A=0,S=0) \cdot P(S=0) + P(J=0|A=0,S=1) \cdot P(S=1) \\
-&amp;= 1 \times 0.2 + 1 \times 0.8 = 1
-\end{aligned}
-\]</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(J=0|A=1) &amp;= P(J=0|A=1,S=0) \cdot P(S=0) + P(J=0|A=1,S=1) \cdot P(S=1) \\
-&amp;= 0.03 \times 0.2 + 0.9 \times 0.8 \\
-&amp;= 0.006 + 0.72 = 0.726
-\end{aligned}
-\]</span></p>
-<p>Step 3: Compute <span class="math inline">\(P(M=1|A)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(M=1|A=0) &amp;= P(M=1|A=0,C=0) \cdot P(C=0) + P(M=1|A=0,C=1) \cdot P(C=1) \\
-&amp;= 0.05 \times 0.85 + 0 \times 0.15 = 0.0425
-\end{aligned}
-\]</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(M=1|A=1) &amp;= P(M=1|A=1,C=0) \cdot P(C=0) + P(M=1|A=1,C=1) \cdot P(C=1) \\
-&amp;= 0.85 \times 0.85 + 0.15 \times 0.15 \\
-&amp;= 0.7225 + 0.0225 = 0.745
-\end{aligned}
-\]</span></p>
-<p>Step 4: Compute <span class="math inline">\(P(M=1, J=0|B=1)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(M=1, J=0|B=1) &amp;= \sum_{A} P(M=1|A) \cdot P(J=0|A) \cdot P(A|B=1) \\
-&amp;= P(M=1|A=0) \cdot P(J=0|A=0) \cdot P(A=0|B=1) \\
-&amp;\quad + P(M=1|A=1) \cdot P(J=0|A=1) \cdot P(A=1|B=1) \\
-&amp;= 0.0425 \times 1 \times 0.0992 + 0.745 \times 0.726 \times 0.9008 \\
-&amp;= 0.004216 + 0.4872 = 0.4914
-\end{aligned}
-\]</span></p>
-<p>Step 5: Compute <span class="math inline">\(P(J=0|B=1)\)</span></p>
-<p><span class="math display">\[
-\small
-\begin{aligned}
-P(J=0|B=1) &amp;= \sum_{A} P(J=0|A) \cdot P(A|B=1) \\
-&amp;= P(J=0|A=0) \cdot P(A=0|B=1) + P(J=0|A=1) \cdot P(A=1|B=1) \\
-&amp;= 1 \times 0.0992 + 0.726 \times 0.9008 \\
-&amp;= 0.0992 + 0.654 = 0.7532
-\end{aligned}
-\]</span></p>
-<p>Step 6: Final Calculation</p>
-<p><span class="math display">\[
-\small
-P(M=1|B=1,J=0) = \frac{P(M=1, J=0|B=1)}{P(J=0|B=1)} = \frac{0.4914}{0.7532} = 0.652
-\]</span></p>
-</section>
-<section id="exercise-7.-d-separating-sets" class="level3">
-<h3 class="anchored" data-anchor-id="exercise-7.-d-separating-sets">Exercise 7. d-Separating Sets</h3>
-<p>Let <span class="math inline">\(G\)</span> (shown below) be the causal diagram of some unknown model <span class="math inline">\(M\)</span> and let <span class="math inline">\(P\)</span> be <span class="math inline">\(M\)</span>’s observational distribution.</p>
+<p><strong>3. Why</strong> <span class="math inline">\(\{Z, W\}\)</span> is not admissible:</p>
+<ul>
+<li>This set includes <span class="math inline">\(W\)</span>.</li>
+<li>As established above, conditioning on <span class="math inline">\(W\)</span> opens the confounding path <span class="math inline">\(X \leftrightarrow W \leftrightarrow Y\)</span>.</li>
+</ul>
+<p><strong>B.</strong> Derive the identification expression for <span class="math inline">\(P(y|do(x))\)</span> using the rules of do-calculus. <em>Hint: In the first step, justify adding</em> <span class="math inline">\(do(w)\)</span>, <span class="math inline">\(do(z)\)</span> to <span class="math inline">\(P(y|do(x))\)</span>. Then, note that <span class="math inline">\(do(x)\)</span> in the <span class="math inline">\(do(w)do(z)\)</span> is the same as <span class="math inline">\(see(x)\)</span>. Finally, use the law of conditional probability to compute the numerator and the denominator.</p>
+<p><strong>Answer:</strong> Following is the graph <span class="math inline">\(G_{\overline{X}\overline{WZ}}\)</span>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="p4.png" class="img-fluid figure-img" width="400"></p>
-<figcaption>Exercise 7 DAG</figcaption>
+<figcaption>Exercise 4 DAG</figcaption>
 </figure>
 </div>
-<p><strong>(a)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(W\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\{Z, S\}\)</span></p>
-<p><strong>(b)</strong> Find a minimal set <span class="math inline">\(A\)</span> (if it exists) that d-separates <span class="math inline">\(X\)</span> and <span class="math inline">\(S\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\{\emptyset\}\)</span></p>
-<p><strong>(c)</strong> Find all minimal sets <span class="math inline">\(A\)</span> (if any exists) that d-separate <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span>.</p>
-<p><strong>Answer:</strong> <span class="math inline">\(\{W,T\}, \{W, S\}\)</span></p>
-<p><strong>(d)</strong> Draw a graph <span class="math inline">\(\mathcal{G}'\)</span> over the variables <span class="math inline">\(\{X, S, W, Y\}\)</span> such that:</p>
-<ul>
-<li><span class="math inline">\(\mathcal{G}'\)</span> has exactly the same independence as <span class="math inline">\(\mathcal{G}'\)</span> with respect to <span class="math inline">\(P(X, S, W, Y)\)</span>, and<br>
-</li>
-<li><span class="math inline">\(\mathcal{G}'\)</span> has the minimum number of edges while satisfying this constraint in the previous bullet.</li>
-</ul>
-<p><em>Hint: In the first step, determine which graph is obtained if</em> <span class="math inline">\(Z\)</span> and <span class="math inline">\(T\)</span> are unobserved, and list the independences implied by this graph. In the second step, consider which of the edges can be removed without affecting any of the independences.</p>
-<p><strong>Answer:</strong></p>
-<div class="center">
+<p><strong>Step 1: Add Interventions (Rule 3)</strong></p>
+<p>We invoke <strong>Rule 3</strong> of do-calculus to add the interventions <span class="math inline">\(do(w)\)</span> and <span class="math inline">\(do(z)\)</span>:</p>
+<p><span class="math display">\[
+P(y \mid do(x)) = P(y \mid do(x), do(z), do(w))
+\]</span></p>
+<p><strong>Step 2: Exchange Action for Observation (Rule 2)</strong></p>
+<p>We invoke <strong>Rule 2</strong> of do-calculus to replace the intervention <span class="math inline">\(do(x)\)</span> with the observation <span class="math inline">\(x\)</span>, since all paths from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> are causal in the <span class="math inline">\(do(z, w)\)</span> world:</p>
+<p><span class="math display">\[
+P(y \mid do(x), do(z), do(w)) = P(y \mid x, do(z), do(w))
+\]</span></p>
+<p><strong>Step 3: Expansion and Derivation</strong></p>
+<p>We rewrite the expression using the definition of conditional probability:</p>
+<p><span class="math display">\[
+P(y \mid x, do(z), do(w)) = \frac{P(y, x \mid do(z), do(w))}{P(x \mid do(z), do(w))}
+\]</span></p>
+<p><strong>Numerator Analysis:</strong> First, we apply <strong>Rule 3</strong> to remove <span class="math inline">\(do(w)\)</span>, as <span class="math inline">\(W\)</span> does not affect <span class="math inline">\(\{Y, X\}\)</span> once <span class="math inline">\(Z\)</span> is intervened upon (or more formally, observing the independence conditions in the graph):</p>
+<p><span class="math display">\[
+P(y, x \mid do(z), do(w)) = P(y, x \mid do(z))
+\]</span></p>
+<p>Next, we compute <span class="math inline">\(P(y, x \mid do(z))\)</span>. We note that <span class="math inline">\(W\)</span> is a valid back-door set for the effect of <span class="math inline">\(Z\)</span> on <span class="math inline">\(\{X, Y\}\)</span>. Thus, we expand on <span class="math inline">\(W\)</span> and apply <strong>Rule 2</strong>:</p>
+<p><span class="math display">\[
+P(y, x \mid do(z), do(w)) = \sum_{w} P(y, x \mid z, w)P(w)
+\]</span></p>
+<p><strong>Denominator Analysis:</strong> The same logic applies to the denominator. We remove <span class="math inline">\(do(w)\)</span> via Rule 3 and apply the back-door criterion with <span class="math inline">\(W\)</span> for the effect of <span class="math inline">\(Z\)</span> on <span class="math inline">\(X\)</span>:</p>
+<p><span class="math display">\[
+P(x \mid do(z), do(w)) = \sum_{w} P(x \mid z, w)P(w)
+\]</span></p>
+<p><strong>Final Expression:</strong> Putting the numerator and denominator together:</p>
+<p><span class="math display">\[
+P(y \mid do(x)) = \frac{\sum_{w} P(y, x \mid z, w)P(w)}{\sum_{w} P(x \mid z, w)P(w)}
+\]</span></p>
+</section>
+<section id="exercise-5.-changing-the-granularity-of-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-5.-changing-the-granularity-of-the-model">Exercise 5. Changing the Granularity of the Model</h3>
+<p>Consider the causal diagram <span class="math inline">\(G\)</span> involving variables <span class="math inline">\(A, B, C, D, E, X, Y\)</span>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="p6.png" class="img-fluid figure-img" width="400"></p>
-<figcaption>Exercise 7(d) DAG</figcaption>
+<p><img src="f6.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 5 DAG</figcaption>
 </figure>
 </div>
+<p><strong>A.</strong> Determine whether the causal effect <span class="math inline">\(P(y|do(x))\)</span> is identifiable; if so, show how.</p>
+<p><strong>Answer:</strong></p>
+<p>There are several choices here, for instance</p>
+<p><span class="math display">\[
+P(y \mid do(x)) = \sum_{a,c} P(y \mid x, a, c)P(a, c)
+\]</span></p>
+<p>due to the back-door criterion and the fact that <span class="math inline">\(\{A, C\}\)</span> admissible. Or simply because this is the adjustment by the parents. We could also have</p>
+<p><span class="math display">\[
+P(y \mid do(x)) = \sum_{e} P(e \mid x) \sum_{x'} P(y \mid e, x')P(x')
+\]</span></p>
+<p>since <span class="math inline">\(E\)</span> is front-door admissible. We could also derive some expressions with do-calculus.</p>
+<p><strong>B.</strong> Write a SCM <span class="math inline">\(M\)</span> that induces this causal diagram and a probability distribution <span class="math inline">\(P(V)\)</span> such that for every <span class="math inline">\(v\)</span>, <span class="math inline">\(P(v)&gt;0\)</span>. You don’t need to show <span class="math inline">\(P(v)\)</span> in your answer.</p>
+<p><strong>Answer:</strong></p>
+<p>For instance, consider the following model <span class="math inline">\(\mathcal{M}\)</span>:</p>
+<p><span class="math display">\[
+\begin{align*}
+\mathbf{V} &amp;= \{X, Y, A, B, C, D, E\} \\
+\mathbf{U} &amp;= \{U_b, U_{bd}, U_x, U_y, U_a, U_c, U_e\} \\
+\mathcal{F} &amp;= \begin{cases}
+f_A = U_a \\
+f_B = A \oplus U_{bd} \oplus U_b \\
+f_C = B \oplus D \oplus U_c \\
+f_D = U_{bd} \\
+f_X = A \oplus C \oplus U_x \\
+f_E = X \oplus U_e \\
+f_Y = E \oplus D \oplus U_y
+\end{cases} \\
+P(\mathbf{u}) &amp;= \{P(U_b = 1) = P(U_{bd} = 1) = P(U_x = 1) = P(U_y = 1) \\
+&amp;= P(U_a = 1) = P(U_c = 1) = P(U_e = 1) = 1/2\}
+\end{align*}
+\]</span></p>
+<p><strong>C.</strong> Suppose that in a different study the same system (represented by the SCM <span class="math inline">\(M\)</span>) is observed, but only the variables <span class="math inline">\(V^{\prime}=\{X,Y,B,C\}\)</span> are measured. Write a new SCM <span class="math inline">\(\mathcal{M}^{\prime}=\langle V^{\prime},U^{\prime},\mathcal{F}^{\prime},P(u^{\prime})\rangle\)</span> corresponding to the model for this study, based on your answer to the previous question.</p>
+<p><strong>Answer:</strong></p>
+<p><span class="math display">\[
+\begin{align*}
+V' &amp;= \{X, Y, B, C\} \\
+U' &amp;= \{A, D, U_x, U_y, U_c, U_e\} \\
+\mathcal{F} &amp;= \begin{cases}
+f_B = A \oplus D \\
+f_C = B \oplus D \oplus U_c \\
+f_X = U_x \oplus A \oplus C \\
+f_Y = (X \oplus U_e) \oplus D \oplus U_y
+\end{cases} \\
+P(\mathbf{u}) &amp;= \{P(A = 1) = P(D = 1) = P(U_x = 1) = P(U_y = 1) \\
+&amp;= P(U_c = 1) = P(U_e = 1) = 1/2\}
+\end{align*}
+\]</span></p>
+<p><strong>D.</strong> Draw the causal diagram <span class="math inline">\(\mathcal{G^{\prime}}\)</span> corresponding to <span class="math inline">\(\mathcal{M}^{\prime}\)</span>. Naturally, since we are talking about the same underlying reality (the SCM you proposed), <span class="math inline">\(\mathcal{M}^{\prime}\)</span> and <span class="math inline">\(V^{\prime}\)</span> have to preserve all the (probabilistic) independencies among the variables in <span class="math inline">\(V^{\prime}\)</span> that were implied in <span class="math inline">\(M\)</span> and <span class="math inline">\(V\)</span>.</p>
+<p><strong>Answer:</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="p5.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 5 DAG</figcaption>
+</figure>
 </div>
+<p>Naturally, since we are talking about the same underlying reality (the SCM you proposed), <span class="math inline">\(\mathcal{M}'\)</span> and <span class="math inline">\(V'\)</span> have to preserve all the (probabilistic) independencies among the variables in <span class="math inline">\(V'\)</span> that were implied in <span class="math inline">\(\mathcal{M}\)</span> and <span class="math inline">\(V\)</span>.</p>
+<p><strong>E.</strong> Is the effect <span class="math inline">\(P(y|do(x))\)</span> identifiable from <span class="math inline">\(P(v^{\prime})\)</span> and <span class="math inline">\(\mathcal{G}^{\prime}?\)</span> Specifically, is there a back-door or front-door adjustment set?</p>
+<p><strong>Answer:</strong></p>
+<p>The effect <span class="math inline">\(P(y \mid do(x))\)</span> is not identifiable from the graph induced by <span class="math inline">\(\mathcal{M}'\)</span> and <span class="math inline">\(P(V')\)</span>, so there is no admissible sets for back-door adjustment, front-door adjustment, any do-calculus derivation and IDENTIFY fails with this instance.</p>
+</section>
+<section id="exercise-6.-many-paths-lead-to-id" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-6.-many-paths-lead-to-id">Exercise 6. Many Paths Lead to ID</h3>
+<p>The target causal quantity <span class="math inline">\(P(y|do(x))\)</span> may not be identifiable from <span class="math inline">\(P(V)\)</span> depending on the causal diagram. On the other hand, for identifiable effects, there could be more than one expression that is equal to the effect of interest.</p>
+<p>Consider the causal diagram involving variables <span class="math inline">\(A, B, C, D, X, Y, E\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="f7.png" class="img-fluid figure-img" width="400"></p>
+<figcaption>Exercise 6 DAG</figcaption>
+</figure>
+</div>
+<p>Give 5 different functions of the observational distribution <span class="math inline">\(P(v)\)</span> that are equal to the effect <span class="math inline">\(Q\)</span>. That is, find 5 different identification expressions. Justify the validity of each expression using the Back-door Criterion, the Front-door criterion, or showing a derivation in do-calculus.</p>
+<p><strong>Answer:</strong></p>
+<p>The diagram contains the following paths between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>:</p>
+<p><strong>Causal Paths:</strong></p>
+<ul>
+<li><span class="math inline">\(X \rightarrow D \rightarrow Y\)</span></li>
+<li><span class="math inline">\(X \rightarrow E \rightarrow Y\)</span></li>
+</ul>
+<p><strong>Back-door Paths:</strong></p>
+<ul>
+<li><strong>Path 1:</strong> <span class="math inline">\(X \leftarrow A \rightarrow B \leftarrow U_{BY} \rightarrow Y\)</span>. In this path, <span class="math inline">\(B\)</span> acts as a collider, this path is naturally blocked.</li>
+<li><strong>Path 2:</strong> <span class="math inline">\(X \leftarrow C \leftarrow B \leftarrow U_{BY} \rightarrow  Y\)</span>. In this path, there are no colliders. This path is open and conveys non-causal association.</li>
+</ul>
+<p>Below are 5 distinct functions of the observational distribution <span class="math inline">\(P(v)\)</span> that are equal to the causal effect <span class="math inline">\(P(y|do(x))\)</span>.</p>
+<p><strong>1. Back-door Adjustment with</strong> <span class="math inline">\(Z = \{A, C\}\)</span></p>
+<p><span class="math display">\[P(y|do(x)) = \sum_{a,c} P(y|x, a, c)P(a, c)\]</span></p>
+<p><strong>Justification:</strong> To satisfy the Back-door Criterion, we must block the open <strong>Path 2</strong>. Conditioning on <span class="math inline">\(C\)</span> blocks <strong>Path 2</strong>. However, since <span class="math inline">\(C\)</span> is a descendant of the collider <span class="math inline">\(B\)</span> (from <strong>Path 1</strong>), conditioning on <span class="math inline">\(C\)</span> opens <strong>Path 1</strong>. To resolve this, we also condition on <span class="math inline">\(A\)</span>, which blocks <strong>Path 1</strong> at its source. Thus, the set <span class="math inline">\(\{A, C\}\)</span> blocks all back-door paths.</p>
+<p><strong>2. Back-door Adjustment with</strong> <span class="math inline">\(Z = \{A, B\}\)</span></p>
+<p><span class="math display">\[P(y|do(x)) = \sum_{a,b} P(y|x, a, b)P(a, b)\]</span></p>
+<p><strong>Justification:</strong> Conditioning on <span class="math inline">\(B\)</span> directly blocks <strong>Path 2</strong>. However, because <span class="math inline">\(B\)</span> is the collider in <strong>Path 1</strong>, conditioning on it opens <strong>Path 1</strong>. We include <span class="math inline">\(A\)</span> in the adjustment set to re-block <strong>Path 1</strong>. The set <span class="math inline">\(\{A, B\}\)</span> therefore satisfies the Back-door Criterion.</p>
+<p><strong>3. Back-door Adjustment with</strong> <span class="math inline">\(Z = \{A, B, C\}\)</span></p>
+<p><span class="math display">\[P(y|do(x)) = \sum_{a,b,c} P(y|x, a, b, c)P(a, b, c)\]</span></p>
+<p><strong>Justification:</strong> If two sets are valid, their union is often valid provided no descendants of <span class="math inline">\(X\)</span> are included. Since <span class="math inline">\(\{A, B\}\)</span> and <span class="math inline">\(\{A, C\}\)</span> are valid adjustment sets, and neither <span class="math inline">\(A, B,\)</span> nor <span class="math inline">\(C\)</span> are descendants of <span class="math inline">\(X\)</span>, the set <span class="math inline">\(\{A, B, C\}\)</span> is a valid sufficient set that blocks all back-door paths.</p>
+<p><strong>4. Front-door Adjustment with</strong> <span class="math inline">\(M = \{D, E\}\)</span></p>
+<p><span class="math display">\[P(y|do(x)) = \sum_{d,e} P(d,e|x) \sum_{x'} P(y|x', d, e)P(x')\]</span></p>
+<p><strong>Justification:</strong> The variables <span class="math inline">\(D\)</span> and <span class="math inline">\(E\)</span> satisfy the Front-door Criterion: 1. They intercept all directed paths from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>. 2. There are no unblocked back-door paths from <span class="math inline">\(X\)</span> to <span class="math inline">\(D\)</span> or <span class="math inline">\(E\)</span>. 3. All back-door paths from <span class="math inline">\(\{D, E\}\)</span> to <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(X\)</span>.</p>
+<p><strong>5. Do-calculus derivation</strong></p>
+<p><span class="math display">\[
+\begin{align}
+P(y \mid do(x)) &amp;= P(y \mid do(x), do(c)) &amp;&amp; \text{R3: } (Y \perp\!\!\perp C \mid X)_{G_{\overline{X},\overline{C}}} \\
+&amp;= P(y \mid x, do(c)) &amp;&amp; \text{R2: } (Y \perp\!\!\perp X \mid C)_{G_{\overline{C}\underline{X}}} \\
+&amp;= \frac{P(y, x \mid do(c))}{P(x \mid do(c))} &amp;&amp; \text{Cond. Prob.} \\
+&amp;= \frac{\sum_{b} P(y, x \mid do(c), b)P(b \mid do(c))}{\sum_{b} P(x \mid do(c), b)P(b \mid do(c))} &amp;&amp; \text{Conditioning on } B \\
+&amp;= \frac{\sum_{b} P(y, x \mid c, b)P(b \mid do(c))}{\sum_{b} P(x \mid c, b)P(b \mid do(c))} &amp;&amp; \text{R2: } (X, Y \perp\!\!\perp C \mid B)_{G_{\underline{C}}} \\
+&amp;= \frac{\sum_{b} P(y, x \mid c, b)P(b)}{\sum_{b} P(x \mid c, b)P(b)} &amp;&amp; \text{R3: } (B \perp\!\!\perp C)_{G_{\overline{C}}}
+\end{align}
+\]</span></p>
 </section>
 </section>
 <section id="further-reading" class="level2">
 <h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
 <ul>
-<li>Pearl, J. (2009). <em>Causality: Models, Reasoning, and Inference</em> (2nd ed.)</li>
-<li>Pearl, J., Glymour, M., &amp; Jewell, N. P. (2016). <em>Causal Inference in Statistics: A Primer</em></li>
-<li>Pearl, J., &amp; Mackenzie, D. (2018). <em>The book of why: the new science of cause and effect. Basic books</em></li>
-<li>Bareinboim, E., Correa, J. D., Ibeling, D., &amp; Icard, T. (2022). <em>On Pearl’s hierarchy and the foundations of causal inference. In Probabilistic and causal inference: the works of Judea Pearl.</em></li>
+<li>E. Bareinboim (2025). <a href="https://causalai-book.net/">Causal Artificial Intelligence</a></li>
 </ul>
 <hr>
-<p><em>This tutorial is based on lecture and assignment materials from STATS C160/260: Causal Inference for Health Data taught by Professor <a href="https://dplecko.com/">Drago Plecko</a>, Winter 2026.</em></p>
+<p><em>This tutorial is based on reading/lecture/assignment materials from STATS C160/260: Causal Inference for Health Data taught by Professor <a href="https://dplecko.com/">Drago Plecko</a>, Winter 2026.</em></p>
 
 
 </section>
