@@ -14,15 +14,28 @@ format:
 
 <div class="hanging">
 
+
+### 2026
+
+Eagan, K., & **Ai, S.** (2026). *BUILDing STEM Futures: The Role of Undergraduate Research and Mentorship in Developing Graduate Degree Aspirations.* Paper presentation at the annual meeting of the American Education Research Association, Division J: Postsecondary Education, Los Angeles, CA.
+
+
+**Ai, S.** (2026). *Does Exposure to Science Museums or Planetariums Shape Science Identity and STEM Major Choice? Evidence from HSLS:09.* Roundtable presentation at the annual meeting of the American Education Research Association, Division J: Postsecondary Education, Los Angeles, CA.
+
+
 ### 2025
 
-**Ai, S.** (2025). *Can Community Service Foster Commitment to Social Responsibility Among First-year STEM Major Aspirants?*  Dissertation Proposal Defense at UCLA School of Education & Information Studies, Los Angeles, CA. [<a href="slides/2025.12PreliOralDefense.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.** (2025). *Can Community Service Foster Commitment to Social Responsibility Among First-year STEM Major Aspirants?*  Dissertation Proposal Defense at UCLA School of Education & Information Studies, Los Angeles, CA. 
+[<a href="slides/2025.12PreliOralDefense.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-**Ai, S.**, Eagan, K., & Wu, J. (2025). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Denver, CO. [<a href="slides/2025ASHE_GradegWOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.**, Eagan, K., & Wu, J. (2025). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Denver, CO. 
+[<a href="slides/2025ASHE_GradegWOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-**Ai, S.**, & Eagan, K. (2025). *What Factors Promote High School Students’ Development of Science Identity and STEM Major Aspiration? An Analysis of HSLS:09 Data.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO. [<a href="slides/2025AERA_STEMmajor.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.**, & Eagan, K. (2025). *What Factors Promote High School Students’ Development of Science Identity and STEM Major Aspiration? An Analysis of HSLS:09 Data.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO. 
+[<a href="slides/2025AERA_STEMmajor.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-**Ai, S.** (2025). *A Critical Race Analysis of Black and Hispanic Female Graduate Students’ Enrollment Trends from 2012 to 2021.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO. [<a href="slides/2025AERA_EnrollmentTrends.pdf" class="slides-btn"> [PDF]</a>]{style="white-space: nowrap;"}
+**Ai, S.** (2025). *A Critical Race Analysis of Black and Hispanic Female Graduate Students’ Enrollment Trends from 2012 to 2021.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division J: Postsecondary Education, Denver, CO. 
+[<a href="slides/2025AERA_EnrollmentTrends.pdf" class="slides-btn"> [PDF]</a>]{style="white-space: nowrap;"}
 
 </div>
 
@@ -33,15 +46,22 @@ format:
 
 ### 2024
 
-**Ai, S.**, Rios, M., Olivares, J., & Jiang, T. (2024). *Can Community Cultural Wealth Guide Undergraduate Women of Color Toward STEM Careers? Examining HERI Data.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. [<a href="slides/2024ASHE_CCW WOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"} [<a href="slides/2024ASHE_paperCCW WOC.pdf" class="slides-btn"> [Conference Paper]</a>]{style="white-space: nowrap;"}
+**Ai, S.**, Rios, M., Olivares, J., & Jiang, T. (2024). *Can Community Cultural Wealth Guide Undergraduate Women of Color Toward STEM Careers? Examining HERI Data.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. 
+[<a href="slides/2024ASHE_CCW WOC.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"} 
+[<a href="https://escholarship.org/uc/item/86c6r5m2" class="slides-btn"> [Conference Paper]</a>]{style="white-space: nowrap;"}
 
-Ramos, H., Eagan, K., & **Ai, S.** (2024). *BUILDing Science Identity: Exploring the Efficacy and Moderation Effects of a Nationally Funded Intervention.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. [<a href="slides/2024ASHE_BUILDingSciid.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-Jiang, T., **Ai, S.**, & Li, K. (2024). *Revealing Contributions on Research Data: The Potential of Data Paper.* Paper presentation at the MET/STI 2024 Workshop, Association for Information Science and Technology (ASIS&T), Virtual. [<a href="slides/2024SIG-MET_ResearchData.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+Ramos, H., Eagan, K., & **Ai, S.** (2024). *BUILDing Science Identity: Exploring the Efficacy and Moderation Effects of a Nationally Funded Intervention.* Paper presentation at the annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN. 
+[<a href="slides/2024ASHE_BUILDingSciid.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-**Ai, S.** (2024). *STEM Curriculum as a Catalyst: Narrowing Racial and Structural Inequalities.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division L: Educational Policies and Politics, Philadelphia, PA. [<a href="slides/2024AERA_STEMcatalyst.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+Jiang, T., **Ai, S.**, & Li, K. (2024). *Revealing Contributions on Research Data: The Potential of Data Paper.* Paper presentation at the MET/STI 2024 Workshop, Association for Information Science and Technology (ASIS&T), Virtual. 
+[<a href="slides/2024SIG-MET_ResearchData.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
-Liu, Xi., & **Ai, S. **(2024). *Improving Affect Detections for K-12 Online Math Learning Using Time-related Variables.* Paper presentation at the annual meeting of the American Education Research Association (AERA), Division C: Learning and Instruction, Philadelphia, PA. [<a href="slides/2024AERA_affect detector.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+**Ai, S.** (2024). *STEM Curriculum as a Catalyst: Narrowing Racial and Structural Inequalities.* Roundtable presentation at the annual meeting of the American Educational Research Association (AERA), Division L: Educational Policies and Politics, Philadelphia, PA. 
+[<a href="slides/2024AERA_STEMcatalyst.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+
+Liu, Xi., & **Ai, S. **(2024). *Improving Affect Detections for K-12 Online Math Learning Using Time-related Variables.* Paper presentation at the annual meeting of the American Education Research Association (AERA), Division C: Learning and Instruction, Philadelphia, PA. 
+[<a href="slides/2024AERA_affect detector.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
 </div>
 
