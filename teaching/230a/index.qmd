@@ -1,7 +1,7 @@
 ---
 title: "ED230A TA Recap session"
 author: Shuhan (Alice) Ai
-date: "2026-02-09"
+date: "2026-02-18"
 categories: [230A]
 toc: true
 toc-depth: 3
@@ -16,9 +16,12 @@ In this post, you’ll find:
 * A recap of the major expectations and common issues for Homework 1
 * A recap and clarification of key steps for Homework 2
 * An R code walkthrough (with Zoom recording) demonstrating the analysis process and how to interpret the output
+* A recap and go over for quiz 1
 
 ![](IR1_recap.pdf){width="100%" height="500px"}
 
 ![](DA1_recap.pdf){width="100%" height="500px"}
 
 [DA1 Zoom Recording](https://ucla.zoom.us/rec/share/AHfoDj7-HaZl-igvNkyDMFBU6PPxXPbxRzmdjzdt3GiPz4wr-ewqAGin0-yq5oaH.vytXVIRFF342Nvlm?startTime=1769986876000)
+
+![](Quiz1_recap.pdf){width="100%" height="500px"}
