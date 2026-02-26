@@ -1,5 +1,5 @@
 ---
-title: "SCM Part 3: Counterfactuals — The Art of Asking 'What If?'"
+title: "SCM Part 3: Counterfactuals, the Art of Asking 'What If?'"
 author: Shuhan (Alice) Ai
 date: "2026-02-18"
 categories: [Causal Inference]
