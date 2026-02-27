@@ -2,6 +2,7 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/ml_diffusion/index.html",
       "/posts/ci_scm3/index.html",
       "/posts/ml_transformers/index.html",
       "/posts/ci_scm2/index.html",
