@@ -733,11 +733,11 @@ window.Quarto = {
 <li><strong>First term</strong> <span class="math inline">\(E[Y_{X=1} \mid X = 1]\)</span>: The expected outcome under treatment, for those who <em>were actually treated</em>. By the <strong>consistency axiom</strong> (if a person actually received treatment <span class="math inline">\(X = 1\)</span>, then their counterfactual outcome under <span class="math inline">\(X = 1\)</span> is just their observed outcome), this simplifies to:</li>
 </ul>
 <p><span class="math display">\[E[Y_{X=1} \mid X = 1] = E[Y \mid X = 1]\]</span></p>
-<p>This is just a Layer 1 (observational) quantity — we can read it directly from the data!</p>
+<p>This is just a Layer 1 (observational) quantity — we can read it directly from the data.</p>
 <ul>
 <li><strong>Second term</strong> <span class="math inline">\(E[Y_{X=0} \mid X = 1]\)</span>: The expected outcome under <em>no treatment</em>, for those who <em>were actually treated</em>. This is the counterfactual piece. We’re asking: “For the students who <em>did</em> attend tutoring, what grade <em>would they have gotten</em> if they hadn’t?” We can never directly observe this — it’s the road not taken.</li>
 </ul>
-<p>This is a <strong>Layer 3</strong> quantity! The conditioning (<span class="math inline">\(X = 1\)</span>) tells us which subpopulation we’re examining (the treated group), while the subscript (<span class="math inline">\(X = 0\)</span>) tells us which hypothetical intervention we’re imagining. Mixing an observation with a hypothetical intervention for the same individuals is the hallmark of counterfactual reasoning.</p>
+<p>This is a <strong>Layer 3</strong> quantity. The conditioning (<span class="math inline">\(X = 1\)</span>) tells us which subpopulation we’re examining (the treated group), while the subscript (<span class="math inline">\(X = 0\)</span>) tells us which hypothetical intervention we’re imagining. Mixing an observation with a hypothetical intervention for the same individuals is the hallmark of counterfactual reasoning.</p>
 <section id="connecting-ett-to-the-three-step-algorithm" class="level4">
 <h4 class="anchored" data-anchor-id="connecting-ett-to-the-three-step-algorithm">Connecting ETT to the Three-Step Algorithm</h4>
 <p>To compute the ETT, we need the counterfactual term <span class="math inline">\(E[Y_{X=0} \mid X = 1]\)</span>. This is exactly the kind of query that requires our three-step algorithm from <a href="#three-step">Section 1.3</a>:</p>
@@ -1212,7 +1212,7 @@ window.Quarto = {
 <p>This is just a standard probability identity — we’re partitioning the event by all possible values of <span class="math inline">\(X_{\mathbf{Tz}}\)</span>.</p>
 <p><strong>Step 2 — Consistency</strong>: Within each term of the sum, we know that <span class="math inline">\(X_{\mathbf{Tz}} = x\)</span>. By the consistency axiom, whenever we know the value of a counterfactual variable, we can replace that counterfactual with its realized value. So the nested <span class="math inline">\(X_{\mathbf{z}}\)</span> inside the subscript of <span class="math inline">\(Y\)</span> can be replaced with the constant <span class="math inline">\(x\)</span>:</p>
 <p><span class="math display">\[= \sum_x P(Y_{\mathbf{T}x} = y, \; X_{\mathbf{Tz}} = x)\]</span></p>
-<p>And we’re done — the nesting has been removed!</p>
+<p>And we’re done — the nesting has been removed.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -3609,11 +3609,11 @@ P(y_x \mid x') &amp;= \sum_{w,z} P(y_x \mid z_x, w, x') \cdot P(z_x \mid w, x') 
 <span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>$$E<span class="co">[</span><span class="ot">Y_{X=1} \mid X = 1</span><span class="co">]</span> = E<span class="co">[</span><span class="ot">Y \mid X = 1</span><span class="co">]</span>$$</span>
 <span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>This is just a Layer 1 (observational) quantity — we can read it directly from the data!</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>This is just a Layer 1 (observational) quantity — we can read it directly from the data.</span>
 <span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Second term** $E<span class="co">[</span><span class="ot">Y_{X=0} \mid X = 1</span><span class="co">]</span>$: The expected outcome under *no treatment*, for those who *were actually treated*. This is the counterfactual piece. We're asking: "For the students who *did* attend tutoring, what grade *would they have gotten* if they hadn't?" We can never directly observe this — it's the road not taken.</span>
 <span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>This is a **Layer 3** quantity! The conditioning ($X = 1$) tells us which subpopulation we're examining (the treated group), while the subscript ($X = 0$) tells us which hypothetical intervention we're imagining. Mixing an observation with a hypothetical intervention for the same individuals is the hallmark of counterfactual reasoning.</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>This is a **Layer 3** quantity. The conditioning ($X = 1$) tells us which subpopulation we're examining (the treated group), while the subscript ($X = 0$) tells us which hypothetical intervention we're imagining. Mixing an observation with a hypothetical intervention for the same individuals is the hallmark of counterfactual reasoning.</span>
 <span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Connecting ETT to the Three-Step Algorithm</span></span>
 <span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
@@ -3947,7 +3947,7 @@ P(y_x \mid x') &amp;= \sum_{w,z} P(y_x \mid z_x, w, x') \cdot P(z_x \mid w, x') 
 <span id="cb1-513"><a href="#cb1-513" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-514"><a href="#cb1-514" aria-hidden="true" tabindex="-1"></a>$$= \sum_x P(Y_{\mathbf{T}x} = y, \; X_{\mathbf{Tz}} = x)$$</span>
 <span id="cb1-515"><a href="#cb1-515" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-516"><a href="#cb1-516" aria-hidden="true" tabindex="-1"></a>And we're done — the nesting has been removed!</span>
+<span id="cb1-516"><a href="#cb1-516" aria-hidden="true" tabindex="-1"></a>And we're done — the nesting has been removed.</span>
 <span id="cb1-517"><a href="#cb1-517" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-518"><a href="#cb1-518" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
 <span id="cb1-519"><a href="#cb1-519" aria-hidden="true" tabindex="-1"></a><span class="fu">## Intuition: Why This Works</span></span>

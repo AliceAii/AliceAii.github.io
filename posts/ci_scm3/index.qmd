@@ -173,11 +173,11 @@ Let's break this down term by term:
 
 $$E[Y_{X=1} \mid X = 1] = E[Y \mid X = 1]$$
 
-This is just a Layer 1 (observational) quantity — we can read it directly from the data!
+This is just a Layer 1 (observational) quantity — we can read it directly from the data.
 
 - **Second term** $E[Y_{X=0} \mid X = 1]$: The expected outcome under *no treatment*, for those who *were actually treated*. This is the counterfactual piece. We're asking: "For the students who *did* attend tutoring, what grade *would they have gotten* if they hadn't?" We can never directly observe this — it's the road not taken.
 
-This is a **Layer 3** quantity! The conditioning ($X = 1$) tells us which subpopulation we're examining (the treated group), while the subscript ($X = 0$) tells us which hypothetical intervention we're imagining. Mixing an observation with a hypothetical intervention for the same individuals is the hallmark of counterfactual reasoning.
+This is a **Layer 3** quantity. The conditioning ($X = 1$) tells us which subpopulation we're examining (the treated group), while the subscript ($X = 0$) tells us which hypothetical intervention we're imagining. Mixing an observation with a hypothetical intervention for the same individuals is the hallmark of counterfactual reasoning.
 
 #### Connecting ETT to the Three-Step Algorithm
 
@@ -511,7 +511,7 @@ This is just a standard probability identity — we're partitioning the event by
 
 $$= \sum_x P(Y_{\mathbf{T}x} = y, \; X_{\mathbf{Tz}} = x)$$
 
-And we're done — the nesting has been removed!
+And we're done — the nesting has been removed.
 
 ::: {.callout-tip}
 ## Intuition: Why This Works
