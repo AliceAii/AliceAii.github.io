@@ -297,7 +297,7 @@ This decomposition holds exactly. Every bit of the observed disparity is account
 
 A natural question arises: these counterfactual quantities involve nested interventions (like $Y_{x_1, W_{x_0}}$), which we can never directly observe. How do we actually *compute* these effects from real data?
 
-This is the **identification problem** --- translating causal (counterfactual) quantities into expressions involving only the observational distribution $P(X, Z, W, Y)$. The key insight is that the structure of the Standard Fairness Model, combined with tools from causal inference (the law of total probability, the consistency axiom, and conditional independences encoded in the DAG), allows us to do exactly this.
+This is the **identification problem** --- translating causal (counterfactual) quantities into expressions involving only the observational distribution $P(X, Z, W, Y)$. The key insight is that the structure of the Standard Fairness Model, combined with the **counterfactual calculus** (ctf-calculus) and the **Ancestral Multi-World Network** (AMWN) --- tools developed in [Correa & Bareinboim (2024)](https://proceedings.mlr.press/v267/correa25a.html) --- allows us to do exactly this through a principled, step-by-step derivation.
 
 #### The Identification Theorem Under the SFM
 
@@ -313,53 +313,101 @@ $$
 x\text{-DE}_{x_0,x_1}(y \mid x_0) = E[Y_{x_1, W_{x_0}} \mid X = x_0] - E[Y_{x_0} \mid X = x_0]
 $$
 
-purely in terms of quantities we can estimate from data. We focus on the first (harder) term, $E[Y_{x_1, W_{x_0}} \mid X = x_0]$, since the second term $E[Y_{x_0} \mid X = x_0] = E[Y \mid X = x_0]$ follows directly from the consistency axiom.
+purely in terms of quantities we can estimate from data. We focus on the first (harder) term, $P(y_{x, W_{x'}} \mid x')$ (where $x = x_1, x' = x_0$), since the second term $E[Y_{x_0} \mid X = x_0] = E[Y \mid X = x_0]$ follows directly from the consistency axiom.
 
-**Step 1: Introduce $W$ via the Law of Total Expectation.**
+**Step 1: Un-nest the Counterfactual.**
 
-We marginalize over the mediator $W$ (and the confounders $Z$):
-
-$$
-E[Y_{x_1, W_{x_0}} \mid x_0] = \sum_{w} \sum_{z} E[Y_{x_1, w} \mid x_0, z] \cdot P(w \mid x_0, z) \cdot P(z \mid x_0)
-$$
-
-Here we use the law of iterated expectation, and the fact that under the SFM, $W_{x_0}$ can be decomposed by conditioning on $Z$. The term $P(w \mid x_0, z)$ gives us the natural distribution of the mediator for someone in the minority group with confounder value $z$, and $P(z \mid x_0)$ gives the confounder distribution in the minority group.
-
-**Step 2: Apply the Consistency Axiom to $P(w \mid x_0, z)$.**
-
-Since we are conditioning on $X = x_0$, the consistency axiom tells us that $W_{x_0} = W$ for individuals with $X = x_0$. This means:
+The expression $Y_{x, W_{x'}}$ is a **nested** counterfactual --- $W_{x'}$ is itself a counterfactual random variable plugged into the subscript of $Y$. We can't work with it directly. The first move is to **un-nest** by introducing $W$ explicitly via the law of total probability:
 
 $$
-P(W_{x_0} = w \mid X = x_0, Z = z) = P(W = w \mid X = x_0, Z = z)
+P(y_{x, W_{x'}} \mid x') = \sum_w P(y_{xw},\; w_{x'} \mid x') \tag{1}
 $$
 
-This is an observational quantity! It's just the conditional distribution of $W$ given $X = x_0$ and $Z = z$ in the data.
+This works because when $W_{x'} = w$, the nested counterfactual $Y_{x, W_{x'}}$ reduces to $Y_{xw}$. After un-nesting, we now have a **joint distribution over two counterfactual variables from different worlds**: $Y_{xw}$ (from the world where $X := x$ and $W := w$) and $W_{x'}$ (from the world where $X := x'$). This cross-world joint is the central challenge of identification.
 
-**Step 3: Apply Conditional Independence from the DAG to $E[Y_{x_1, w} \mid x_0, z]$.**
+**Step 2: Condition on $Z$.**
 
-This is the crucial step where the causal graph structure does the heavy lifting. In the SFM, once we condition on $W = w$ and $Z = z$, the outcome $Y$ is independent of the "background" value of $X$ used for sampling. More formally, using the graphical d-separation properties of the SFM:
-
-$$
-E[Y_{x_1, w} \mid x_0, z] = E[Y_{x_1, w} \mid z] = E[Y \mid x_1, w, z]
-$$
-
-The first equality holds because, in the SFM, conditioning on $Z = z$ blocks all back-door paths between $X$ and $Y$ that don't go through $W$. The second equality is another application of the consistency axiom: for a unit with $X = x_1$, $W = w$, and $Z = z$, we have $Y_{x_1, w} = Y$.
-
-**Step 4: Combine into the Final Identification Formula.**
-
-Substituting Steps 2 and 3 back into Step 1, we obtain:
+We introduce the confounder $Z$ via the law of total probability:
 
 $$
-\boxed{E[Y_{x_1, W_{x_0}} \mid x_0] = \sum_{w} \sum_{z} E[Y \mid x_1, w, z] \cdot P(w \mid x_0, z) \cdot P(z \mid x_0)}
+= \sum_{w,z} P(y_{xw},\; w_{x'} \mid z, x') \cdot P(z \mid x') \tag{2}
 $$
 
-This is the **mediation formula** adapted for the SFM context. Every term on the right-hand side is estimable from observational data:
+The term $P(z \mid x')$ is directly observable. The key question is now: can we **factorize** the joint $P(y_{xw}, w_{x'} \mid z, x')$ into a product? This is where the AMWN comes in.
 
-- $E[Y \mid x_1, w, z]$: the expected outcome for majority-group members with mediator value $w$ and confounder value $z$ --- estimated from the data by looking at outcomes for the majority group, stratified by $W$ and $Z$.
-- $P(w \mid x_0, z)$: the conditional distribution of the mediator among minority-group members with confounder value $z$ --- estimated from the minority-group data.
-- $P(z \mid x_0)$: the distribution of confounders in the minority group --- estimated directly from the minority-group data.
+**Step 3: Build the AMWN and Factorize.**
 
-Therefore, the complete $x$-DE identification formula is:
+To determine whether $Y_{xw} \perp W_{x'} \mid Z$, we construct the **Ancestral Multi-World Network** (AMWN) --- a graphical tool that is sound and complete for reading counterfactual independences via d-separation.
+
+**(a) Compute counterfactual ancestors.** Following the definition in Correa & Bareinboim (2024), for each counterfactual variable we find its ancestors in the mutilated graph, then compute which intervention variables appear as subscripts:
+
+**$An(Y_{xw})$:** The intervention set is $\{X, W\}$. In the mutilated graph $\mathcal{G}_{\overline{\{X,W\}}}$ (remove incoming edges to $X$ and $W$), the remaining edges into $Y$ are $X \to Y$, $Z \to Y$, $W \to Y$. The non-intervention ancestors of $Y$ are $An_{\mathcal{G}_{\overline{XW}}}(Y) \setminus \{X, W\} = \{Y, Z\}$. For each, we compute the subscript $\mathbf{z} = \{X,W\} \cap An_{\mathcal{G}_{\overline{XW}}}(\cdot)$:
+
+- $Y$: $\{X,W\} \cap An_{\mathcal{G}_{\overline{XW}}}(Y) = \{X,W\}$ → $Y_{xw}$
+- $Z$: $\{X,W\} \cap An_{\mathcal{G}_{\overline{XW}}}(Z) = \emptyset$ → $Z$ (no subscript, since $Z$ has no intervention-variable ancestors)
+
+$$An(Y_{xw}) = \{Y_{xw},\; Z\}$$
+
+**$An(W_{x'})$:** The intervention set is $\{X\}$. In the mutilated graph $\mathcal{G}_{\overline{\{X\}}}$, the non-intervention ancestors of $W$ are $An_{\mathcal{G}_{\overline{X}}}(W) \setminus \{X\} = \{W, Z\}$:
+
+- $W$: $\{X\} \cap An_{\mathcal{G}_{\overline{X}}}(W) = \{X\}$ → $W_{x'}$
+- $Z$: $\{X\} \cap An_{\mathcal{G}_{\overline{X}}}(Z) = \emptyset$ → $Z$ (no subscript)
+
+$$An(W_{x'}) = \{W_{x'},\; Z\}$$
+
+**(b) Construct the AMWN.** Collect all ancestor nodes: $\{Y_{xw}, W_{x'}, Z\}$. Note that $Z$ appears in both ancestor sets with the **same (empty) subscript**, so it is a **shared node** --- only one copy. We add directed edges witnessing ancestrality:
+
+$$
+W_{x'} \longleftarrow Z \longrightarrow Y_{xw}
+$$
+
+**(c) Read d-separation.** The only path between $W_{x'}$ and $Y_{xw}$ goes through $Z$ (a fork). **Conditioning on $Z$ blocks this path.** Therefore:
+
+$$Y_{xw} \perp W_{x'} \mid Z$$
+
+This gives us the factorization:
+
+$$
+P(y_{xw}, w_{x'} \mid z, x') = P(y_{xw} \mid z, x') \cdot P(w_{x'} \mid z, x') \tag{3}
+$$
+
+**Step 4: Reduce Each Factor to Observational Quantities.**
+
+We now reduce each factor separately.
+
+*For $P(w_{x'} \mid z, x')$:* Since we are conditioning on $X = x'$, which matches the intervention $do(X := x')$, the **consistency axiom** applies directly --- $W_{x'} = W$ for individuals with $X = x'$:
+
+$$
+P(w_{x'} \mid z, x') = P(w \mid z, x') \tag{4}
+$$
+
+*For $P(y_{xw} \mid z, x')$:* From the AMWN, $Y_{xw}$ depends only on $Z$ and $U_Y$ (the exogenous variable for $Y$). Given $Z = z$, $Y_{xw}$ is independent of $X$ (since $X$ given $Z$ depends only on $U_X$, which is independent of $U_Y$). So we can drop the conditioning on $x'$:
+
+$$
+P(y_{xw} \mid z, x') = P(y_{xw} \mid z) \tag{5}
+$$
+
+Finally, $P(y_{xw} \mid z) = P(Y = y \mid do(X = x, W = w), Z = z)$ is an interventional quantity. In the SFM, there is no hidden confounding between $(X, W)$ and $Y$ beyond $Z$ (no bidirected $X \leftrightarrow Y$ or $W \leftrightarrow Y$ edges), so conditioning on $Z$ satisfies the back-door criterion:
+
+$$
+P(y_{xw} \mid z) = P(y \mid x, w, z) \tag{6}
+$$
+
+**Step 5: Combine into the Final Identification Formula.**
+
+Substituting equations (3)–(6) back into (2):
+
+$$
+\boxed{P(y_{x, W_{x'}} \mid x') = \sum_{w,z} P(y \mid x, w, z) \cdot P(w \mid x', z) \cdot P(z \mid x')}
+$$
+
+Every term on the right-hand side is estimable from observational data:
+
+- $P(y \mid x, w, z)$: the conditional outcome for group $x$ with mediator value $w$ and confounder value $z$ --- estimated by stratifying on $X$, $W$, and $Z$.
+- $P(w \mid x', z)$: the conditional distribution of the mediator among group $x'$ with confounder value $z$ --- estimated from the group-$x'$ data.
+- $P(z \mid x')$: the distribution of confounders in group $x'$ --- estimated directly from the group-$x'$ data.
+
+Therefore, the complete $x$-DE identification formula is (plugging in $x = x_1, x' = x_0$):
 
 $$
 x\text{-DE}_{x_0,x_1}(y \mid x_0) = \sum_{w,z} E[Y \mid x_1, w, z] \cdot P(w \mid x_0, z) \cdot P(z \mid x_0) - E[Y \mid x_0]
