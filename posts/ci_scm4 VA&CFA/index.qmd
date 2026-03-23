@@ -1,7 +1,7 @@
 ---
 title: "SCM Part 4: Variation Analysis and Causal Fairness Analysis"
 author: Shuhan (Alice) Ai
-date: "2026-03-05"
+date: "2026-03-23"
 categories: [Causal Inference]
 toc: true
 toc-depth: 3
