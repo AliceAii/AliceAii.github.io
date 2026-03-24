@@ -28,7 +28,14 @@ Methodologically, my research draws from a range of quantitative techniques, inc
 
 <div style="flex: 2; padding-right: 20px;">
 
+**Fun fact about me:**
 
+This is my little baby, **Star**. She also has a beautiful Chinese name, 星晨, 星 means “stars,” and 晨 means “daylight.” She came into my life in the summer of 2025 and helped me through an anxious and difficult time during my PhD journey. Her name is a gentle reminder not to overlook the smallest yet most beautiful moments in life. Even when things get tough and rejections pile up, we can still look up at the stars and find joy in the simple things. Star loves sniffing around, chasing balls, and playing with all kinds of squeaky toys. Sometimes she can be a bit naughty — she’s chewed on our cables, sofa, board games, and even a few pairs of shoes. But every time her adorable little smile appears, all the troubles just melt away.
 
+</div>
 
+<div style="flex: 1; text-align: right;">
+  <img src="star.jpg" alt="Star the corgi" style="width: 250px; border-radius: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+</div>
 
+</div>
