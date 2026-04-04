@@ -1,0 +1,347 @@
+---
+title: "ED230B Tutorial: Linear and Logistic Regression in R"
+author: "Shuhan (Alice) Ai"
+date: "2026-04-01"
+categories: [ED230B]
+toc: true
+toc-depth: 3
+self-contained: true
+image: "f1.png"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+In the 230A class, we covered descriptive statistics, correlation, and simple hypothesis testing. In this tutorial, we will walk through two regression methods, linear regression and logistic regression, using an research example drawn from the High School Longitudinal Study of 2009 (HSLS:09).
+
+## 1. Introduction
+
+### 1.1 Study Context
+
+Our guiding research questions are:
+
+1.  **Science Identity (Continuous Outcome):** After accounting for students' background characteristics, does visiting a science museum or planetarium between 9th and 11th grade predict higher *science identity* in 11th grade? (We will address this question with **multiple linear regression**).
+
+2.  **STEM Major Choice (Binary Outcome):** After accounting for students' background characteristics, does visiting a science museum or planetarium during high school increase the likelihood of *pursuing a STEM major in college*? (We will address this question with **logistic regression**).
+
+::: callout-note
+The analysis uses following variables:
+
+**Key Variable of Interest:**\
+- `p2museum` = visited a science-related museum/planetarium between 9th and 11th grade (1 = Yes, 0 = No)\
+**Dependent variables (DVs):**\
+- `x2sciid` = 11th-grade science identity scale (standardized z-score)\
+- `collegeSTEMmajorasp` = binary indicator of whether the student aspired to or declared a STEM major while enrolled in college (1 = Yes, 0 = No)\
+**Baseline covariates:**\
+- `x1sciid` = 9th-grade baseline science identity scale (standardized z-score)\
+- `stemoccasp9th` = binary indicator of whether the student aspired to a STEM occupation in 9th grade\
+**Student-level IVs: background characteristics:**\
+- `x1race` = White (ref), Asian, Black, Latino, Multiracial, Native American, Other\
+- `x1sex` = binary sex indicator (0 = Male, 1 = Female)\
+- `x1sesq5` = socioeconomic status quintile, First quintile (ref, lowest), Second, Third, Fourth, and Fifth quintile (highest)\
+- `x1txmscr` = 9th-grade math achievement score (IRT-scaled)\
+- `x1sciint` = science course interest scale (standardized z-score)\
+- `x1stuedexpct` = student's highest educational expectation, categorized as Uncertain (ref), High School, Bachelor’s, Master’s, or PhD\
+- `x1schoolbel` = 9th-grade student-perceived school belonging scale (standardized z-score)\
+**Student-leve IVs: formal and informal STEM experiences (9th grade):**\
+- `s1alg1m09` = binary indicator of whether the student took Algebra I in 9th grade (Yes/No)\
+- `s1sfall09` = binary indicator of whether the student took a science course in fall 2009 (Yes/No)\
+- `p1campms` = binary indicator of whether the student participated in math or science camp outside of school in last year (Yes/No)\
+- `p1fixed` = binary indicator of whether parents built or fixed something with 9th grader in last year (Yes/No)\
+- `p1sciproj` = binary indicator of whether the helped 9th grader with a school science fair project in last year with 9th grader in last year (Yes/No)\
+:::
+
+### 1.2 Setup
+
+```{r}
+library(tidyverse)
+
+data <- readRDS("hslspsm_imputed.rds")
+```
+
+```{r, echo = FALSE, eval=FALSE}
+table(data$x1race)
+
+# Collapse small racial subgroups for stable estimation
+data <- data %>% 
+  mutate(x1race = fct_collapse(x1race, Other = c("Native American", "Other")))
+```
+
+## 2. Linear Regression
+
+### 2.1 The Linear Regression Model
+
+The general form of a multiple linear regression model is:
+
+$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki} + \epsilon_i$$ Where:
+
+-   $Y_i$ is the outcome for individual $i$ (here, 11th-grade science identity `x2sciid`)
+-   $\beta_0$ is the **intercept**: the predicted value of $Y$ when all predictors equal zero
+-   $\beta_1, \beta_2, \ldots, \beta_k$ are **regression coefficients**: each represents the expected change in $Y$ for a one-unit increase in the corresponding predictor, *holding all other predictors constant*
+-   $\epsilon_i$ is the **residual** (error term): the part of $Y$ not explained by the model
+
+### 2.2 Simple Bivariate Regression
+
+Let's start with the simplest possible model, just our key variable of interest predicting the outcome, with no other covariates in the picture. This gives us the **unadjusted (naive) estimate**: the raw difference in 11th-grade science identity between students who visited a science museum and those who didn't.
+
+```{r}
+# Model 0: Bivariate (unadjusted) model
+model_0 <- lm(x2sciid ~ p2museum, data = data)
+summary(model_0)
+```
+
+**Interpretation:**
+
+-   **`(Intercept)`**: This is the predicted science identity score for students in the **reference group** (those who did *not* visit a science museum). In other words, non-visitors have an average science identity score of about 0.047 (just slightly above the sample mean of zero, since this is a z-score).
+
+-   **`p2museumTreatment`**: Students who visited a science museum scored, on average, **0.142 standard deviations higher** on the 11th-grade science identity scale than students who did not, and this difference is statistically significant (*p* \< .001).
+
+-   **`Std. Error`**: This tells us how precise our estimate is. Smaller standard errors mean more confidence in the estimate.
+
+-   **`Multiple R-squared` = 0.004899**: The model explains only about **0.5%** of the variance in science identity. That's very little, but not surprising, since we only have one predictor in the model.
+
+-   **`Adjusted R-squared` = 0.004746**: Nearly identical to $R^2$ here because we only have one predictor. The difference between $R^2$ and Adjusted $R^2$ becomes more meaningful as we add more variables later.
+
+::: callout-note
+### $R^2$ vs. Adjusted $R^2$
+
+$R^2$ Tells us the proportion of variance in the outcome explained by the model. It will only go up (or stay the same) every time we add a predictor, even if that predictor is completely useless. So, if we just throw some junk predictors, we can inflate out $R^2$ without actually improving our model.
+
+$$
+R^2 = 1 - \frac{SS_{\text{residual}}}{SS_{\text{total}}}
+$$
+
+**Adjusted** $R^2$ fixes this issue by penalizing for the number of predictors. It asks: did that new variable improve the model *enough* to justify the added complexity? If not, Adjusted $R^2$ will actually *decrease*.
+
+$$
+R^2_{\text{adj}} = 1 - \frac{(1 - R^2)(n - 1)}{n - k - 1}
+$$
+
+As $k$ (number of predictors) grows, the denominator $n - k - 1$ shrinks, which pushes the penalty term up. So a new predictor has to earn its keep by improving $R^2$ enough to overcome that penalty.
+
+**Rule of thumb:** When comparing models with different numbers of predictors (like in block-wise regression), look at Adjusted $R^2$. If it goes up, the new block is pulling its weight. If it stays flat or drops, those extra variables aren't helping.
+:::
+
+### 2.3 Multiple Linear Regression Model
+
+The bivariate model told us that museum visitors scored higher on science identity, but the adjusted $R^2$ was tiny. This is where **multiple regression** comes in.
+
+By adding covariates, baseline science identity, demographics, and STEM experiences, we can ask a sharper question: *is the museum visit still associated with higher science identity after we account for all of these other factors?* If the coefficient shrinks, that tells us part of the original association was driven by confounds. If it holds up, we have more confidence that something about the museum experience itself matters.
+
+```{r}
+model <- lm(x2sciid ~ p2museum +
+                       x1sciid + stemoccasp9th +
+                       x1race + x1sex + x1sesq5 + x1schoolbel + 
+                       x1txmscr + x1sciint + x1stuedexpct +
+                       s1alg1m09 + s1sfall09 + 
+                       p1campms + p1fixed + p1sciproj, 
+             data = data)
+summary(model)
+```
+
+**Interpretation:**
+
+-   **`p2museumTreatment`**: Holding all other variable constant, students who visited a science museum expected to have **0.047 standard deviations higher** on the 11th-grade science identity scale than students who did not, and this difference is statistically significant (*p* \< 0.05). The coefficient shrank by about from 0.142 (bivariate model) to 0.047, once we controlled for these confounders in the full model,
+
+-   **`x1sciid`** (9th-grade science identity): Holding all other variables constant, a one standard deviation increase in 9th-grade science identity is associated with an **estimated 0.356 standard deviation** increase in predicted 11th-grade science identity. This association is statistically significant (*p* \< 0.001).
+
+-   **`x1sexFemale`**: Condition on other covariates, female students are **predicted to score 0.110 standard deviations** lower on 11th-grade science identity compared to male students (the reference group). This association is statistically significant (*p* \< 0.001).
+
+-   **`x1stuedexpctPhD`**: Holding all other variables constant, students who aspired to earn a PhD are **predicted to score 0.164 standard deviations** higher on 11th-grade science identity than students whose educational expectations were uncertain (the reference category). This difference is statistically significant (*p* \< 0.001).
+
+-   **`Adjusted R-squared`**: The full model has an Adjusted $R^2$ of **0.243**, meaning our predictors collectively explain about **24.3%** of the variance in 11th-grade science identity.
+
+::: callout-note
+## Interpreting Coefficients for Different Variable Types
+
+| Predictor Type | Interpretation of $\hat{\beta}$ |
+|------------------------------------|------------------------------------|
+| **Continuous** (e.g., `x1txmscr`) | A one-unit increase in $X$ is associated with a $\hat\beta$-unit change in $Y$, holding all else constant. |
+| **Binary/Dummy** (e.g., `x1sexFemale`) | The predicted difference in $Y$ between the indicated group and the **reference group**, holding all else constant. |
+| **Categorical with** $k$ levels (e.g., `x1stuedexpct`, `x1race`) | R creates $k-1$ dummy variables. Each coefficient compares that category to the **reference category**. |
+
+**What is Dummy Coding?**
+
+When we feed a categorical variable like `x1stuedexpct` (with levels: Uncertain, High School, Bachelor's, Master's, PhD) into a regression, R can't work with text labels directly. Behind the scenes, it converts the variable into a set of **dummy variables** — binary (0/1) indicators for each category except the reference group.
+
+For example, `x1stuedexpct` has 5 levels, so R creates **4 dummy variables** (i.e., $k - 1 = 5 - 1 = 4$):
+
+| Student | Original Variable | High School | Bachelor's | Master's | PhD |
+|---------|-------------------|:-----------:|:----------:|:--------:|:---:|
+| A       | Uncertain         |      0      |     0      |    0     |  0  |
+| B       | High School       |      1      |     0      |    0     |  0  |
+| C       | Bachelor's        |      0      |     1      |    0     |  0  |
+| D       | Master's          |      0      |     0      |    1     |  0  |
+| E       | PhD               |      0      |     0      |    0     |  1  |
+
+Notice that **"Uncertain" has all zeros**: that's how R represents the reference group. It doesn't need its own column because it's the baseline that every other group is compared against. This is why the reference category never appears in the regression output, and why choosing an appropriate reference group matters for interpretation.
+:::
+
+### 2.4 Standardized Coefficients (Beta Weights)
+
+Raw coefficients are measured in the original units of each predictor, making it hard to compare the *relative importance* of predictors that are on different scales. **Standardized coefficients** (often called $\beta$ or Beta weights) rescale everything into standard deviation units.They tell us: for a **one standard deviation** increase in the predictor, how many **standard deviations** does the outcome change?
+
+When to Use Standardized vs. Unstandardized Coefficients?
+
+-   Use **unstandardized coefficients (B)** when you want to describe the effect in meaningful, real-world units (e.g., "a 10-point increase in math scores is associated with a 0.15 SD increase in science identity").
+-   Use **standardized coefficients (**$\beta$) when you want to compare the *relative strength* of different predictors within the same model (e.g., "baseline science identity has a stronger association with the outcome than math achievement").
+
+```{r}
+library(lm.beta)
+model_beta <- lm.beta(model)
+beta_df <- data.frame(
+  Unstandardized_B = coef(model),
+  Standardized_Beta = model_beta$standardized.coefficients)
+beta_df
+```
+
+## 3. Logistic Regression
+
+So far, we've used linear regression to predict a **continuous** outcome (11th-grade science identity). But what if the outcome we care about a **binary** outcome?
+
+In our second research question, the outcome is whether a student pursued a STEM major in college (`collegeSTEMmajorasp`: 1 = Yes, 0 = No). This is not a score on a scale, it's a category with only two possible values.
+
+Linear regression breaks down with binary outcomes for three reasons:
+
+1.  **Predictions go out of bounds.** Linear regression can produce predicted values like 1.3 or −0.2 — which make no sense as probabilities.
+2.  **The relationship isn't linear.** The connection between predictors and a binary outcome follows an S-shaped (sigmoid) curve, not a straight line. As a predictor increases, the probability of $Y = 1$ doesn't rise at a constant rate — it levels off near 0 and 1.
+3.  **The residuals misbehave.** When the outcome can only be 0 or 1, residuals can't be normally distributed, violating a key assumption of OLS regression.
+
+**Logistic regression** solves all three problems by modeling the **log-odds** of the outcome instead of the outcome itself. This ensures predicted probabilities always stay between 0 and 1, and respects the nonlinear nature of the relationship.
+
+::: callout-note
+## Sigmoid function (Bonus Knowledge)
+
+The sigmoid function is what makes logistic regression work — it takes any real number (the linear combination of predictors) and squashes it into a probability between 0 and 1:
+
+$$
+p_i = \frac{1}{1 + e^{-s_i}}
+$$
+
+where $s_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots$ is the linear predictor (log-odds score) for individual $i$.
+
+```{r}
+#| echo: false
+#| fig-width: 6
+#| fig-height: 4
+#| fig-align: center
+
+# Generate the sigmoid curve
+sigmoid_data <- data.frame(s = seq(-6, 6, by = 0.05)) %>%
+  mutate(p = 1 / (1 + exp(-s)))
+
+ggplot(sigmoid_data, aes(x = s, y = p)) +
+  geom_line(color = "#003366", linewidth = 1.2) +
+  # Reference lines at p = 0.5 and s = 0
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "grey50") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  # Annotations
+  annotate("text", x = 4.2, y = 0.92, 
+           label = "p → 1 as s → ∞", size = 3.5, color = "grey30") +
+  annotate("text", x = -4.2, y = 0.08, 
+           label = "p → 0 as s → −∞", size = 3.5, color = "grey30") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.25)) +
+  scale_x_continuous(breaks = seq(-6, 6, by = 3)) +
+  labs(
+    title = "The Sigmoid Function",
+    subtitle = "Transforms any real number to a probability between 0 and 1",
+    x = expression(s[i] ~ "(linear score)"),
+    y = expression(p[i] ~ "(probability)")
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5, color = "grey40"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+As you can see from the curve, when the linear score $s_i$ is large and positive, the predicted probability approaches 1; when $s_i$ is large and negative, the probability approaches 0; and when $s_i = 0$, the probability is exactly 0.5.
+:::
+
+### 3.1 The Logistic Regression Model
+
+The logistic regression model is:
+
+$$
+\ln\left(\frac{p_i}{1 - p_i}\right) = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki}
+$$
+
+Where:
+
+-   $p_i = P(Y_i = 1 \mid X)$ is the probability of the outcome occurring (here, pursuing a STEM major)
+-   $\frac{p_i}{1 - p_i}$ is the **odds** of the outcome
+-   $\ln\left(\frac{p_i}{1 - p_i}\right)$ is the **log-odds** (logit)
+
+::: callout-note
+## Two Scales of Logistic Regression
+
+Logistic regression output can be interpreted on three different scales:
+
+| Scale | What It Represents | How to Get It |
+|------------------------|------------------------|------------------------|
+| **Log-odds (logit)** | The raw coefficient $\hat\beta$ from R output | Default output from `glm()` |
+| **Odds ratio (OR)** | $e^{\hat\beta}$ = multiplicative change in odds | Exponentiate: `exp(coef(model))` |
+
+Most researchers report **odds ratios** because they are more intuitive than log-odds. We will learn how to compute and interpret them all.
+:::
+
+### 3.2 Simple Bivariate Logistic Regression
+
+Just as we did with linear regression, let's start with the simplest model. Just our key variable of interest predicting the outcome, with no other covariates.
+
+```{r}
+logit_m0 <- glm(collegeSTEMmajorasp ~ p2museum, data = data, family = binomial())
+summary(logit_m0)
+#use exponentiatie coefficients to get odds ratios
+exp(coef(logit_m0))
+```
+
+**Interpretation:**
+
+-   **`(Intercept)`**: -1.362 is the predicted **log-odds** of pursuing a STEM major for students in the reference group (those who did *not* visit a science museum). We can convert this to a probability: $p = \frac{1}{1 + e^{-(-1.362)}} = 0.204$, meaning about **20.4%** of non-visitors are predicted to pursue a STEM major.
+
+-   **`p2museumTreatment`**: Students who visited a science museum have **0.209 higher log-odds** of pursuing a STEM major than students who did not. This is statistically significant (*p* \< 0.001). But 0.209 log-odds is not very intuitive, we convert this to an **odds ratio**. $OR = e^{0.209} = 1.232$, this means museum visitors had **1.23 times the odds** of pursuing a STEM major compared to non-visitors.
+
+-   **`Null deviance` = 6809.9**: This is the deviance (a measure of model misfit) for the **empty model** (a model with no predictors, just the intercept).
+
+-   **`Residual deviance` = 6798.1**: This is the deviance for our model *with* the museum predictor. The drop from 6809.9 to 6798.1 tells us the museum variable improved the fit (a reduction of about 11.8).
+
+-   **`AIC` = 6802.1**: The Akaike Information Criterion balances model fit against complexity. Unlike $R^2$ in linear regression, AIC has no fixed scale, it's only meaningful when **compared across models**. Lower AIC = better fit.
+
+### 3.3 Multiple Logistic Regression
+
+```{r}
+logit_m <- glm(collegeSTEMmajorasp ~ p2museum + 
+                                      stemoccasp9th + x1sciid +
+                                      x1race + x1sex + x1sesq5 + x1schoolbel +
+                                      x1txmscr + x1sciint + x1stuedexpct +
+                                      s1alg1m09 + s1sfall09 + 
+                                      p1campms + p1fixed + p1sciproj, 
+               data = data, family = binomial())
+summary(logit_m)
+exp(coef(logit_m))
+```
+
+**Interpretation:**
+
+-   **`p2museumTreatment`**: Log-odds = 0.115, OR = 1.121 (*p* = 0.089). Holding all other variables constant, students who visited a science museum had **1.12 times the odds** of pursuing a STEM major compared to non-visitors. However, this effect is **not statistically significant** at the conventional $\alpha = 0.05$ level. Notice that this coefficient was significant in the bivariate model (OR = 1.232, *p* \< 0.001), but shrank and lost significance once we controlled for covariates.
+
+-   **`x1sciid`**: Log-odds = 0.276, OR = 1.318 (*p* \< 0.001). Holding all other variables constant, a one standard deviation increase in 9th-grade science identity is associated with **1.32 times the odds** of pursuing a STEM major.
+
+-   **`x1sexFemale`**: Log-odds = −0.956, OR = 0.384 (*p* \< 0.001). Compared to male students, female students had **0.38 times the odds** of pursuing a STEM major, holding all else constant. Another way to say this: female students had statistically significant lower likelihood of choosing a STEM major than their male peers, holding all else constant.
+
+-   **`x1stuedexpctPhD`**: Log-odds = −0.025, OR = 0.976 (*p* = 0.816). Compared to students with uncertain educational expectations, those who aspired to earn a PhD had **0.98 times the odds** of pursuing a STEM major. This is **not statistically significant**.
+
+-   **`Residual deviance` = 5861.0**: The deviance dropped from **6809.9** (null model) to **5861.0** (full model), having a reduction of about **948.9**. This tells us the full set of predictors improved the model fit compared to an intercept-only model.
+
+-   **`AIC` = 5914.3**: The AIC for this full model is 5913. Recall that the bivariate model had AIC = 6802.1. The drop from 6802 to 5914 confirms that adding covariates meaningfully improved the model.
+
+::: callout-note
+**Quick rules:**
+
+-   OR = 1: no effect
+-   OR \> 1: higher odds, higher likelihood
+-   OR \< 1: lower odds, lower likelihood
+:::
