@@ -16,27 +16,29 @@ format:
 
 <div class="hanging">
 
-**Ai, S.** & Eagan, K., (in press). From Club to College: The Impact of Science Clubs/Groups on High School Students’ STEM Major Choice. *Research in Higher Education.*
+**Ai, S.** & Eagan, K., (in press). From Club to College: The Impact of Science Clubs/Groups on High School Students’ STEM Major Choice. *Research in Higher Education.* 
 
-**Ai, S.** (2024). Empowering Online Teaching: A System Review of Online Instructors’ Professional Development in Higher Education. *InterActions: UCLA Journal of Education and Information Studies, 19*(1). <https://doi.org/10.5070/D41.6661>
+**Ai, S.** (2024). Empowering Online Teaching: A System Review of Online Instructors’ Professional Development in Higher Education. *InterActions: UCLA Journal of Education and Information Studies, 19*(1). 
+[[Paper]](https://doi.org/10.5070/D41.6661)
 
 -----
 
 **Preprint:**
 
-**Ai, S.** (2026). Discussion Network Formation and Evolution in an Online Professional Development Class: Evidence from a MOOC for K-12 Educators. *arXiv preprint*.<https://arxiv.org/abs/2601.01117>
+**Ai, S.** (2026). Discussion Network Formation and Evolution in an Online Professional Development Class: Evidence from a MOOC for K-12 Educators. *arXiv preprint*.
+[[Paper]](https://arxiv.org/abs/2601.01117)
 
-**Ai, S.**, Kevin, E., Olivares, J., & Jiang, T. (2024). Can Community Cultural Wealth Maintain STEM Career Aspirations of Undergraduate Women of Color? Examining HERI Data. *In annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN.* Retrieved from <https://escholarship.org/uc/item/86c6r5m2>
+**Ai, S.**, Kevin, E., Olivares, J., & Jiang, T. (2024). Can Community Cultural Wealth Maintain STEM Career Aspirations of Undergraduate Women of Color? Examining HERI Data. *In annual meeting of the Association for the Study of Higher Education (ASHE), Minneapolis, MN.* 
+[[Paper]](https://escholarship.org/uc/item/86c6r5m2)
 
 ------
 
 **Technical Reports:**
 
-Omery, F., Montes-Diaz, I., **Ai, S.** (2023). City Fiscal Conditions. *National League of Cities.*  
-<https://www.nlc.org/resource/city-fiscal-conditions-2023/>
+Omery, F., Montes-Diaz, I., **Ai, S.** (2023). City Fiscal Conditions. *National League of Cities.* 
+[[Report]](https://www.nlc.org/resource/city-fiscal-conditions-2023/)
 
-Omeyr, F. & **Ai, S.** (2023). State of the Cities. *National League of Cities.*  
-<https://www.nlc.org/resource/state-of-the-cities-2023/>
+Omeyr, F. & **Ai, S.** (2023). State of the Cities. *National League of Cities.*  [[Report]](https://www.nlc.org/resource/state-of-the-cities-2023/)
 
 ---------
 
