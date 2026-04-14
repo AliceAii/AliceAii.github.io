@@ -25,6 +25,9 @@ format:
 
 **Preprint:**
 
+**Ai, S.** (2026). Causal Fairness Analysis of ADHD Status and High School STEM Outcomes. *arXiv preprint*. [[Paper]](https://arxiv.org/abs/2604.10824) [[Code]](https://github.com/AliceAii/ADHD_STEM-Outcomes_Causal-Fairness-Analysis)
+
+
 **Ai, S.** (2026). Discussion Network Formation and Evolution in an Online Professional Development Class: Evidence from a MOOC for K-12 Educators. *arXiv preprint*.
 [[Paper]](https://arxiv.org/abs/2601.01117)
 
