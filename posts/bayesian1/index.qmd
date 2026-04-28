@@ -242,19 +242,21 @@ Both errors equal 0.05. A nice, clean Frequentist result. But does that 5% actua
 
 Now the crucial question: if we observe $0.9 < x < 1$ — a value in the overlap region, consistent with both hypotheses — what is the **conditional** probability that our decision is wrong?
 
-The decision rule splits this overlap region into two pieces:
+We need to condition on the event $\{0.9 < X < 1\}$ and compute the error probability within this region. The decision boundary at $x = 0.95$ splits the overlap region $(0.9, 1)$ into two halves of equal length (0.05 each), so:
 
-**Case 1: $0.9 < x < 0.95$ (we accept $H_0$)**
+**Conditional Type I error** (reject $H_0$ when $H_0$ is true, given $0.9 < x < 1$):
 
-- If $H_0$ is true → correct decision → error probability = 0
-- If $H_1$ is true → wrong decision (Type II error) → error probability = 1
+$$P(X > 0.95 \mid X \sim U(0,1), \; 0.9 < X < 1) = \frac{1 - 0.95}{1 - 0.9} = \frac{0.05}{0.1} = \frac{1}{2}$$
 
-**Case 2: $0.95 \leq x < 1$ (we reject $H_0$)**
+**Conditional Type II error** (accept $H_0$ when $H_1$ is true, given $0.9 < x < 1$):
 
-- If $H_0$ is true → wrong decision (Type I error) → error probability = 1
-- If $H_1$ is true → correct decision → error probability = 0
+$$P(X < 0.95 \mid X \sim U(0.9, 1.9), \; 0.9 < X < 1) = \frac{0.95 - 0.9}{1 - 0.9} = \frac{0.05}{0.1} = \frac{1}{2}$$
 
-In both cases, once $x$ is observed and a decision is made, we're either **certainly right** or **certainly wrong** — we just don't know which. The conditional probability of error is **either 0 or 1**.
+Either way, the conditional probability of error given $0.9 < x < 1$ is **1/2** — vastly different from the unconditional 5%.
+
+Notice the parallel with Example 1: there, the conditional error at $x = 50$ was also 1/2, compared to the unconditional ~0.031%. Both examples tell the same story — the pre-data error rate can be dramatically different from the post-data error probability once we condition on what we actually observed.
+
+The point is: given we observe $0.9 < x < 1$, do we continue to regard the probability of making an error to be 0.05, or do we regard it to be $\frac{1}{2}$? The latter typifies the *conditional* perspective that motivates Bayesian inference.
 
 ::: {.callout-important}
 ## The Frequentist Limitation
