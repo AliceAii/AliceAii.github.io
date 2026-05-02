@@ -2,6 +2,7 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/bayesian2/index.html",
       "/posts/bayesian1/index.html",
       "/posts/ci_scm4 VA&CFA/index.html",
       "/posts/ml_diffusion/index.html",

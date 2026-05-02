@@ -1,0 +1,699 @@
+---
+title: "Bayesian Methods Part 2: Specifying Prior Distributions and the Road to Posterior Inference"
+author: Shuhan (Alice) Ai
+date: "2026-04-27"
+categories: [Bayesian, R]
+format:
+  html:
+    toc: true
+    code-fold: false
+    self-contained: true
+image: "cover.png"
+---
+
+In Part 1, we saw that Frequentist error rates can be misleading once data are observed, and that the likelihood function lets data speak directly about which parameter values are plausible. But the likelihood alone doesn't give us a full probability distribution over $\theta$ --- for that, we need a **prior**. In this tutorial, we tackle the question that stops many newcomers in their tracks: *where does the prior come from?*
+
+
+In this tutorial, we will learn:
+
+- The **subjective prior**, where you encode your own knowledge into a probability distribution using a simple histogram method
+- The **noninformative (Jeffreys) prior**, which tries to "let the data speak" by making the prior as uninformative as possible
+- The mathematical toolkit that makes it all work --- Fisher information, digamma and trigamma functions, and the Beta-Binomial model
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+
+# Subjective histogram prior vs Jeffreys prior for Binomial theta
+theta <- seq(0.001, 0.999, length.out = 500)
+
+df <- data.frame(
+  theta = rep(theta, 3),
+  density = c(
+    dbeta(theta, 3, 3),                         # a possible subjective prior
+    dbeta(theta, 0.5, 0.5),                     # Jeffreys prior Beta(1/2, 1/2)
+    dbeta(theta, 1, 1)                           # Uniform = Bayes's prior
+  ),
+  curve = factor(rep(c("Subjective Prior", "Jeffreys Prior", "Bayes's Uniform"),
+                     each = length(theta)),
+                 levels = c("Subjective Prior", "Jeffreys Prior", "Bayes's Uniform"))
+)
+
+ggplot(df, aes(theta, density, color = curve, linetype = curve)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = c("Subjective Prior" = "#5B8DB8",
+                                "Jeffreys Prior" = "#E8913A",
+                                "Bayes's Uniform" = "#8B3A8B")) +
+  scale_linetype_manual(values = c("Subjective Prior" = "solid",
+                                   "Jeffreys Prior" = "dashed",
+                                   "Bayes's Uniform" = "dotted")) +
+  labs(title = "Three Philosophies, Three Priors",
+       x = expression(theta), y = "Density") +
+  coord_cartesian(xlim = c(0, 1), ylim = c(0, 3.5)) +
+  theme_classic(base_family = "serif") +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    legend.position = c(0.50, 0.98),
+    legend.justification = c(0.5, 1),
+    legend.text = element_text(family = ""),
+    legend.title = element_blank()
+  )
+```
+
+## Why Should We Care About Priors?
+
+Recall from Part 1 that Bayes' rule updates a prior belief into a posterior belief:
+
+$$p(\theta \mid y) = \frac{p(y \mid \theta) \, p(\theta)}{p(y)}$$
+
+The likelihood $p(y \mid \theta)$ comes from our data and statistical model. The posterior $p(\theta \mid y)$ is what we want. But the prior $p(\theta)$ --- where does it come from? This is the question that has sparked decades of debate in statistics, and it's also the question that makes Bayesian methods so flexible.
+
+In education research, we often have strong prior knowledge. A literacy intervention that raised reading scores in five prior RCTs probably works; a brand-new, untested program is more uncertain. Should our statistical analysis reflect that difference? Bayesian inference says *yes*, and the prior is the mechanism. But even when we don't want to inject subjective beliefs, there are principled ways to construct priors that are "minimally informative" --- and understanding how they work requires some elegant mathematics.
+
+As Hoff (2009, Ch. 3) discusses, no prior is truly "noninformative" --- every prior favors some parameter values over others. The goal is to be transparent about what our prior assumes, and to understand when the data will overwhelm the prior (making the choice matter less) versus when prior specification is critical.
+
+## 1. The Subjective Prior: Encoding Your Knowledge
+
+### 1.1 The Histogram Approach
+
+The simplest way to build a prior is the **histogram method**. The idea is intuitive: partition the parameter space into intervals, assign a probability to each interval based on your beliefs, then convert to a density.
+
+**Example:** Let $\theta$ denote the highest temperature (in $^\circ$F) that will occur outdoors on the UCLA campus on October 19th. Based on historical weather data and our experience living in Los Angeles, we might reason:
+
+- October in LA is warm but not extreme; highs are typically in the 70s--80s
+- Temperatures below 65$^\circ$F or above 90$^\circ$F are rare but possible
+- The most likely range is 75--80$^\circ$F
+
+We translate this reasoning into a table:
+
+| Interval | Probability | Width | Density (prob $\div$ width) |
+|:--------:|:-----------:|:-----:|:---------------------------:|
+| [55, 65) | 0.05        | 10    | 0.005                       |
+| [65, 70) | 0.10        | 5     | 0.020                       |
+| [70, 75) | 0.20        | 5     | 0.040                       |
+| [75, 80) | 0.30        | 5     | 0.060                       |
+| [80, 85) | 0.20        | 5     | 0.040                       |
+| [85, 90) | 0.10        | 5     | 0.020                       |
+| [90, 100)| 0.05        | 10    | 0.005                       |
+
+::: {.callout-tip}
+## Why Density = Probability $\div$ Width?
+**Probability** is the area under the curve for an interval. **Density** is the height of the curve. Since area = height $\times$ width, we get:
+
+$$\text{density} = \frac{\text{probability}}{\text{width of interval}}$$
+
+This ensures that the total area under our histogram equals 1 (a valid probability distribution), even when the intervals have different widths. For example, the interval [55, 65) is 10$^\circ$F wide with probability 0.05, giving density $0.05/10 = 0.005.$ The interval [75, 80) is only 5$^\circ$F wide with probability 0.30, giving density $0.30/5 = 0.060$ --- twelve times higher than 0.005.
+:::
+
+### 1.2 Visualizing the Subjective Prior in R
+
+```{r, message=FALSE, warning=FALSE}
+# Define the histogram prior
+breaks <- c(55, 65, 70, 75, 80, 85, 90, 100)
+probs  <- c(0.05, 0.10, 0.20, 0.30, 0.20, 0.10, 0.05)
+widths <- diff(breaks)
+density_vals <- probs / widths
+
+# Verify it integrates to 1
+cat("Total area (should be 1):", sum(density_vals * widths), "\n")
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Plot the subjective prior
+library(ggplot2)
+
+df_prior <- data.frame(
+  xmin = breaks[-length(breaks)],
+  xmax = breaks[-1],
+  density = density_vals
+)
+
+ggplot(df_prior) +
+  geom_rect(aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = density),
+            fill = "#5B8DB8", alpha = 0.6, color = "black") +
+  labs(title = "Subjective Prior for Highest Temperature on Oct 19th (UCLA)",
+       x = expression("Temperature " * theta * " (" * degree * "F)"),
+       y = "Prior Density") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+
+::: {.callout-note}
+## R Code Walkthrough
+Let's break down each piece:
+
+- `breaks <- c(55, 65, 70, 75, 80, 85, 90, 100)` --- the boundary points of our intervals. With 8 boundaries, we get 7 intervals.
+- `probs <- c(0.05, 0.10, ...)` --- our subjective probabilities, one per interval. These must sum to 1.
+- `widths <- diff(breaks)` --- `diff()` computes consecutive differences, giving us each interval's width: 10, 5, 5, 5, 5, 5, 10.
+- `density_vals <- probs / widths` --- convert probabilities to densities.
+- `geom_rect(...)` --- draws rectangles for the histogram. Each rectangle's area (height $\times$ width) equals the interval's probability.
+:::
+
+The histogram approach is transparent and flexible. You can use any intervals you like, and the probabilities directly encode your beliefs. The key requirement is that probabilities sum to 1. In practice, you might refine these probabilities by consulting historical data, domain experts, or published studies --- the point is that the prior is an explicit, auditable statement of what you believe before seeing the current data.
+
+
+## 2. Background: PMF, PDF, Likelihood, and Log-Likelihood
+
+Before diving into noninformative priors, let's make sure we have a clear picture of the four fundamental functions in statistical inference. These concepts are closely related but serve different purposes.
+
+### 2.1 Side-by-Side Comparison
+
+| | **PMF** | **PDF** | **Likelihood** | **Log-Likelihood** |
+|:---|:---|:---|:---|:---|
+| **Full name** | Probability Mass Function | Probability Density Function | Likelihood Function | Log-Likelihood Function |
+| **Applies to** | Discrete $X$ | Continuous $X$ | Any model | Any model |
+| **Notation** | $P(X = x \mid \theta)$ | $f(x \mid \theta)$ | $L(\theta \mid x)$ | $\ell(\theta \mid x)$ |
+| **What varies?** | $x$ (data values) | $x$ (data values) | $\theta$ (parameter) | $\theta$ (parameter) |
+| **What's fixed?** | $\theta$ (parameter) | $\theta$ (parameter) | $x$ (observed data) | $x$ (observed data) |
+| **Interpretation** | Probability of each outcome | Relative plausibility at $x$ | Support for each $\theta$ | Same, on log scale |
+| **Sums/integrates to** | 1 (over $x$) | 1 (over $x$) | Not necessarily 1 | N/A |
+| **Key use** | Compute probabilities | Compute probabilities | Compare parameter values | Optimization, derivatives |
+
+::: {.callout-tip}
+## The Core Insight
+The PMF/PDF and the likelihood use the **same formula** --- the difference is perspective:
+
+- **PMF/PDF**: Fix $\theta$, vary $x$ $\longrightarrow$ "What data would I expect to see?"
+- **Likelihood**: Fix $x$, vary $\theta$ $\longrightarrow$ "Which parameter values explain my data?"
+
+For example, the Binomial formula $\binom{n}{x}\theta^x(1-\theta)^{n-x}$ can be read two ways:
+
+- **As a PMF** (fix $\theta = 0.5$, $n = 10$): $P(X = 7) = \binom{10}{7}(0.5)^7(0.5)^3 \approx 0.117$ --- "If the coin is fair, what's the chance of 7 heads?"
+- **As a likelihood** (fix $x = 7$, $n = 10$): $L(\theta) = \binom{10}{7}\theta^7(1-\theta)^3$ --- "I saw 7 heads; which coin bias $\theta$ best explains that?"
+
+The log-likelihood $\ell(\theta) = \log L(\theta)$ is a monotone transformation that turns products into sums, making calculus much easier. We maximize $\ell(\theta)$ to find the MLE, and its second derivative gives us the Fisher information.
+:::
+
+### 2.2 Concrete Example
+
+Suppose $X \sim \text{Binomial}(10, \theta)$ and we observe $x = 7$.
+
+- **As a PMF** (fix $\theta = 0.5$, vary $x$): $P(X = 7 \mid \theta = 0.5) = \binom{10}{7}(0.5)^{10} \approx 0.117$
+- **As a likelihood** (fix $x = 7$, vary $\theta$): $L(\theta \mid x = 7) = \binom{10}{7}\theta^7(1-\theta)^3$
+
+```{r, message=FALSE, warning=FALSE}
+# PMF: fix theta = 0.5, show distribution over x
+x_vals <- 0:10
+pmf_vals <- dbinom(x_vals, 10, 0.5)
+
+# Likelihood: fix x = 7, show as function of theta
+theta_vals <- seq(0.01, 0.99, length.out = 200)
+lik_vals <- dbinom(7, 10, theta_vals)
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1), family = "serif")
+
+# Left: PMF
+barplot(pmf_vals, names.arg = x_vals, col = "#5B8DB8",
+        main = expression("PMF: " * P(X == x ~ "|" ~ theta == 0.5)),
+        xlab = "x", ylab = "Probability")
+
+# Right: Likelihood
+plot(theta_vals, lik_vals, type = "l", lwd = 2, col = "#E8913A",
+     main = expression("Likelihood: " * L(theta ~ "|" ~ x == 7)),
+     xlab = expression(theta), ylab = expression(L(theta)))
+abline(v = 0.7, lty = 2, col = "gray50")
+text(0.72, max(lik_vals) * 0.9, expression(hat(theta)[MLE] == 0.7), adj = 0, cex = 0.9)
+```
+
+**Reading the left panel (PMF):** If I know the coin is fair ($\theta = 0.5$) and I flip it 10 times, what outcomes should I expect? The bars show the probability of each possible outcome. I'd most likely get 5 heads; getting 4 or 6 is pretty common too; but getting 0 or 10 is almost impossible. The result $P(X = 7 \mid \theta = 0.5) \approx 0.117$ says there's about an 11.7% chance of getting exactly 7 heads, not very likely, but not impossible. This is a *forward* question: from parameter to data.
+
+**Reading the right panel (Likelihood):** I already flipped the coin 10 times and got 7 heads. Now I want to work *backwards* --- what kind of coin could have produced this result? The likelihood is not a single number but a whole *function* of $\theta$. For any coin bias we plug in, it tells us how plausible that bias is given we saw 7 heads:
+
+- Plug in $\theta = 0.7$: $L(0.7) = 120 \times 0.7^7 \times 0.3^3 \approx 0.267$ --- the peak, most plausible
+- Plug in $\theta = 0.5$: $L(0.5) = 120 \times 0.5^{10} \approx 0.117$ --- possible but less supported
+- Plug in $\theta = 0.1$: $L(0.1) = 120 \times 0.1^7 \times 0.9^3 \approx 0.0000087$ --- essentially ruled out
+
+Notice something fun: the PMF result ($\approx 0.117$) and the likelihood evaluated at $\theta = 0.5$ ($\approx 0.117$) are the same number. That's the "same formula" point --- we're plugging in $x = 7$ and $\theta = 0.5$ either way, just asking different questions about it.
+
+## 3. Three Distributions You Need to Know
+
+The Jeffreys prior derivations below involve three important distributions. If you've only seen the Binomial in intro stats, here's how they connect:
+
+### 3.1 Comparison Table
+
+| | **Binomial** | **Negative Binomial** | **Gamma** |
+|:---|:---|:---|:---|
+| **Type** | Discrete | Discrete | Continuous |
+| **Question** | Fix $n$ trials: how many successes? | Fix $m$ successes: how many failures first? | How long until events accumulate? |
+| **Random variable** | $X$ = number of successes | $X$ = number of failures before $m$-th success | $X$ = waiting time / total amount |
+| **Parameters** | $n$ (trials), $\theta$ (success prob) | $m$ (target successes), $\theta$ (success prob) | $\theta$ (shape), $\beta$ (scale) |
+| **Support** | $x = 0, 1, \ldots, n$ | $x = 0, 1, 2, \ldots$ | $x > 0$ |
+| **PMF / PDF** | $\binom{n}{x}\theta^x(1-\theta)^{n-x}$ | $\binom{x+m-1}{x}\theta^m(1-\theta)^x$ | $\frac{1}{\Gamma(\theta)\beta^\theta}x^{\theta-1}e^{-x/\beta}$ |
+| **Mean** | $n\theta$ | $m(1-\theta)/\theta$ | $\theta\beta$ |
+| **Variance** | $n\theta(1-\theta)$ | $m(1-\theta)/\theta^2$ | $\theta\beta^2$ |
+
+::: {.callout-tip}
+## How They Connect
+Think of a sequence of independent coin flips with $P(\text{success}) = \theta$:
+
+- **Binomial**: "I'll flip 100 times. How many heads?" $\longrightarrow$ Fixed experiment length
+- **Negative Binomial**: "I'll keep flipping until I get 5 heads. How many tails along the way?" $\longrightarrow$ Fixed number of successes, random experiment length
+
+The **Gamma** distribution is the continuous cousin: instead of counting discrete events, it measures the continuous "waiting time" or "total amount" until a process accumulates enough. When the shape parameter $\theta$ is a positive integer, $\text{Gamma}(\theta, \beta)$ equals the sum of $\theta$ independent $\text{Exponential}(\beta)$ random variables --- just as the Negative Binomial "sums up" geometric waiting times.
+:::
+
+
+## 4. Noninformative Priors: Letting the Data Speak
+
+### 4.1 The Problem with "No Prior Information"
+
+Sometimes we don't have strong prior beliefs, or we want our analysis to be driven primarily by the data. Can we find a prior that is "uninformative" --- one that doesn't favor any particular parameter value?
+
+The naive answer is the **uniform prior**: $p(\theta) \propto 1$. But here's the catch: the uniform prior is *not invariant under reparameterization*. If $\theta$ is a probability and we transform to the odds $\phi = \theta/(1-\theta)$, a uniform prior on $\theta$ becomes a *non-uniform* prior on $\phi$. So "uninformative" depends on how we parameterize the problem --- hardly a satisfying state of affairs.
+
+Harold Jeffreys (1946) proposed an elegant solution: define the prior in terms of a quantity that is intrinsic to the statistical model, not dependent on the parameterization. That quantity is the **Fisher information**.
+
+
+### 4.2 Fisher Information: The Curvature of the Log-Likelihood
+
+The Fisher information measures how much information a single observation carries about the parameter $\theta$. Formally:
+
+$$I(\theta) = -\mathbf{E}\!\left[\frac{d^2 \ell(\theta)}{d\theta^2}\right]$$
+
+where $\ell(\theta) = \log L(\theta \mid x)$ is the log-likelihood and the expectation is taken over the data $X$.
+
+::: {.callout-important}
+## Intuition: Why Curvature Matters
+Imagine the log-likelihood as a landscape, with $\theta$ on the horizontal axis and $\ell(\theta)$ on the vertical axis. The second derivative $d^2\ell/d\theta^2$ measures the **curvature** of this landscape at any point:
+
+- **Sharp peak** (large negative curvature) $\Rightarrow$ the data are very informative --- small changes in $\theta$ cause big drops in likelihood. Fisher information is **large**.
+- **Flat peak** (small negative curvature) $\Rightarrow$ the data are not very informative --- many $\theta$ values fit almost equally well. Fisher information is **small**.
+
+**Coin flip analogy:** Consider estimating a coin's bias $\theta$. Near $\theta = 0.5$, flipping the coin doesn't tell us much (the outcomes are nearly 50-50 regardless of small perturbations). Near $\theta = 0.01$ or $\theta = 0.99$, every flip is highly diagnostic --- seeing even one head when $\theta \approx 0$ is startling. This is why $I(\theta) = n/[\theta(1-\theta)]$ for the Binomial is large near 0 and 1 (informative) and small near 0.5 (less informative).
+:::
+
+```{r, message=FALSE, warning=FALSE}
+# Visualize Fisher information for Binomial(n=1, theta)
+theta <- seq(0.01, 0.99, length.out = 300)
+fisher_info <- 1 / (theta * (1 - theta))
+
+ggplot(data.frame(theta, fisher_info), aes(theta, fisher_info)) +
+  geom_line(linewidth = 1.2, color = "#E8913A") +
+  labs(title = "Fisher Information for a Single Bernoulli Trial",
+       x = expression(theta),
+       y = expression(I(theta) == 1 / (theta * (1 - theta)))) +
+  annotate("text", x = 0.5, y = 10,
+           label = "Least informative\n(outcomes are 50-50)",
+           size = 3.5, family = "serif") +
+  annotate("text", x = 0.08, y = 60,
+           label = "Highly\ninformative", size = 3.5, family = "serif") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+
+### 4.3 The Jeffreys Prior
+
+The **Jeffreys prior** is defined as:
+
+$$\pi(\theta) \propto \sqrt{I(\theta)}$$
+
+By taking the square root of the Fisher information, Jeffreys' rule gives more prior weight to regions of parameter space where the data are most informative (large $I(\theta)$). Crucially, this prior is **invariant under reparameterization**: if we transform $\theta \to \phi = g(\theta)$, the Jeffreys prior for $\phi$ is exactly what we'd get by transforming the Jeffreys prior for $\theta$. This invariance property is what makes it the "right" noninformative prior in many settings.
+
+
+## 5. Deriving Jeffreys Priors: Three Worked Examples
+
+Now let's derive the Jeffreys prior for each of our three distributions. Each derivation follows the same recipe:
+
+1. Write the log-likelihood $\ell(\theta)$
+2. Take the first derivative $d\ell/d\theta$
+3. Take the second derivative $d^2\ell/d\theta^2$
+4. Compute Fisher information $I(\theta) = -\mathbf{E}[d^2\ell/d\theta^2]$
+5. The Jeffreys prior is $\pi(\theta) \propto \sqrt{I(\theta)}$
+
+### 5.1 Binomial: $X \sim \text{Bin}(n, \theta)$
+
+**Step 1: Log-likelihood.**
+
+$$\ell(\theta) = \log\binom{n}{x} + x\log\theta + (n-x)\log(1-\theta)$$
+
+**Step 2: First derivative.**
+
+$$\frac{d\ell}{d\theta} = \frac{x}{\theta} - \frac{n-x}{1-\theta}$$
+
+**Step 3: Second derivative.**
+
+$$\frac{d^2\ell}{d\theta^2} = -\frac{x}{\theta^2} - \frac{n-x}{(1-\theta)^2}$$
+
+**Step 4: Fisher information.** Take the negative expectation, using $\mathbf{E}[X] = n\theta$:
+
+$$I(\theta) = -\mathbf{E}\!\left[\frac{d^2\ell}{d\theta^2}\right] = \frac{\mathbf{E}[X]}{\theta^2} + \frac{n - \mathbf{E}[X]}{(1-\theta)^2} = \frac{n\theta}{\theta^2} + \frac{n(1-\theta)}{(1-\theta)^2} = \frac{n}{\theta(1-\theta)}$$
+
+**Step 5: Jeffreys prior.**
+
+$$\pi(\theta) \propto \sqrt{\frac{n}{\theta(1-\theta)}} \propto \theta^{-1/2}(1-\theta)^{-1/2}$$
+
+This is the kernel of a $\text{Beta}(1/2, 1/2)$ distribution! In fact, this prior is **proper** (it integrates to a finite value), and we can write out the full normalized density:
+
+$$\pi(\theta) = \frac{1}{\pi\,[\theta(1-\theta)]^{1/2}}$$
+
+where $\pi = 3.14159\ldots$ in the denominator is the mathematical constant (the normalizing constant of $\text{Beta}(1/2, 1/2)$ happens to be $B(1/2, 1/2) = \Gamma(1/2)^2/\Gamma(1) = \pi$).
+
+```{r, message=FALSE, warning=FALSE}
+# Jeffreys prior for Binomial = Beta(1/2, 1/2)
+theta <- seq(0.001, 0.999, length.out = 500)
+
+ggplot(data.frame(theta, density = dbeta(theta, 0.5, 0.5)),
+       aes(theta, density)) +
+  geom_line(linewidth = 1.2, color = "#8B3A8B") +
+  geom_line(data = data.frame(theta, density = dbeta(theta, 1, 1)),
+            aes(theta, density), linetype = "dashed", color = "gray50") +
+  annotate("text", x = 0.5, y = 1.3,
+           label = "Uniform Beta(1,1)", color = "gray50",
+           size = 3.5, family = "serif") +
+  annotate("text", x = 0.15, y = 2.0,
+           label = "Jeffreys Beta(1/2, 1/2)", color = "#8B3A8B",
+           size = 3.5, family = "serif") +
+  labs(title = "Jeffreys Prior for the Binomial Probability Parameter",
+       x = expression(theta), y = "Density") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+::: {.callout-note}
+## Beta(1/2, 1/2) vs. Uniform
+The Jeffreys prior $\text{Beta}(1/2, 1/2)$ is *not* uniform --- it places more weight near $\theta = 0$ and $\theta = 1$. This makes sense: near the boundaries, each observation is more informative (as we saw from the Fisher information plot), so the Jeffreys prior "compensates" by upweighting these regions. The uniform prior $\text{Beta}(1, 1)$, by contrast, spreads weight evenly across $[0,1]$.
+:::
+
+
+### 5.2 Negative Binomial: $X \sim \text{NegBin}(m, \theta)$
+
+The Negative Binomial models the number of failures $X$ before the $m$-th success, with PMF:
+
+$$f(x \mid \theta) = \binom{x+m-1}{x}\theta^m(1-\theta)^x, \quad x = 0, 1, 2, \ldots$$
+
+**Step 1: Log-likelihood.**
+
+$$\ell(\theta) = \log\binom{x+m-1}{x} + m\log\theta + x\log(1-\theta)$$
+
+**Step 2: First derivative.**
+
+$$\frac{d\ell}{d\theta} = \frac{m}{\theta} - \frac{x}{1-\theta}$$
+
+**Step 3: Second derivative.**
+
+$$\frac{d^2\ell}{d\theta^2} = -\frac{m}{\theta^2} - \frac{x}{(1-\theta)^2}$$
+
+**Step 4: Fisher information.** Using $\mathbf{E}[X] = m(1-\theta)/\theta$:
+
+$$I(\theta) = \frac{m}{\theta^2} + \frac{m(1-\theta)/\theta}{(1-\theta)^2} = \frac{m}{\theta^2} + \frac{m}{\theta(1-\theta)} = \frac{m(1-\theta) + m\theta}{\theta^2(1-\theta)} = \frac{m}{\theta^2(1-\theta)}$$
+
+**Step 5: Jeffreys prior.**
+
+$$\pi(\theta) \propto \sqrt{\frac{m}{\theta^2(1-\theta)}} \propto \theta^{-1}(1-\theta)^{-1/2}$$
+
+This has the kernel of a $\text{Beta}(0, 1/2)$ distribution.
+
+::: {.callout-important}
+## An Improper Prior
+The exponent on $\theta$ is $-1$, which means $\pi(\theta) \to \infty$ as $\theta \to 0$. In fact, this prior does **not** integrate to a finite value over $(0, 1)$ --- it is an *improper prior*. Improper priors can still lead to proper posteriors (once we multiply by the likelihood), but they must be used with care. They cannot be interpreted as probability distributions on their own; they are formal devices for generating posterior inference.
+
+Comparing to the Binomial result: the Binomial Jeffreys prior $\theta^{-1/2}(1-\theta)^{-1/2}$ is integrable (it's a proper Beta distribution), while the Negative Binomial Jeffreys prior $\theta^{-1}(1-\theta)^{-1/2}$ diverges at $\theta = 0$. The extra factor of $\theta^{-1/2}$ comes from the asymmetric role that $\theta$ plays in the Negative Binomial --- the number of failures can be arbitrarily large when $\theta$ is small, making the Fisher information grow faster near zero.
+:::
+
+
+### 5.3 Gamma: $X \sim \text{Gamma}(\theta, \beta)$ with Known Scale $\beta$
+
+The Gamma PDF with shape $\theta$ and known scale parameter $\beta$ is:
+
+$$f(x \mid \theta) = \frac{1}{\Gamma(\theta)\,\beta^\theta}\, x^{\theta - 1}\, e^{-x/\beta}, \quad x > 0$$
+
+**Step 1: Log-likelihood.**
+
+$$\ell(\theta) = -\log\Gamma(\theta) - \theta\log\beta + (\theta - 1)\log x - x/\beta$$
+
+**Step 2: First derivative.** Here we encounter a special function:
+
+$$\frac{d\ell}{d\theta} = -\psi(\theta) - \log\beta + \log x$$
+
+where $\psi(\theta) = \frac{d}{d\theta}\log\Gamma(\theta)$ is the **digamma function**.
+
+**Step 3: Second derivative.**
+
+$$\frac{d^2\ell}{d\theta^2} = -\psi'(\theta)$$
+
+where $\psi'(\theta)$ is the **trigamma function**. Notice that the second derivative does not depend on the data $x$ or the scale $\beta$ --- it is purely a function of the shape parameter $\theta$.
+
+**Step 4: Fisher information.** Since $\psi'(\theta)$ doesn't depend on the data $x$, the expectation is trivial:
+
+$$I(\theta) = \psi'(\theta)$$
+
+**Step 5: Jeffreys prior.**
+
+$$\pi(\theta) \propto \sqrt{\psi'(\theta)}$$
+
+This has **no closed form** --- it cannot be written as a familiar distribution. We can only evaluate it numerically using the `trigamma()` function in R. Moreover, since $\psi'(\theta) \approx 1/\theta$ for large $\theta$, we have $\pi(\theta) \approx 1/\sqrt{\theta}$ in the tail, which means this prior is **improper** --- it does not integrate to a finite value over $(0, \infty)$. Like the Negative Binomial case, it can still yield proper posteriors once combined with the likelihood.
+
+```{r, message=FALSE, warning=FALSE}
+# Jeffreys prior for Gamma shape parameter
+theta <- seq(0.01, 10, length.out = 500)
+jeffreys_density <- sqrt(trigamma(theta))
+
+# Normalize for plotting (approximate)
+area <- sum(jeffreys_density * diff(c(theta, theta[length(theta)] + 0.02)))
+jeffreys_density_norm <- jeffreys_density / area
+
+ggplot(data.frame(theta, density = jeffreys_density_norm),
+       aes(theta, density)) +
+  geom_line(linewidth = 1.2, color = "#2E8B57") +
+  labs(title = "Jeffreys Prior for the Gamma Shape Parameter",
+       x = expression(theta), y = expression(pi(theta) %prop% sqrt(psi * "'" * (theta)))) +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+
+## 6. Interlude: The Digamma and Trigamma Functions
+
+The Gamma distribution derivation introduced two special functions that deserve their own spotlight. If you've never encountered them before, don't worry --- they're simply the "derivatives of the log-Gamma function," and R computes them for us.
+
+### 6.1 Definitions
+
+The **digamma function** is the first derivative of $\log\Gamma(\theta)$:
+
+$$\psi(\theta) = \frac{d}{d\theta}\log\Gamma(\theta) = \frac{\Gamma'(\theta)}{\Gamma(\theta)}$$
+
+The **trigamma function** is the second derivative:
+
+$$\psi'(\theta) = \frac{d^2}{d\theta^2}\log\Gamma(\theta) = \frac{d}{d\theta}\psi(\theta)$$
+
+### 6.2 Why Do They Appear?
+
+Whenever a statistical model involves the Gamma function $\Gamma(\theta)$ as a function of the parameter (not the data), taking log-likelihood derivatives produces digamma and trigamma functions. This happens for the Gamma distribution (shape parameter), the Beta distribution, the Dirichlet distribution, and many others. They are the "calculus of $\Gamma(\theta)$."
+
+### 6.3 Key Properties
+
+```{r, message=FALSE, warning=FALSE}
+# Digamma and trigamma for a range of theta
+theta <- seq(0.1, 8, length.out = 200)
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1), family = "serif")
+
+plot(theta, digamma(theta), type = "l", lwd = 2, col = "#5B8DB8",
+     main = expression("Digamma " * psi(theta)),
+     xlab = expression(theta), ylab = expression(psi(theta)))
+abline(h = 0, lty = 2, col = "gray60")
+
+plot(theta, trigamma(theta), type = "l", lwd = 2, col = "#E8913A",
+     main = expression("Trigamma " * psi * "'" * (theta)),
+     xlab = expression(theta), ylab = expression(psi * "'" * (theta)))
+```
+
+Key facts about these functions:
+
+- $\psi(\theta) < 0$ for $\theta < e^{-\gamma} \approx 0.56$ and $\psi(\theta) > 0$ for larger $\theta$, where $\gamma \approx 0.5772$ is the Euler--Mascheroni constant
+- $\psi(\theta) \approx \log\theta - 1/(2\theta)$ for large $\theta$ (it grows like $\log\theta$)
+- $\psi'(\theta) > 0$ always (log-Gamma is convex), and $\psi'(\theta) \approx 1/\theta$ for large $\theta$
+- $\psi(1) = -\gamma \approx -0.5772$ and $\psi'(1) = \pi^2/6 \approx 1.645$
+
+::: {.callout-tip}
+## In R
+Computing these is trivial: `digamma(x)` and `trigamma(x)` are built-in functions. No packages needed. You can verify: `digamma(1)` returns approximately $-0.5772$, and `trigamma(1)` returns approximately $1.6449$.
+:::
+
+```{r}
+# Quick verification
+cat("psi(1) =", digamma(1), " (should be approx -0.5772)\n")
+cat("psi'(1) =", trigamma(1), " (should be approx pi^2/6 =", pi^2/6, ")\n")
+```
+
+## 7. The Beta-Binomial Model: Integrating Out Uncertainty
+
+### 7.1 From Conditional to Marginal
+
+So far we've been working with $p(X \mid \theta)$ --- the distribution of data given a known parameter. But in the Bayesian framework, $\theta$ itself is uncertain (it has a prior distribution). What is the distribution of $X$ if we don't know $\theta$?
+
+This is the **marginal distribution** of $X$, obtained by averaging (integrating) the conditional distribution over all possible values of $\theta$, weighted by the prior:
+
+$$p(X = x) = \int_0^1 p(X = x \mid \theta) \, p(\theta) \, d\theta$$
+
+The name "marginal" comes from the idea that we are "marginalizing out" (removing) the parameter $\theta$. Just as a marginal distribution in a joint probability table is obtained by summing over the other variable, here we integrate over $\theta$ to get a distribution that depends only on $x$.
+
+### 7.2 Deriving the Beta-Binomial
+
+Suppose $X \mid \theta \sim \text{Binomial}(n, \theta)$ and $\theta \sim \text{Beta}(\alpha, \beta)$. Then:
+
+$$p(X = x) = \int_0^1 \binom{n}{x}\theta^x(1-\theta)^{n-x} \cdot \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{B(\alpha,\beta)} \, d\theta$$
+
+Collect the $\theta$ terms:
+
+$$= \frac{\binom{n}{x}}{B(\alpha,\beta)} \int_0^1 \theta^{x+\alpha-1}(1-\theta)^{n-x+\beta-1} \, d\theta$$
+
+The integral is exactly the Beta function $B(x+\alpha, \; n-x+\beta)$. So:
+
+$$\boxed{p(X = x) = \binom{n}{x}\frac{B(x+\alpha, \; n-x+\beta)}{B(\alpha,\beta)}, \quad x = 0, 1, \ldots, n}$$
+
+This is the **Beta-Binomial distribution**. Using the relationship $B(a,b) = \Gamma(a)\Gamma(b)/\Gamma(a+b)$, we can also write:
+
+$$p(X = x) = \binom{n}{x}\frac{\Gamma(x+\alpha)\,\Gamma(n-x+\beta)}{\Gamma(n+\alpha+\beta)} \cdot \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\,\Gamma(\beta)}$$
+
+::: {.callout-tip}
+## The Beta Function: A Quick Reference
+The Beta function $B(a,b)$ is defined as:
+
+$$B(a,b) = \int_0^1 t^{a-1}(1-t)^{b-1}\,dt = \frac{\Gamma(a)\,\Gamma(b)}{\Gamma(a+b)}$$
+
+It appears constantly in Bayesian statistics because the Beta distribution is the conjugate prior for binomial-type likelihoods. Recognizing integrals of the form $\int_0^1 \theta^{(\cdot)}(1-\theta)^{(\cdot)}\,d\theta$ as Beta functions is one of the most useful tricks in Bayesian derivations.
+:::
+
+### 7.3 Visualizing the Beta-Binomial
+
+```{r, message=FALSE, warning=FALSE}
+# Compare Binomial vs Beta-Binomial
+n <- 10
+x_vals <- 0:n
+
+# Standard Binomial with theta = 0.5
+binom_pmf <- dbinom(x_vals, n, 0.5)
+
+# Beta-Binomial with alpha = beta = 1 (uniform prior)
+beta_binom <- function(x, n, alpha, beta_param) {
+  choose(n, x) * beta(x + alpha, n - x + beta_param) / beta(alpha, beta_param)
+}
+bb_uniform <- sapply(x_vals, beta_binom, n = n, alpha = 1, beta_param = 1)
+
+# Beta-Binomial with alpha = beta = 0.5 (Jeffreys prior)
+bb_jeffreys <- sapply(x_vals, beta_binom, n = n, alpha = 0.5, beta_param = 0.5)
+
+df_bb <- data.frame(
+  x = rep(x_vals, 3),
+  prob = c(binom_pmf, bb_uniform, bb_jeffreys),
+  model = factor(rep(c("Binomial(10, 0.5)",
+                        "Beta-Binomial(Uniform prior)",
+                        "Beta-Binomial(Jeffreys prior)"), each = length(x_vals)))
+)
+
+ggplot(df_bb, aes(x, prob, fill = model)) +
+  geom_col(position = "dodge", width = 0.7, alpha = 0.8) +
+  scale_fill_manual(values = c("#5B8DB8", "#8B3A8B", "#E8913A")) +
+  labs(title = "Binomial vs. Beta-Binomial Distributions (n = 10)",
+       x = "Number of Successes (x)", y = "Probability",
+       fill = "Model") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "top")
+```
+
+::: {.callout-note}
+## What the Plot Shows
+The Binomial (blue) assumes we *know* $\theta = 0.5$ and concentrates probability near $x = 5$. The Beta-Binomial models account for *uncertainty* in $\theta$ by integrating over the prior, which spreads the probability mass toward the extremes. The uniform prior (purple) produces a completely flat distribution (as we'll prove next!), while the Jeffreys prior (orange) produces a U-shape that places more probability on extreme outcomes.
+:::
+
+
+## 8. Bayes's Original Argument: Why Uniform Implies $\alpha = \beta = 1$
+
+### 8.1 The Historical Context
+
+Thomas Bayes, in his famous 1763 posthumous paper, argued that if we have *no prior information* about a probability $\theta$, then the marginal distribution of $X$ should be uniform: every outcome $x = 0, 1, \ldots, n$ should be equally likely. This is a stronger statement than saying $\theta$ is uniform --- it's saying that our *predictive distribution* for the data should show no preference for any outcome.
+
+As Stigler (1982) discusses, this "billiard ball" argument was Bayes's way of justifying the uniform prior. But mathematically, it pins down the prior uniquely.
+
+### 8.2 The Proof
+
+**Claim:** If $X \mid \theta \sim \text{Bin}(n, \theta)$ and $\theta \sim \text{Beta}(\alpha, \beta)$, then $p(X = x) = \frac{1}{n+1}$ for all $x = 0, 1, \ldots, n$ if and only if $\alpha = \beta = 1$.
+
+**Proof.** If $p(X = x)$ is constant for all $x$, then in particular we must have $m(x) = m(x+1)$ for all $x = 0, 1, \ldots, n-1$. Using the Beta-Binomial formula and simplifying with Gamma function properties ($\Gamma(z+1) = z\,\Gamma(z)$), the equation $m(x) = m(x+1)$ reduces to:
+
+$$(x + \alpha)(n - x) = (n - x + \beta - 1)(x + 1)$$
+
+Expanding both sides and collecting terms in $x$:
+
+$$(2 - (\alpha + \beta))\,x + n(\alpha - 1) - (\beta - 1) = 0 \quad \text{for all } x = 0, 1, \ldots, n$$
+
+For a linear function of $x$ to equal zero for all $x$, both the coefficient and the constant must vanish:
+
+- Coefficient of $x$: $2 - (\alpha + \beta) = 0 \implies \alpha + \beta = 2$
+- Constant term: $n(\alpha - 1) - (\beta - 1) = 0$
+
+Substituting $\beta = 2 - \alpha$ into the second equation: $n(\alpha - 1) - (1 - \alpha) = 0$, which gives $(n+1)(\alpha - 1) = 0$, so $\alpha = 1$ and therefore $\beta = 1$.
+
+Thus $\alpha = \beta = 1$, which is $\text{Beta}(1,1) = \text{Uniform}(0,1)$. 
+
+```{r, message=FALSE, warning=FALSE}
+# Verify: Beta-Binomial with alpha = beta = 1 gives uniform over x
+n <- 10
+x_vals <- 0:n
+bb_probs <- sapply(x_vals, function(x) {
+  choose(n, x) * beta(x + 1, n - x + 1) / beta(1, 1)
+})
+
+cat("Beta-Binomial probabilities with alpha=beta=1:\n")
+for (i in seq_along(x_vals)) {
+  cat(sprintf("  P(X=%d) = %.6f\n", x_vals[i], bb_probs[i]))
+}
+cat("\nAll equal to 1/(n+1) =", 1/(n+1), "\n")
+```
+
+::: {.callout-important}
+## The Deep Insight
+Bayes's argument works "backwards" from a desired property of the predictive distribution to pin down the prior. If you believe that --- before seeing any data --- every outcome is equally likely, then your prior for $\theta$ *must* be uniform. This is a **characterization theorem**: the uniform prior is the *unique* Beta prior that produces a uniform marginal. No other Beta prior satisfies this property.
+
+This is different from the Jeffreys argument, which derives the prior from the geometry of the statistical model (Fisher information). The two approaches give different priors --- $\text{Beta}(1,1)$ vs. $\text{Beta}(1/2, 1/2)$ --- reflecting genuinely different philosophies about what "uninformative" means.
+:::
+
+## 9. Putting It All Together: A Summary of Prior Choices
+
+```{r, message=FALSE, warning=FALSE}
+theta <- seq(0.001, 0.999, length.out = 500)
+
+df_summary <- data.frame(
+  theta = rep(theta, 4),
+  density = c(
+    dbeta(theta, 1, 1),
+    dbeta(theta, 0.5, 0.5),
+    dbeta(theta, 2, 5),
+    dbeta(theta, 10, 10)
+  ),
+  prior = factor(rep(c("Uniform Beta(1,1)",
+                        "Jeffreys Beta(1/2, 1/2)",
+                        "Informative Beta(2,5)",
+                        "Concentrated Beta(10,10)"),
+                     each = length(theta)),
+                 levels = c("Uniform Beta(1,1)", "Jeffreys Beta(1/2, 1/2)",
+                            "Informative Beta(2,5)", "Concentrated Beta(10,10)"))
+)
+
+ggplot(df_summary, aes(theta, density, color = prior)) +
+  geom_line(linewidth = 1.1) +
+  scale_color_manual(values = c("#4A90D9", "#E8913A", "#8B3A8B", "#2E8B57")) +
+  labs(title = "A Gallery of Beta Priors",
+       x = expression(theta), y = "Density",
+       color = "Prior") +
+  coord_cartesian(ylim = c(0, 4)) +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = c(0.80, 0.98),
+        legend.justification = c(0.5, 1),
+        legend.title = element_blank())
+```
+
+| Prior | Philosophy | Formula | When to use |
+|:------|:-----------|:--------|:------------|
+| Uniform $\text{Beta}(1,1)$ | Equal prior weight everywhere | $p(\theta) = 1$ | When you want the posterior to equal the normalized likelihood |
+| Jeffreys $\text{Beta}(1/2,1/2)$ | Invariant under reparameterization | $p(\theta) \propto \theta^{-1/2}(1-\theta)^{-1/2}$ | Default "reference" prior; most widely recommended noninformative prior |
+| Informative (e.g., $\text{Beta}(2,5)$) | Encodes specific prior knowledge | Chosen to match beliefs | When prior studies or expert opinion provide meaningful information |
+| Subjective histogram | Flexible, non-parametric | Piecewise constant density | When beliefs don't fit a standard parametric family |
+
+*This tutorial is based on UCLA [STATS C216: Applied Bayesian Social Statistics](https://handcock.github.io/teaching/c216/) taught by Prof [Mark Handcock](https://handcock.github.io/).*
+
+
