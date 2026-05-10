@@ -1,0 +1,482 @@
+---
+title: "Bayesian Methods Part 3: From Prior to Posterior --- Conjugacy, Prediction, and Credible Intervals"
+author: Shuhan (Alice) Ai
+date: "2026-05-10"
+categories: [Bayesian, R]
+format:
+  html:
+    toc: true
+    code-fold: false
+    self-contained: true
+image: "cover.png"
+---
+
+[Part 1](https://aliceaii.github.io/posts/bayesian1/) of this series argued that Frequentist error rates can be misleading once the data are in hand. [Part 2](https://aliceaii.github.io/posts/bayesian2/) dealt with where priors come from --- both subjective histogram priors and noninformative Jeffreys priors. This post is about what happens after we have a prior and a likelihood: how to compute the posterior, and what to actually do with it.
+ 
+We will cover three things:
+ 
+- **Conjugate analysis**: certain prior--likelihood pairs produce posteriors in the same family, so updating reduces to adding numbers.
+- **Predictive distributions**: how to forecast a future outcome while accounting for the fact that we don't actually know the parameter.
+- **Credible intervals**: how the posterior lets us make direct probability statements about a parameter, which is something a Frequentist confidence interval never does.
+ 
+We'll keep one example running through all three sections: **a pilot retention program for first-generation college students**.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+ 
+theta <- seq(0.001, 0.999, length.out = 500)
+ 
+df <- data.frame(
+  theta = rep(theta, 3),
+  density = c(
+    dbeta(theta, 2, 8),
+    dbinom(3, 20, theta) / max(dbinom(3, 20, theta)) * max(dbeta(theta, 2, 8)) * 0.7,
+    dbeta(theta, 5, 25)
+  ),
+  curve = factor(rep(c("Prior Be(2,8)", "Likelihood (rescaled)", "Posterior Be(5,25)"),
+                     each = length(theta)),
+                 levels = c("Prior Be(2,8)", "Likelihood (rescaled)", "Posterior Be(5,25)"))
+)
+ 
+ggplot(df, aes(theta, density, color = curve, linetype = curve)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = c("Prior Be(2,8)" = "#5B8DB8",
+                                "Likelihood (rescaled)" = "#E8913A",
+                                "Posterior Be(5,25)" = "#8B3A8B")) +
+  scale_linetype_manual(values = c("Prior Be(2,8)" = "dashed",
+                                   "Likelihood (rescaled)" = "dotted",
+                                   "Posterior Be(5,25)" = "solid")) +
+  labs(title = "Bayesian Updating: Prior + Data = Posterior",
+       x = expression(theta), y = "Density") +
+  coord_cartesian(xlim = c(0, 0.8), ylim = c(0, 7)) +
+  theme_classic(base_family = "serif") +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    legend.position = c(0.70, 0.95),
+    legend.justification = c(0, 1),
+    legend.text = element_text(family = ""),
+    legend.title = element_blank()
+  )
+```
+
+## The Running Example: First-Gen Retention at W University
+ 
+W University recently rolled out a new program called **First-Gen Forward**: peer mentoring, intrusive advising, and fellowships, all aimed at improving first-year retention among first-generation students.
+ 
+A few facts to set the stage:
+ 
+- **Historical baseline**: National first-year dropout rates for first-gen students sit around 25--33%. At W, the recent baseline has been about 30% (i.e., 70% retention).
+- **Pilot data**: In year one of the program, 20 first-gen students enrolled. We track how many came back for a second year.
+- **Parameter of interest**: $\theta$, the true retention rate under the program.
+ 
+This one study will carry us through the whole post. Section 1 estimates $\theta$. Section 2 forecasts how many students a larger future cohort will retain. Section 3 builds credible intervals and tackles the provost's actual question: *"Is the retention rate at least 80%?"*
+ 
+
+## 1. Conjugate Analysis: Estimating the Retention Rate
+ 
+### 1.1 The Setup
+ 
+Each of the 20 students either stays (with probability $\theta$) or doesn't. The retention count $X$ is Binomial:
+ 
+$$X \mid \theta \sim \text{Binomial}(20, \theta)$$
+ 
+For the prior, the program evaluator looks at the historical 70% retention rate and the literature on similar advising interventions and settles on:
+ 
+$$\theta \sim \text{Be}(7, 3)$$
+ 
+::: {.callout-tip}
+## Interpreting Beta Hyperparameters
+We can read $\alpha$ and $\beta$ in a $\text{Be}(\alpha, \beta)$ prior as "pseudo-counts" from prior experience:
+ 
+- $\alpha = 7$: like having previously seen 7 students retained
+- $\beta = 3$: like having seen 3 drop out
+- $\alpha + \beta = 10$: the total prior "sample size" --- roughly how strong the prior is
+- $\alpha / (\alpha + \beta) = 0.70$: the prior mean, i.e., our best guess before seeing data
+ 
+So $\text{Be}(7, 3)$ is saying: "My experience is worth about 10 students, 7 of whom were retained. I think the retention rate is around 70%, but I'm not very committed to that number."
+:::
+ 
+### 1.2 Deriving the Posterior
+ 
+By Bayes' theorem:
+ 
+$$p(\theta \mid x) \propto p(x \mid \theta) \cdot p(\theta)$$
+ 
+Plugging in the Binomial likelihood and Beta prior:
+ 
+$$p(\theta \mid x) \propto \underbrace{\theta^x (1-\theta)^{n-x}}_{\text{likelihood}} \cdot \underbrace{\theta^{\alpha-1}(1-\theta)^{\beta-1}}_{\text{prior}}$$
+ 
+Combining exponents:
+ 
+$$= \theta^{(x + \alpha) - 1}(1-\theta)^{(n - x + \beta) - 1}$$
+ 
+That's the kernel of a Beta distribution. So:
+ 
+$$\boxed{\theta \mid x \;\sim\; \text{Be}(\alpha + x,\; \beta + n - x)}$$
+ 
+The update rule is just:
+ 
+- new $\alpha$ = old $\alpha$ + students retained
+- new $\beta$ = old $\beta$ + students who dropped out
+ 
+::: {.callout-note}
+## What Is Conjugacy?
+A prior family is **conjugate** to a likelihood when the posterior ends up in the same family as the prior. Beta is conjugate to Binomial, which is why we never have to compute a nasty integral here --- two parameters in, two parameters out.
+ 
+Most prior--likelihood pairs are not conjugate. When conjugacy does hold, we can do Bayesian updating with arithmetic.
+:::
+ 
+### 1.3 The Pilot Results
+ 
+The pilot data: **16 of 20 students were retained** ($x = 16$). So the posterior is:
+ 
+$$\theta \mid x = 16 \;\sim\; \text{Be}(7 + 16,\; 3 + 4) = \text{Be}(23, 7)$$
+ 
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+ 
+# Prior parameters
+alpha_prior <- 7
+beta_prior <- 3
+ 
+# Data
+n <- 20
+x <- 16
+ 
+# Posterior parameters
+alpha_post <- alpha_prior + x      # 7 + 16 = 23
+beta_post <- beta_prior + n - x    # 3 + 4 = 7
+ 
+cat("Prior: Be(", alpha_prior, ",", beta_prior, ")\n")
+cat("  Prior mean:", alpha_prior / (alpha_prior + beta_prior), "\n")
+cat("Data: x =", x, "retained out of n =", n, "\n")
+cat("  MLE:", x/n, "\n")
+cat("Posterior: Be(", alpha_post, ",", beta_post, ")\n")
+cat("  Posterior mean:", alpha_post / (alpha_post + beta_post), "\n")
+```
+ 
+```{r, message=FALSE, warning=FALSE}
+theta <- seq(0.001, 0.999, length.out = 500)
+ 
+df <- data.frame(
+  theta = rep(theta, 3),
+  density = c(
+    dbeta(theta, alpha_prior, beta_prior),
+    dbeta(theta, x + 1, n - x + 1),   # likelihood (proportional to Beta)
+    dbeta(theta, alpha_post, beta_post)
+  ),
+  curve = factor(rep(c("Prior Be(7,3)", "Likelihood", "Posterior Be(23,7)"),
+                     each = length(theta)),
+                 levels = c("Prior Be(7,3)", "Likelihood", "Posterior Be(23,7)"))
+)
+ 
+ggplot(df, aes(theta, density, color = curve, linetype = curve)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = c("#5B8DB8", "#E8913A", "#8B3A8B")) +
+  scale_linetype_manual(values = c("dashed", "dotted", "solid")) +
+  labs(title = "Bayesian Updating: First-Gen Forward Retention Rate",
+       subtitle = "16 out of 20 students retained in Year 1",
+       x = expression(theta ~ "(retention rate)"), y = "Density") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = c(0.02, 0.98),
+        legend.justification = c(0, 1),
+        legend.title = element_blank())
+```
+ 
+::: {.callout-tip}
+## Reading the Plot
+A few things jump out:
+ 
+The posterior (purple) sits between the prior (blue) and the likelihood (orange). That's always how it works: the posterior is a compromise between prior belief and observed data.
+ 
+The posterior is also narrower than either curve on its own. Adding information cuts uncertainty.
+ 
+The posterior mean (0.767) lands closer to the MLE (0.80) than to the prior mean (0.70). With $n = 20$ observations against an effective prior sample size of 10, the data carry about twice the weight.
+:::
+ 
+The three curves together tell one story:
+ 
+| Curve | Source | Center | Interpretation |
+|:---|:---|:---:|:---|
+| Prior Be(7, 3) | Historical data + literature | 0.70 | "What we believe before seeing the data" |
+| Likelihood | Current pilot data | 0.80 (MLE) | "What the data alone are saying" |
+| Posterior Be(23, 7) | Prior $\times$ Likelihood | 0.767 | "What we believe after seeing the data" |
+ 
+The posterior always lands between the prior and the likelihood, and is narrower than either one on its own. Those are two general rules of Bayesian updating.
+ 
+ 
+## 2. Predictive Distributions: Forecasting Next Year's Cohort
+ 
+### 2.1 The Problem
+ 
+The provost likes the pilot results and wants to scale up. Next year, First-Gen Forward will take 60 students. Her question: *"How many of those 60 should we expect to retain, and how uncertain are we?"*
+ 
+If we somehow knew $\theta$, this would be a $\text{Binomial}(60, \theta)$ problem. We don't. We have a posterior $\text{Be}(23, 7)$ from a small pilot, and the right thing to do is integrate over our uncertainty about $\theta$ to get a **predictive distribution** for the next year's count.
+
+### 2.2 The Law of Total Expectation and Variance
+ 
+Let $Y$ be next year's retention count out of $n^* = 60$. Conditional on $\theta$, $Y \mid \theta \sim \text{Binomial}(60, \theta)$. The predictive (marginal) distribution averages over $\theta$:
+ 
+$$\mathbf{E}[Y] = \mathbf{E}[\mathbf{E}[Y \mid \theta]] = \mathbf{E}[60\theta] = 60 \times \mathbf{E}[\theta]$$
+ 
+$$\text{Var}(Y) = \underbrace{\mathbf{E}[\text{Var}(Y \mid \theta)]}_{\text{within-group variance}} + \underbrace{\text{Var}(\mathbf{E}[Y \mid \theta])}_{\text{between-group variance}}$$
+ 
+::: {.callout-note}
+## Intuition: Law of Total Variance
+Imagine running First-Gen Forward many times next year, each cohort with a fresh group of 60 students. Even if we could somehow pin down the true retention rate $\theta$ exactly, the retention count would still bounce around from cohort to cohort --- maybe 44 one year, 47 the next, 49 the year after. That random scatter *at fixed $\theta$* is the **within-group variance**: pure binomial noise we'd see even with perfect knowledge of the rate.
+ 
+But we don't have perfect knowledge of $\theta$. Our posterior $\text{Be}(23, 7)$ spreads probability across a range of plausible values --- maybe the program's true rate is 0.72, maybe 0.80, maybe something in between. Each candidate $\theta$ gives a different expected count $60\theta$. The spread of those expected counts across plausible values of $\theta$ is the **between-group variance**.
+ 
+Stacking the two pieces together:
+ 
+- The **within-group** term, $\mathbf{E}[\text{Var}(Y \mid \theta)]$, is the binomial noise we'd still have even if we knew $\theta$ exactly.
+- The **between-group** term, $\text{Var}(\mathbf{E}[Y \mid \theta])$, captures the fact that we don't know $\theta$, so the expected count itself has a distribution.
+ 
+Reporting only the within-group piece would pretend we know the retention rate exactly. Carrying both pieces is what makes the predictive distribution honest.
+:::
+
+### 2.3 Computing the Predictive Distribution
+ 
+Using our posterior $\theta \mid x \sim \text{Be}(23, 7)$ with $\mathbf{E}[\theta] = 23/30$ and $\text{Var}(\theta) = \frac{23 \times 7}{30^2 \times 31}$:
+ 
+**Marginal mean:**
+ 
+$$\mathbf{E}[Y] = 60 \times \frac{23}{30} = 46 \text{ students}$$
+ 
+**Marginal variance:**
+ 
+$$\text{Var}(Y) = \underbrace{\mathbf{E}[60\theta(1-\theta)]}_{= 60 \times \mathbf{E}[\theta(1-\theta)]} + \underbrace{\text{Var}(60\theta)}_{= 60^2 \times \text{Var}(\theta)}$$
+ 
+```{r, message=FALSE, warning=FALSE}
+# Posterior parameters from Section 1
+alpha_post <- 23
+beta_post <- 7
+n_star <- 60  # next year's cohort size
+ 
+# Posterior moments
+E_theta <- alpha_post / (alpha_post + beta_post)
+Var_theta <- (alpha_post * beta_post) /
+  ((alpha_post + beta_post)^2 * (alpha_post + beta_post + 1))
+ 
+# E[theta(1-theta)] = E[theta] - E[theta^2] = E[theta] - (Var(theta) + E[theta]^2)
+E_theta_1mtheta <- E_theta - (Var_theta + E_theta^2)
+ 
+# Predictive moments
+E_Y <- n_star * E_theta
+Var_Y_within <- n_star * E_theta_1mtheta        # E[Var(Y|theta)]
+Var_Y_between <- n_star^2 * Var_theta             # Var(E[Y|theta])
+Var_Y <- Var_Y_within + Var_Y_between
+SD_Y <- sqrt(Var_Y)
+ 
+cat("Posterior mean of theta:", round(E_theta, 4), "\n")
+cat("Posterior variance of theta:", round(Var_theta, 5), "\n\n")
+cat("Predictive mean (E[Y]):", round(E_Y, 1), "students\n")
+cat("  Within-group variance:", round(Var_Y_within, 2), "\n")
+cat("  Between-group variance:", round(Var_Y_between, 2), "\n")
+cat("  Total variance:", round(Var_Y, 2), "\n")
+cat("Predictive SD:", round(SD_Y, 2), "students\n")
+```
+ 
+```{r, message=FALSE, warning=FALSE}
+# Simulate the full predictive distribution via Monte Carlo
+set.seed(216)
+n_sim <- 100000
+theta_sim <- rbeta(n_sim, alpha_post, beta_post)
+Y_sim <- rbinom(n_sim, n_star, theta_sim)
+ 
+# Compare: if we "knew" theta = 0.767 (posterior mean)
+Y_fixed <- rbinom(n_sim, n_star, E_theta)
+ 
+df_pred <- data.frame(
+  Y = c(Y_sim, Y_fixed),
+  type = factor(rep(c("Predictive (theta uncertain)",
+                       "If we knew theta = 0.767"),
+                    each = n_sim),
+                levels = c("If we knew theta = 0.767",
+                           "Predictive (theta uncertain)"))
+)
+ 
+ggplot(df_pred, aes(Y, fill = type)) +
+  geom_histogram(position = "identity", alpha = 0.5, binwidth = 1, color = "white") +
+  scale_fill_manual(values = c("#5B8DB8", "#8B3A8B")) +
+  labs(title = "How Many of 60 First-Gen Students Will Be Retained?",
+       subtitle = "Predictive distribution accounts for uncertainty in theta",
+       x = "Number of Students Retained", y = "Frequency",
+       fill = "") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = c(0.02, 0.98),
+        legend.justification = c(0, 1))
+```
+ 
+::: {.callout-important}
+## The Predictive Distribution Is Wider Than the Conditional One
+The purple histogram (predictive) is visibly wider than the blue one (conditional on $\theta = 0.767$). The blue version only accounts for binomial noise, as if we'd somehow nailed down the retention rate. The purple version adds the extra spread that comes from not actually knowing it.
+ 
+Reporting the blue distribution to the provost would be overconfident. The honest answer is the purple one: we expect about 46 retentions next year, with a plausible range roughly from 38 to 53.
+:::
+
+## 3. Credible Intervals: Answering the Provost's Questions
+ 
+### 3.1 What Is a Credible Interval?
+ 
+A **credible interval** is the Bayesian analog of a confidence interval, with a much more usable interpretation. A 95% credible interval $[a, b]$ means:
+ 
+$$P(a \leq \theta \leq b \mid \text{data}) = 0.95$$
+ 
+Given the data we actually observed, there's a 95% probability that $\theta$ lies in $[a, b]$. A Frequentist 95% confidence interval, by contrast, says something about repeated sampling: "if we ran this experiment many times, 95% of the resulting intervals would cover the true $\theta$." That's a statement about the procedure, not about this specific interval. Most people interpret confidence intervals as if they were credible intervals anyway --- the Bayesian version just makes the natural reading the correct one.
+ 
+### 3.2 The Highest Posterior Density (HPD) Interval
+ 
+There are infinitely many 95% credible intervals. The **HPD interval** is the shortest one. It's defined by a threshold $k$ such that:
+ 
+$$\text{HPD} = \{\theta : p(\theta \mid x) \geq k\}$$
+ 
+with $k$ picked so the set has total probability 0.95. Every point inside the HPD has higher posterior density than every point outside it.
+ 
+::: {.callout-tip}
+## HPD Intuition
+Imagine a population-density map of a city, and we want to draw the smallest boundary enclosing 95% of the residents. We'd start from the densest neighborhoods and expand outward until we'd captured 95%. The HPD does the same thing with posterior density.
+ 
+For a symmetric, unimodal posterior (e.g., a normal), the HPD coincides with the familiar central interval. For a skewed posterior (e.g., a Beta near the boundary), the HPD is asymmetric and strictly shorter than the equal-tailed interval.
+:::
+ 
+### 3.3 HPD for the Full Pilot: Is First-Gen Forward Working?
+ 
+Our posterior from the pilot is $\theta \mid x = 16 \sim \text{Be}(23, 7)$. It's unimodal and mildly left-skewed. Here's the 95% HPD:
+ 
+```{r, message=FALSE, warning=FALSE}
+# Posterior from Section 1
+alpha_post <- 23
+beta_post <- 7
+ 
+# Posterior summaries
+post_mean <- alpha_post / (alpha_post + beta_post)
+post_mode <- (alpha_post - 1) / (alpha_post + beta_post - 2)
+cat("Posterior mean:", round(post_mean, 4), "\n")
+cat("Posterior mode:", round(post_mode, 4), "\n")
+```
+ 
+```{r, message=FALSE, warning=FALSE}
+# Find 95% HPD for Beta(23, 7) using a grid search
+# The HPD is the shortest interval with 95% coverage
+find_hpd_beta <- function(alpha, beta, level = 0.95, n_grid = 10000) {
+  p_lower <- seq(0, 1 - level, length.out = n_grid)
+  p_upper <- p_lower + level
+  lower <- qbeta(p_lower, alpha, beta)
+  upper <- qbeta(p_upper, alpha, beta)
+  widths <- upper - lower
+  idx <- which.min(widths)
+  c(lower = lower[idx], upper = upper[idx])
+}
+ 
+hpd <- find_hpd_beta(alpha_post, beta_post)
+cat("95% HPD interval: [", round(hpd[1], 4), ",", round(hpd[2], 4), "]\n")
+ 
+# Compare with equal-tailed interval
+et_lower <- qbeta(0.025, alpha_post, beta_post)
+et_upper <- qbeta(0.975, alpha_post, beta_post)
+cat("95% equal-tailed interval: [", round(et_lower, 4), ",", round(et_upper, 4), "]\n")
+cat("HPD width:", round(hpd[2] - hpd[1], 4), "\n")
+cat("Equal-tailed width:", round(et_upper - et_lower, 4), "\n")
+```
+ 
+```{r, message=FALSE, warning=FALSE}
+theta <- seq(0.4, 1, length.out = 500)
+post_dens <- dbeta(theta, alpha_post, beta_post)
+ 
+ggplot(data.frame(theta, post_dens), aes(theta, post_dens)) +
+  geom_line(linewidth = 1.2, color = "#8B3A8B") +
+  geom_ribbon(data = subset(data.frame(theta, post_dens),
+                            theta >= hpd[1] & theta <= hpd[2]),
+              aes(ymin = 0, ymax = post_dens),
+              fill = "#8B3A8B", alpha = 0.2) +
+  geom_vline(xintercept = post_mode, lty = 2, color = "gray50") +
+  annotate("text", x = post_mode - 0.01, y = max(post_dens) * 0.95,
+           label = paste0("Mode = ", round(post_mode, 3)),
+           hjust = 1, size = 3.5, family = "serif") +
+  labs(title = "Posterior Distribution of First-Gen Forward Retention Rate",
+       subtitle = "95% HPD region shaded (16 of 20 retained)",
+       x = expression(theta ~ "(retention rate)"), y = "Posterior Density") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+ 
+So the message to the provost is: given the pilot and our prior, we're 95% sure the true retention rate is somewhere around $[0.61, 0.91]$. That's a wide interval, which is honest given that we have only 20 students.
+ 
+Now the policy question: *"Is the retention rate at least 80%?"*
+ 
+```{r, message=FALSE, warning=FALSE}
+# P(theta >= 0.80 | data)
+prob_ge_80 <- 1 - pbeta(0.80, alpha_post, beta_post)
+cat("P(theta >= 0.80 | data):", round(prob_ge_80, 4), "\n")
+cat("As a percentage:", round(prob_ge_80 * 100, 1), "%\n")
+```
+ 
+About a 40% posterior probability that retention meets the 80% target. Encouraging but far from conclusive --- a 20-student pilot just doesn't carry that much information. With next year's larger cohort, the posterior should sharpen up considerably.
+ 
+### 3.4 A Skewed Scenario: What If No One Dropped Out?
+ 
+For contrast, suppose the pilot had gone even better: all 20 students retained ($x = 20$). The posterior becomes:
+ 
+$$\theta \mid x = 20 \;\sim\; \text{Be}(7 + 20,\; 3 + 0) = \text{Be}(27, 3)$$
+ 
+$\text{Be}(27, 3)$ piles most of its mass near $\theta = 1$, so it's heavily right-skewed and the HPD comes out asymmetric:
+ 
+```{r, message=FALSE, warning=FALSE}
+# Scenario: all 20 retained
+alpha_post2 <- 7 + 20
+beta_post2 <- 3 + 0
+ 
+post_mean2 <- alpha_post2 / (alpha_post2 + beta_post2)
+post_mode2 <- (alpha_post2 - 1) / (alpha_post2 + beta_post2 - 2)
+ 
+hpd2 <- find_hpd_beta(alpha_post2, beta_post2)
+cat("Posterior: Be(", alpha_post2, ",", beta_post2, ")\n")
+cat("Posterior mean:", round(post_mean2, 4), "\n")
+cat("Posterior mode:", round(post_mode2, 4), "\n")
+cat("95% HPD: [", round(hpd2[1], 4), ",", round(hpd2[2], 4), "]\n")
+```
+ 
+```{r, message=FALSE, warning=FALSE}
+theta <- seq(0.5, 1, length.out = 500)
+post_dens2 <- dbeta(theta, alpha_post2, beta_post2)
+ 
+ggplot(data.frame(theta, post_dens2), aes(theta, post_dens2)) +
+  geom_line(linewidth = 1.2, color = "#2E8B57") +
+  geom_ribbon(data = subset(data.frame(theta, post_dens2),
+                            theta >= hpd2[1] & theta <= hpd2[2]),
+              aes(ymin = 0, ymax = post_dens2),
+              fill = "#2E8B57", alpha = 0.2) +
+  geom_vline(xintercept = 0.80, lty = 2, color = "red", linewidth = 0.8) +
+  annotate("text", x = 0.79, y = max(post_dens2) * 0.6,
+           label = "80% target", color = "red",
+           hjust = 1, size = 3.5, family = "serif") +
+  labs(title = "Posterior If All 20 Students Were Retained",
+       subtitle = "95% HPD region shaded",
+       x = expression(theta ~ "(retention rate)"), y = "Posterior Density") +
+  theme_classic(base_family = "serif") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+ 
+```{r, message=FALSE, warning=FALSE}
+# P(theta >= 0.80 | all 20 retained)
+prob_ge_80_v2 <- 1 - pbeta(0.80, alpha_post2, beta_post2)
+cat("P(theta >= 0.80 | all retained):", round(prob_ge_80_v2, 4), "\n")
+cat("As a percentage:", round(prob_ge_80_v2 * 100, 1), "%\n")
+```
+ 
+Now the posterior probability that retention beats 80% is around 93%. The provost can act on that with much more confidence. One nice feature of the Bayesian framing here: the answer isn't a yes/no significance verdict, it's a probability we can actually plug into a decision.
+ 
+::: {.callout-note}
+## Why the HPD Is Asymmetric Here
+When the posterior is squeezed up against $\theta = 1$, the HPD isn't centered on the mean. It stretches farther to the left (where density tapers off slowly) and not very far to the right (where it hits the boundary at 1). An equal-tailed interval would spend coverage on the thin left tail and cut off some of the dense region near 1. The HPD avoids that by always taking the highest-density chunk first.
+:::
+ 
+
+*This tutorial is based on UCLA [STATS C216: Applied Bayesian Social Statistics](https://handcock.github.io/teaching/c216/) taught by Prof [Mark Handcock](https://handcock.github.io/).*
