@@ -1,0 +1,544 @@
+---
+title: "Bayesian Methods Part 4: Regression with rstanarm --- From Logistic to Ordered Models"
+author: Shuhan (Alice) Ai
+date: "2026-05-23"
+categories: [Bayesian, R]
+format:
+  html:
+    toc: true
+    code-fold: false
+    self-contained: true
+image: "cover.png"
+execute:
+  warning: false
+  message: false
+---
+
+[Part 1](https://aliceaii.github.io/posts/bayesian1/) through [Part 3](https://aliceaii.github.io/posts/bayesian3/) we worked with one simple model the whole way: the Beta-Binomial. It was a friendly place to start because everything had a clean formula. The posterior was just another Beta distribution, and updating our beliefs came down to adding up counts. That was on purpose. With the math staying out of the way, we could focus on the idea itself: prior \times likelihood \rightarrow posterior, and then using that posterior to make predictions and build credible intervals.
+
+But that clean formula is a special case, and most real models don't get it. As soon as we move to regression --- where the outcome depends on several predictors at once through a nonlinear link --- the neat algebra goes away. Logistic regression has no clean formula for the posterior. So we fall back on the one thing we can always do: instead of solving for the posterior, we draw samples from it.
+
+That's what this post is about: how to actually run a Bayesian regression when there's no formula to lean on. We'll do it with Markov Chain Monte Carlo (MCMC) through the rstanarm package. It fits the same kinds of regression models we already know (the syntax looks just like glm), but instead of handing back a single best estimate for each coefficient, it gives you a full distribution of plausible values. Along the way, we'll explore four ideas that the simple Beta-Binomial model couldn't show us:
+
+- **Building and comparing models** with weakly informative priors and leave-one-out cross-validation.
+- **Encoding a substantive prior belief** and watching the posterior land between prior and data.
+- **Rescuing a broken likelihood** --- the case where the classical MLE runs off to infinity and a prior quietly saves it.
+- **Going beyond binary outcomes** with probit links and ordered (multinomial) regression.
+
+Our running example is the **American National Election Study (NES)**, a long-running survey of U.S. voters. We'll use a few different election years to predict how people voted and which party they identified with, based on their background and political views.
+
+
+## Setup: The NES Data
+
+```{r setup}
+library(foreign)    # read .dta
+library(rstanarm)   # Bayesian GLMs via MCMC (Stan)
+library(bayesplot)
+library(loo)        # leave-one-out cross-validation
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+options(mc.cores = 4)
+theme_set(bayesplot::theme_default(base_size = 11))
+```
+
+```{r read-data}
+base <- "https://faculty.stat.ucla.edu/handcock/216/examples/nes/"
+nes_raw <- read.dta(paste0(base, "nes5200_processed_voters_realideo.dta"),
+                    convert.factors = FALSE)
+
+# Drop third-party candidates; recode presvote as 1 = Republican, 0 = Democrat
+Nes.red <- nes_raw[nes_raw$presvote < 3, ]
+Nes.red$presvote <- ifelse(Nes.red$presvote == 2, 1, 0)
+
+dim(Nes.red)
+table(Nes.red$presvote, useNA = "ifany")
+```
+
+A quick codebook for the variables we'll lean on:
+
+| Variable    | Coding                                                                 |
+|-------------|------------------------------------------------------------------------|
+| `presvote`  | 1 = Republican, 0 = Democrat                                           |
+| `female`    | 1 = female, 0 = male                                                    |
+| `black`     | 1 = Black, 0 = non-Black                                                |
+| `educ3`     | 1 ($\leq$ 8 grades) ... 7 (advanced degree)                             |
+| `income`    | 1 (lowest quintile) ... 5 (highest quintile)                            |
+| `partyid7`  | 1 (Strong Democrat) ... 7 (Strong Republican)                           |
+| `real_ideo` | 1 (Extremely liberal) ... 7 (Extremely conservative)                    |
+| `ideo_feel` | Liberal--conservative thermometer (0--100)                              |
+| `age`       | Respondent's age in years                                               |
+
+## 1. Meet `rstanarm`
+
+`rstanarm` lets us fit Bayesian versions of familiar regression models with almost the same code we'd use for `glm`. Where we would write `glm(y ~ x, family = binomial)`, we write `stan_glm(y ~ x, family = binomial)` --- same formula, same `family`, same `data`. The difference is: instead of maximizing the likelihood down to a single point estimate, `rstanarm` hands the model to **Stan**, which runs MCMC to draw thousands of samples from the full posterior. Every coefficient comes back as a distribution, not a number plus a standard error.
+
+The functions we'll lean on:
+
+| Function | What it does |
+|:--|:--|
+| `stan_glm()` | Bayesian GLMs --- logistic and probit regression here |
+| `stan_polr()` | Bayesian ordered logistic regression (Section 6) |
+| `prior_summary()` | reports the priors a model actually used |
+| `posterior_epred()` | posterior draws of the fitted probabilities |
+| `pp_check()` | posterior predictive checks |
+| `loo()`, `loo_compare()` | leave-one-out cross-validation for model comparison |
+
+Two conventions appear in every fit below: `seed` makes the MCMC reproducible, and `refresh = 0` silences the sampler's progress output. After fitting, `as.matrix(model)` pulls the draws out as a matrix --- one column per parameter, one row per draw --- which is how we compute medians, intervals, and densities by hand throughout.
+
+::: {.callout-note}
+## What "weakly informative" actually means
+By default, `stan_glm` puts an independent Normal prior, centered at 0, on each coefficient --- roughly $\mathcal{N}(0,\ 2.5)$ on the log-odds scale once the predictor is rescaled. The point of the scale is to be wide enough to let the data lead, but narrow enough to rule out the absurd.
+
+Here is why $2.5$ counts as "weak" rather than "uninformative." On the log-odds scale, a coefficient of $2.5$ already means a one-unit change in the predictor multiplies the odds by $e^{2.5} \approx 12$. A coefficient of $10$ would mean a multiplier of $e^{10} \approx 22{,}000$ --- an effect that essentially never shows up in real social data. The $\mathcal{N}(0, 2.5)$ prior places almost no probability that far out, so it quietly says *"implausibly huge effects are off the table"* while staying agnostic about every reasonable value in between.
+
+That gentle nudge is usually invisible when the data are rich, but it does two useful jobs: it keeps the sampler stable, and (as we'll see in Section 4) it rescues a fit where a perfectly flat prior would let a coefficient run off to infinity. When we genuinely know more (Section 3), we can swap in a tighter, informative prior; `prior_summary()` always reports what a model actually used.
+:::
+
+## 2. Bayesian Logistic Regression: The 1992 Presidential Vote
+
+### 2.1 Why We Can't Just Update Two Numbers Anymore
+
+In the Beta-Binomial world, a single probability $\theta$ governed everything, and the prior was conjugate. In a logistic regression, the probability of voting Republican depends on a respondent's age, race, income, ideology, and so on:
+
+$$\Pr(\text{vote}_i = 1) = \text{logit}^{-1}(\beta_0 + \beta_1 x_{i1} + \cdots + \beta_k x_{ik})$$
+
+The parameters are now a whole vector $\boldsymbol\beta$, and the Bernoulli likelihood combined with any sensible prior on $\boldsymbol\beta$ gives a posterior with no closed form. There is no "add the counts" shortcut. Instead, MCMC explores the posterior by simulating a Markov chain whose stationary distribution is the posterior, and we summarize the draws. We can use `stan_glm`.
+
+```{r nes92}
+nes92 <- Nes.red %>%
+  filter(year == 1992) %>%
+  select(presvote, female, black, age, income, educ3,
+         partyid7, real_ideo, ideo_feel) %>%
+  na.omit()
+
+nrow(nes92)
+```
+
+### 2.2 A Classical Baseline
+
+It helps to anchor on the familiar `glm` first, so we can see what the Bayesian version adds (and, later, where it breaks).
+
+```{r classical}
+fit_classical <- glm(presvote ~ age + black + income + real_ideo + income:real_ideo,
+                     family = binomial(link = "logit"), data = nes92)
+summary(fit_classical)
+```
+
+### 2.3 Three Bayesian Models
+
+We fit a short sequence of models, from the classical specification to a richer one. The default `rstanarm` priors are weakly informative Normals on the coefficients --- gentle enough to let the data speak, strong enough to keep things stable.
+
+```{r m1}
+# Model 1: the classical specification, refit the Bayesian way
+m1 <- stan_glm(presvote ~ age + black + income + real_ideo + income:real_ideo,
+               family = binomial(link = "logit"),
+               data = nes92, seed = 215, refresh = 0)
+```
+
+```{r m2}
+# Model 2: add party ID, gender, education, and the ideology thermometer
+m2 <- stan_glm(presvote ~ female + black + age + income + educ3 +
+                          real_ideo + partyid7 + ideo_feel,
+               family = binomial(link = "logit"),
+               data = nes92, seed = 215, refresh = 0)
+summary(m2, digits = 3)
+```
+
+```{r m3}
+# Model 3: Model 2 plus an income x ideology interaction
+m3 <- stan_glm(presvote ~ female + black + age + income + educ3 +
+                          real_ideo + partyid7 + ideo_feel + income:real_ideo,
+               family = binomial(link = "logit"),
+               data = nes92, seed = 215, refresh = 0)
+summary(m3, digits = 3)
+```
+
+### 2.4 Checking the Fit
+
+Before comparing models, we should check that the MCMC actually converged and that the model reproduces the data. The `summary` output reports $\hat{R}$ (should be very close to 1) and effective sample sizes (want these in the hundreds or thousands). A posterior predictive check overlays simulated outcome counts on the observed counts:
+
+```{r ppcheck}
+pp_check(m2, plotfun = "bars", nreps = 50) +
+  ggtitle("Posterior predictive check: Model 2")
+```
+
+```{r coefplot}
+plot(m2, prob = 0.95) +
+  ggtitle("Model 2 coefficients with 95% intervals")
+```
+
+A coefficient whose interval clears zero is one the data can speak to with confidence; an interval straddling zero means we can't distinguish its effect from nothing.
+
+### 2.5 Comparing Models: AIC, BIC, and LOO
+
+How do we decide which of the three models to keep? The classical tools are the information criteria. **AIC** and **BIC** both start from the maximized log-likelihood and subtract a penalty for the number of parameters; for both, *lower is better*. We can compute them from ordinary `glm` fits of the same three specifications:
+
+```{r aic-bic}
+# Classical fits of the same three specifications, for AIC/BIC
+g1 <- glm(presvote ~ age + black + income + real_ideo + income:real_ideo,
+          family = binomial, data = nes92)
+g2 <- glm(presvote ~ female + black + age + income + educ3 +
+                     real_ideo + partyid7 + ideo_feel,
+          family = binomial, data = nes92)
+g3 <- glm(presvote ~ female + black + age + income + educ3 +
+                     real_ideo + partyid7 + ideo_feel + income:real_ideo,
+          family = binomial, data = nes92)
+
+ic_table <- data.frame(
+  Model = c("Model 1", "Model 2", "Model 3"),
+  AIC   = c(AIC(g1), AIC(g2), AIC(g3)),
+  BIC   = c(BIC(g1), BIC(g2), BIC(g3))
+)
+kable(ic_table, digits = 1,
+      caption = "Classical information criteria (lower is better)")
+```
+
+The Bayesian counterpart is **leave-one-out cross-validation (LOO)**, which estimates how well each model would predict a held-out observation. The package reports `elpd_loo`, the expected log predictive density. *Higher is better* and `loo_compare` ranks the models and gives each difference together with its standard error.
+
+```{r loo}
+loo1 <- loo(m1)
+loo2 <- loo(m2)
+loo3 <- loo(m3)
+
+loo_compare(loo1, loo2, loo3)
+```
+
+::: {.callout-tip}
+## How to read a LOO comparison
+`loo_compare` puts the best model at the top with a difference of 0, and reports every other model as a (negative) `elpd_diff` relative to it, alongside `se_diff`. A difference that is large compared to its standard error (say, several times bigger) is real predictive evidence; a difference smaller than its own standard error is noise. So the rule of thumb is to look at `elpd_diff / se_diff`, not the raw gap.
+:::
+
+::: {.callout-note}
+## What is `elpd`, and why prefer it to AIC/BIC?
+
+$$
+\text{elpd}_{loo}
+=
+\sum_{i=1}^{n}
+\log p(y_i \mid y_{-i})
+$$
+
+$$
+AIC = -2\log L + 2k
+$$
+
+$$
+BIC = -2\log L + k\log n
+$$
+
+where:
+
+- \(L\) = maximized likelihood
+- \(k\) = number of parameters
+- \(n\) = sample size
+All three numbers are after the same thing --- *how well will this model predict new data?* --- but they get there differently.
+
+AIC and BIC start from the **maximized** log-likelihood (a single best-fit point) and then subtract a complexity penalty: AIC subtracts the number of parameters $k$, BIC subtracts $\tfrac{1}{2}k\log n$. That penalty is a stand-in for overfitting, derived under asymptotic assumptions, and it depends on *counting parameters*, which gets awkward the moment a model has priors, hierarchical structure, or partial pooling, where the effective number of parameters isn't even well defined.
+
+`elpd` (expected log predictive density) skips the asymptotics and estimates predictive accuracy more directly. Leave-one-out cross-validation asks, for each observation in turn, "how probable is this point under the posterior fit to all the *other* points?", then sums the logs of those probabilities. Three advantages follow:
+
+- It uses the **whole posterior**, not just its maximum, so it naturally accounts for parameter uncertainty and the regularizing pull of the prior, instead of penalizing a point estimate after the fact.
+- It needs **no parameter count**. Effective complexity falls out of the cross-validation itself, exactly what we want for Bayesian and hierarchical models.
+- It comes with an **standard error** (`se_diff`), so we can tell a real difference from noise. A raw AIC or BIC gap gives us no comparable measure of its own uncertainty.
+
+In practice the three often agree, as they do for these 1992 models. When they disagree, it is usually because the model has priors or structure that break AIC/BIC's parameter-counting assumption --- and that is precisely when `elpd` is the one to trust.
+:::
+
+**Interpretation:**
+In 1992, tall three model comparison criteria point to Model 2 as the best-performing model. It clearly improves predictive performance over the simpler classical specification, while the additional income*ideology interaction in Model 3 contributes little meaningful improvement.
+
+Substantively, party identification and ideology emerge as the strongest predictors, with race also playing an important role. By contrast, most demographic variables, including income, add relatively little explanatory power once party ID and the ideology thermometer are included in the model. This finding becomes especially important in the next section, where the classical baseline initially suggested that income was influential. A Bayesian perspective helps reveal how dependent that conclusion is on the modeling assumptions.
+
+## 3. Encoding a Prior Belief: Income's Coefficient
+
+Suppose a colleague argues that, conditional on the other predictors, income shouldn't matter for vote choice at all, and that they're confident enough to pin the income coefficient near zero, give or take about one standard deviation. Now we need to give that one coefficient an informative prior centered at zero, and leave the rest weakly informative.
+
+$$\beta_{\text{income}} \sim \mathcal{N}(0,\; \text{SD}), \qquad \text{everything else} \sim \mathcal{N}(0,\; 2.5)$$
+
+We'll set the prior's scale equal to the data-only posterior SD of income (from Model 2), so the prior and the data carry comparable weight.
+
+```{r informative-prior}
+# Posterior SD of income from the data-only fit (Model 2)
+sd_income <- sd(as.matrix(m2)[, "income"])
+
+# Coefficient order in m2: female, black, age, income, educ3, real_ideo, partyid7, ideo_feel
+prior_loc   <- rep(0, 8)
+prior_scale <- c(2.5, 2.5, 2.5, sd_income, 2.5, 2.5, 2.5, 2.5)
+
+m_inf <- stan_glm(presvote ~ female + black + age + income + educ3 +
+                            real_ideo + partyid7 + ideo_feel,
+                  family = binomial(link = "logit"),
+                  data = nes92,
+                  prior = normal(location = prior_loc, scale = prior_scale,
+                                 autoscale = FALSE),
+                  seed = 215, refresh = 0)
+```
+
+```{r compare-income}
+post_m2  <- as.matrix(m2)[, "income"]
+post_inf <- as.matrix(m_inf)[, "income"]
+
+cmp_income <- data.frame(
+  Model   = c("Default (m2)", "Informative (m_inf)"),
+  Median  = c(median(post_m2),  median(post_inf)),
+  SD      = c(sd(post_m2),      sd(post_inf)),
+  CI_2.5  = c(quantile(post_m2, 0.025), quantile(post_inf, 0.025)),
+  CI_97.5 = c(quantile(post_m2, 0.975), quantile(post_inf, 0.975))
+)
+kable(cmp_income, digits = 3, row.names = FALSE,
+      caption = "Income coefficient: weakly-informative vs. informative prior")
+```
+
+```{r income-density, fig.height=3.2}
+inc_df <- data.frame(
+  value = c(post_m2, post_inf),
+  Model = rep(c("Default (m2)", "Informative (m_inf)"), each = length(post_m2))
+)
+
+ggplot(inc_df, aes(x = value, fill = Model)) +
+  geom_density(alpha = 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Posterior of the income coefficient",
+       subtitle = "weakly-informative vs. informative prior",
+       x = "Income coefficient (log-odds scale)", y = "Density")
+```
+
+::: {.callout-note}
+## Intuition: the posterior is a precision-weighted average
+With a Normal prior and an approximately Normal likelihood, the posterior precision (one over the variance) is just the sum of the two precisions,
+
+$$\tau_{\text{post}} = \tau_{\text{prior}} + \tau_{\text{data}},$$
+
+and the posterior mean is the precision-weighted average of the prior mean and the data estimate,
+
+$$\mu_{\text{post}} = \frac{\tau_{\text{prior}}\cdot 0 + \tau_{\text{data}}\cdot \hat\beta_{\text{data}}}{\tau_{\text{prior}} + \tau_{\text{data}}}.$$
+
+This is the same compromise we saw in Part 3 with the Beta-Binomial, just in Gaussian dress. When we set the prior SD equal to the data SD, the two precisions are equal, so the posterior mean lands roughly halfway between the prior's zero and the data estimate, and the posterior SD shrinks by a factor of about $1/\sqrt{2}$. Adding a prior adds information, so the posterior tightens.
+:::
+
+The verdict doesn't change. In both fits the credible interval for income comfortably contains zero, and every other coefficient is essentially untouched --- the informative prior acts locally, on the parameter it targets, and leaves the rest of the model alone. Here the prior and the data happen to agree (both say "income is near zero"), so the prior simply sharpens a conclusion the data were already pointing to rather than overturning anything. 
+
+## 4. When the Likelihood Breaks: Separation in 1964
+
+Switch to the 1964 election and try to predict the vote from gender, race, and income with an ordinary `glm`:
+
+```{r nes64}
+nes64 <- Nes.red %>%
+  filter(year == 1964) %>%
+  select(presvote, female, black, income) %>%
+  na.omit()
+
+fit64_freq <- glm(presvote ~ female + black + income,
+                  family = binomial(link = "logit"), data = nes64)
+summary(fit64_freq)
+```
+
+The coefficient on `black` comes back enormous and negative, with a standard error so large it's clearly meaningless. This isn't a bug --- it's **separation**. When a predictor perfectly (or nearly perfectly) predicts the outcome, the likelihood has no finite maximum: pushing the coefficient further out always makes the data look a little more probable, so the MLE marches off toward infinity and the standard error explodes with it.
+
+A quick cross-tabulation shows what happened:
+
+```{r separation}
+tab_race <- table(black = nes64$black, presvote = nes64$presvote)
+tab_race
+
+cat("\nP(Republican | Black)     =",
+    round(tab_race["1", "1"] / sum(tab_race["1", ]), 4), "\n")
+cat("P(Republican | non-Black) =",
+    round(tab_race["0", "1"] / sum(tab_race["0", ]), 4), "\n")
+```
+
+In this sample, every Black respondent voted Democratic. There's no value of the coefficient that "best" fits a probability of zero, the likelihood just keeps rewarding more extreme estimates.
+
+A weakly informative prior fixes this without any special-casing. By placing gentle probability mass near zero, the prior gives the posterior a finite mode even where the likelihood alone has none:
+
+```{r bayes64}
+fit64_bayes <- stan_glm(presvote ~ female + black + income,
+                        family = binomial(link = "logit"),
+                        data = nes64, seed = 215, refresh = 0)
+summary(fit64_bayes, digits = 3)
+```
+
+```{r compare64}
+classical <- summary(fit64_freq)$coefficients[, c("Estimate", "Std. Error")]
+post_64   <- as.matrix(fit64_bayes)
+
+bayes_summary <- t(apply(post_64[, rownames(classical)], 2, function(x) {
+  c(median = median(x), sd = sd(x),
+    lower = quantile(x, 0.025), upper = quantile(x, 0.975))
+}))
+
+cmp_64 <- data.frame(
+  Variable     = rownames(classical),
+  GLM_Estimate = classical[, "Estimate"],
+  GLM_SE       = classical[, "Std. Error"],
+  Bayes_Median = bayes_summary[, "median"],
+  Bayes_SD     = bayes_summary[, "sd"]
+)
+kable(cmp_64, digits = 3, row.names = FALSE,
+      col.names = c("Variable", "GLM est.", "GLM SE", "Bayes median", "Bayes SD"),
+      caption = "1964 NES: classical GLM vs. Bayesian fit")
+```
+
+::: {.callout-important}
+## The prior acts surgically
+Notice that the prior only does heavy lifting where the data can't. The `black` coefficient moves from -16.829 estimate to -8.505	, while `female` and `income`, which the data identify well, barely change. This is an illustration of Bayesian regularization: the prior rescues the parameter the likelihood couldn't pin down, and stays out of the way everywhere else.
+:::
+
+
+## 5. Logit vs. Probit
+
+Logistic regression uses the logit link; probit regression uses the inverse Normal CDF instead. 
+
+Both models predict a binary outcome by passing a linear predictor $\eta_i = \mathbf{x}_i^\top \boldsymbol\beta$ through a function that squashes it into a probability. They differ only in which squashing function they use. The **logit** link uses the logistic CDF,
+
+$$\Pr(y_i = 1) = \operatorname{logit}^{-1}(\eta_i) = \frac{e^{\eta_i}}{1 + e^{\eta_i}} = \frac{1}{1 + e^{-\eta_i}},$$
+
+while the **probit** link uses the standard Normal CDF $\Phi(\cdot)$,
+
+$$\Pr(y_i = 1) = \Phi(\eta_i) = \int_{-\infty}^{\eta_i} \frac{1}{\sqrt{2\pi}} e^{-t^2/2}\, dt.$$
+
+Equivalently, on the link scale,
+
+$$\underbrace{\log\!\frac{p_i}{1 - p_i} = \eta_i}_{\text{logit}}, \qquad \underbrace{\Phi^{-1}(p_i) = \eta_i}_{\text{probit}}.$$
+
+Practitioners sometimes worry about which to pick. Let's refit our 1992 Model 2 with a probit link and compare.
+
+```{r probit}
+m2_probit <- stan_glm(presvote ~ female + black + age + income + educ3 +
+                                 real_ideo + partyid7 + ideo_feel,
+                      family = binomial(link = "probit"),
+                      data = nes92,
+                      QR = TRUE,       # orthogonalize the design matrix for stability
+                      init_r = 0.5,
+                      seed = 215, refresh = 0)
+```
+
+```{r link-compare}
+post_logit  <- as.matrix(m2)
+post_probit <- as.matrix(m2_probit)
+common_pars <- intersect(colnames(post_logit), colnames(post_probit))
+
+cmp_links <- data.frame(
+  Variable = common_pars,
+  Logit    = apply(post_logit[,  common_pars], 2, median),
+  Probit   = apply(post_probit[, common_pars], 2, median),
+  Ratio    = apply(post_logit[,  common_pars], 2, median) /
+             apply(post_probit[, common_pars], 2, median)
+)
+kable(cmp_links, digits = 3, row.names = FALSE,
+      col.names = c("Variable", "Logit median", "Probit median", "Ratio"),
+      caption = "Posterior medians: logit vs. probit")
+```
+
+```{r fitted-compare, fig.height=3.4}
+p_logit  <- colMeans(posterior_epred(m2))
+p_probit <- colMeans(posterior_epred(m2_probit))
+
+ggplot(data.frame(p_logit, p_probit), aes(p_logit, p_probit)) +
+  geom_abline(slope = 1, intercept = 0, linetype = 2, color = "gray") +
+  geom_point(alpha = 0.3, size = 0.8) +
+  labs(x = "Pr(Republican) -- logit", y = "Pr(Republican) -- probit",
+       title = "Fitted probabilities: logit vs. probit")
+```
+
+```{r loo-link}
+loo_compare(loo(m2), loo(m2_probit))
+```
+
+The two fits are the same model in different units. The ratio of logit to probit coefficients clusters around the theoretical constant $\pi/\sqrt{3} \approx 1.81$ (the ratio of the logistic to the Normal scale), the fitted probabilities fall almost exactly on the 45-degree line, and LOO sees no predictive difference worth mentioning. The choice between logit and probit is mostly a matter of convention and interpretability, not fit.
+
+::: {.callout-note}
+## Where the $\pi/\sqrt{3}$ factor comes from
+Both links arise from the same **latent-variable** story. Imagine an unobserved continuous "propensity to vote Republican,"
+
+$$y_i^{*} = \mathbf{x}_i^\top \boldsymbol\beta + \varepsilon_i, \qquad y_i = \mathbf{1}(y_i^{*} > 0),$$
+
+so the vote is 1 whenever the propensity crosses zero. The only difference between the two models is the assumed distribution of the noise $\varepsilon_i$:
+
+$$\varepsilon_i \sim \text{Logistic}(0, 1) \;\Rightarrow\; \text{logit}, \qquad \varepsilon_i \sim \mathcal{N}(0, 1) \;\Rightarrow\; \text{probit}.$$
+
+Those two error distributions have different spreads. The standard logistic distribution has variance
+
+$$\operatorname{Var}(\varepsilon) = \frac{\pi^2}{3} \approx 3.29 \quad\Longrightarrow\quad \text{SD} = \frac{\pi}{\sqrt{3}} \approx 1.81,$$
+
+whereas the standard Normal has variance $1$. Because the coefficients are only identified up to the scale of the error term, the logit coefficients are inflated by exactly that ratio:
+
+$$\boldsymbol\beta_{\text{logit}} \;\approx\; \frac{\pi}{\sqrt{3}}\, \boldsymbol\beta_{\text{probit}} \;\approx\; 1.81\,\boldsymbol\beta_{\text{probit}}.$$
+
+So the two models aren't really competing descriptions of the data --- they're the same fit measured in different units.
+:::
+
+## 6. Beyond Binary: Ordered Logit for Party ID
+
+Vote choice was binary, but `partyid7` is an *ordered* seven-point scale from Strong Democrat to Strong Republican. We could lump it into two categories, but that throws away the ordering. The proportional-odds (ordered logit) model keeps it: it posits a latent "Republican-ness" score, and a set of increasing cutpoints that slice that score into the seven observed categories. We'll model it from demographics and ideology in the 2000 election.
+
+```{r nes00}
+nes00 <- Nes.red %>%
+  filter(year == 2000) %>%
+  select(partyid7, female, black, age, income, educ3, real_ideo) %>%
+  na.omit() %>%
+  mutate(partyid7 = factor(partyid7, ordered = TRUE, levels = 1:7,
+                           labels = c("StrDem", "WkDem", "LnDem", "Ind",
+                                      "LnRep", "WkRep", "StrRep")))
+table(nes00$partyid7)
+```
+
+```{r polr}
+m_polr <- stan_polr(partyid7 ~ female + black + age + income + educ3 + real_ideo,
+                    data = nes00,
+                    prior = R2(location = 0.3, what = "mean"),
+                    seed = 215, refresh = 0)
+summary(m_polr, digits = 3)
+```
+
+```{r polr-coef}
+post_polr <- as.matrix(m_polr)
+coef_pars <- c("female", "black", "age", "income", "educ3", "real_ideo")
+
+polr_summary <- t(apply(post_polr[, coef_pars], 2, function(x) {
+  c(median = median(x), sd = sd(x),
+    lower = quantile(x, 0.025), upper = quantile(x, 0.975))
+}))
+kable(polr_summary, digits = 3,
+      col.names = c("Median", "SD", "2.5%", "97.5%"),
+      caption = "Ordered logit coefficients: 2000 NES partyid7")
+```
+
+```{r polr-plot}
+plot(m_polr) + ggtitle("Ordered logit coefficients with intervals")
+```
+
+::: {.callout-tip}
+## Reading proportional-odds coefficients
+In an ordered logit, a positive coefficient means that raising the predictor shifts probability mass toward *higher* categories. Here, toward the Republican end. Each coefficient $\beta$ says that a one-unit increase in the predictor multiplies the *cumulative odds* of being at or above any given category by $\exp(\beta)$, and the proportional-odds assumption is that this same multiplier applies at every cutpoint. So a coefficient of $0.8$ means roughly $e^{0.8} \approx 2.2\times$ the cumulative odds per one-point step --- and steps compound, so moving across the full range of a 7-point predictor multiplies the odds by $e^{6\beta}$.
+:::
+
+The cutpoints themselves are worth a look, since they tell us how the latent scale maps onto the observed categories:
+
+```{r cutpoints}
+cut_names <- grep("\\|", colnames(post_polr), value = TRUE)
+cutpoint_summary <- t(apply(post_polr[, cut_names], 2, function(x) {
+  c(median = median(x), lower = quantile(x, 0.025), upper = quantile(x, 0.975))
+}))
+kable(cutpoint_summary, digits = 3,
+      col.names = c("Median", "2.5%", "97.5%"),
+      caption = "Cutpoints between adjacent partyid7 categories")
+```
+
+The cutpoints are strictly increasing, as a well-posed ordered model requires. Where two adjacent cutpoints sit unusually close together, it signals a thin category, a level the latent score passes through quickly, which is what we'd expect for "Independent" in a polarized electorate.
+
+Finally, the same posterior predictive check we used for the binary models works here, now across all seven categories:
+
+```{r polr-ppcheck}
+pp_check(m_polr, plotfun = "bars", nreps = 50) +
+  ggtitle("Posterior predictive check: ordered logit (2000 partyid7)")
+```
+
+Substantively, ideology and race are the dominant drivers of party identification, income adds a modest positive pull toward the Republican end, and gender and education carry little independent signal once the rest is controlled for.
+
+*This tutorial is based on UCLA [STATS C216: Applied Bayesian Social Statistics](https://handcock.github.io/teaching/c216/) taught by Prof [Mark Handcock](https://handcock.github.io/).*
+
+
