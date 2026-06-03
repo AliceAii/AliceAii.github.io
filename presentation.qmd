@@ -17,6 +17,9 @@ format:
 
 ### 2026
 
+**Ai, S. **(2026). *Shortcut or Stepping-Stone? AI-Assisted Coursework and STEM Graduate Aspirations Among U.S. STEM Undergraduates.* Paper Presentation at UCLA School of Education & Information Studies, Los Angeles, CA. [<a href="slides/2026.06RAC_AIGradegasp.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
+
+
 Eagan, K., & **Ai, S.** (2026). *BUILDing STEM Futures: The Role of Undergraduate Research and Mentorship in Developing Graduate Degree Aspirations.* Paper presentation at the annual meeting of the American Education Research Association (AERA), Division J: Postsecondary Education, Los Angeles, CA.
 [<a href="slides/2026AERA_BUILDstemGradasp.pdf" class="slides-btn"> [Slides]</a>]{style="white-space: nowrap;"}
 
