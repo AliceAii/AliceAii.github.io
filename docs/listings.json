@@ -2,6 +2,7 @@
   {
     "listing": "/blog_posts.html",
     "items": [
+      "/posts/bayesianfp/index.html",
       "/posts/bayesian5/index.html",
       "/posts/bayesian4/index.html",
       "/posts/bayesian3/index.html",

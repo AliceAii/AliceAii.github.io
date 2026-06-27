@@ -1,0 +1,618 @@
+---
+title: "Bayesian Methods Research Project: Can Community Service Foster Social Agency Among STEM Students?"
+author: "Shuhan (Alice) Ai"
+date: "2026-06-27"
+categories: [Bayesian, R]
+format:
+  html:
+    toc: true
+    toc-title: Contents
+    toc-depth: 3
+    code-fold: false
+    embed-resources: true
+image: "cover.png"
+execute:
+  warning: false
+  message: false
+  eval: false
+---
+
+This post shares my STATS C216 final project, where I used Bayesian regression models to examine whether community service participation during college is associated with STEM students' social agency by senior year.
+
+The central question was:
+
+> Can community service help cultivate STEM students' commitment and capacity to work for social change?
+
+The full paper is embedded below, followed by a brief project summary and a link to the analysis code.
+
+<embed src="STATS-c216-fp-AliceAi.pdf" style="width:100%" height="1000">
+
+
+## Project Overview
+
+The project uses longitudinal survey data from the Higher Education Research Institute's 2021 Freshman Survey and 2025 College Senior Survey, linked with institutional indicators from IPEDS. The analytic sample includes **5,715 STEM-aspiring undergraduates nested within 53 institutions**.
+
+The outcome is senior-year **social agency**, an IRT-scored HERI construct capturing students' belief in their personal capacity to contribute to social change. The focal predictor is whether students frequently participated in **community service work** during college.
+
+I fit a sequence of Bayesian models using `rstanarm`, varying four dimensions of the analysis:
+
+- linear versus additive functional form;
+- single-level versus institution-random-intercept models;
+- default weakly informative priors versus regularized horseshoe priors;
+- main-effects models versus demographic-interaction models.
+
+The goal was not only to estimate one coefficient, but to ask whether the community-service association was robust across plausible Bayesian specifications.
+
+
+## Research Questions
+
+The project was guided by four questions:
+
+1. After adjusting for student background, pre-college STEM exposure, baseline social agency, aspirations, and institutional context, what is the posterior association between frequent community service and senior-year social agency among STEM students?
+2. Which student- and institution-level characteristics show the strongest credible associations with senior-year social agency?
+3. Does the community-service association vary by gender, race/ethnicity, or first-generation status under a regularized horseshoe prior?
+4. Across eight Bayesian specifications, which model offers the best out-of-sample predictive performance under PSIS-LOO cross-validation?
+
+
+## Main Finding
+
+The headline result was consistent across specifications: **frequent community service was credibly and positively associated with senior-year social agency**.
+
+In the preferred model, a mixed model with an institution-level random intercept and regularized horseshoe prior, frequent community service was associated with approximately a **0.41 SD increase** in social agency:
+
+$$
+\hat\beta_{\text{community service}} = 0.409,
+\qquad
+95\% \text{ CrI } [0.356,\ 0.465].
+$$
+
+This association was slightly larger than the coefficient for baseline social agency measured at college entry, suggesting that what students do during college may matter nearly as much as the dispositions they bring with them.
+
+By contrast, frequent volunteering did **not** show a credible association. This distinction suggests that structured community service may be qualitatively different from more general or episodic volunteering.
+
+
+## What the Bayesian Workflow Added
+
+The Bayesian framework was useful in four ways.
+
+First, it provided full posterior uncertainty for the community-service association rather than a single point estimate plus a standard error.
+
+Second, the regularized horseshoe prior helped separate signal from noise across a large covariate set. It shrank weak predictors toward zero while leaving the strongest associations, especially community service and baseline social agency, essentially unpenalized.
+
+Third, PSIS-LOO cross-validation made it possible to compare model families on expected out-of-sample predictive performance. The best-performing models were the mixed models with institution random intercepts; the additive smooths contributed little and sometimes overfit.
+
+Fourth, posterior predictive checks made the outcome-modeling problem visible. The original social-agency score had a ceiling artifact, so I applied a small jitter to values near the maximum before fitting Gaussian models.
+
+
+## Model Comparison
+
+The mixed model with default priors had the highest expected log predictive density, but the mixed model with the horseshoe prior was statistically indistinguishable from it:
+
+| Model | Structure | Prior | Interpretation |
+|---|---|---|---|
+| M3 | Linear + institution random intercept | Default normal | Best raw LOO performance |
+| M7 | Linear + institution random intercept | Regularized horseshoe | Nearly identical predictive performance, cleaner interpretation |
+| M8 | M7 + demographic interactions | Regularized horseshoe | No credible moderation by gender, race, or first-generation status |
+
+I used M7 as the preferred interpretive model because it preserved the predictive performance of M3 while using the horseshoe prior to regularize a large set of covariates.
+
+
+## Main Takeaways
+
+Several findings stood out:
+
+- Frequent community service was robustly associated with higher senior-year social agency.
+- Frequent volunteering was not credibly associated with social agency after adjustment.
+- Baseline social agency was the strongest non-treatment predictor.
+- Genderqueer/gender-nonconforming, Latino, and Black students showed credibly higher social agency than their reference groups.
+- Engineering and mathematics/computer science students showed lower social agency than biological and life sciences students.
+- The community-service association did not vary credibly by gender, race/ethnicity, or first-generation status.
+
+The institutional random intercept improved prediction modestly, but the remaining between-institution variance was small. Social agency appeared to be primarily an individual-level outcome in this sample.
+
+
+## Reproducibility
+
+The analysis was conducted in R using `rstanarm`, `loo`, `bayesplot`, `tidybayes`, and `posterior`.
+
+The source analysis is available here:
+
+Models (all fit with `rstanarm`: `stan_glm` / `stan_glmer` / `stan_gamm4`). Set A uses default weakly informative priors; Set B replaces them with a regularized horseshoe on parametric coefficients (smooth-term priors unchanged).
+
+- **Set A — default priors**
+  - M1 Linear: y \~ comserv_freq + covariates
+  - M2 Additive: y \~ comserv_freq + s(continuous...) + remaining covariates
+  - M3 Mixed: y \~ comserv_freq + covariates + (1 \| UNITID)
+  - M4 Additive mixed: y \~ comserv_freq + s(continuous...) + covariates + (1 \| UNITID)
+- **Set B — sparsity (regularized horseshoe) priors**
+  - M5 Linear + HS
+  - M6 Additive + HS (smooths unshrunk)
+  - M7 Mixed + HS
+- **Set C — interactions under sparsity prior**
+  - M8 Mixed + HS + comserv_freq × {gender, race, firstgen.b}
+
+Outcome: `socagency.sd_smooth` (jittered to remove the IRT ceiling spike — see Data Preparation).
+
+# Setup
+
+```r
+library(tidyverse)
+library(rstanarm)    # Bayesian regression (course's main package)
+library(loo)         # LOO / WAIC model comparison
+library(bayesplot)   # posterior predictive checks, diagnostics
+library(tidybayes)   # tidy posterior summaries
+library(posterior)   # as_draws / summarise_draws for diagnostics
+library(knitr)
+library(dplyr)
+
+# Reproducibility + use all cores for the 4 MCMC chains
+options(mc.cores = parallel::detectCores())
+set.seed(216)
+
+# Sampler defaults for every fit below (bump iter if ESS/R-hat need it)
+CHAINS <- 4
+ITER   <- 2000      # 1000 warmup + 1000 sampling per chain by default
+```
+
+```r
+data <- readRDS("/Users/aishuhan/Desktop/PhD Dissertation/Data/HERICSS2021-25_STEMSRO_clean_v01.rds")
+dim(data)
+str(data)
+```
+
+# Data Preparation
+
+## Smoothing the Ceiling Spike in Social Agency
+
+The raw `socagency.sd` distribution shows a sharp ceiling spike near the top of the scale — an artifact of the IRT scoring procedure that places many students at a single maximum value. To reduce this discontinuity prior to Gaussian modelling, we add small Gaussian noise to all observations within $\varepsilon = 0.05$ of the maximum.
+
+Specification: - Detect ceiling mask: $\{i : y_i \ge y_{\max} - \varepsilon\}$, with $\varepsilon = 0.05$ - Jitter: $y_i^{\text{smooth}} = y_i + \eta_i$, where $\eta_i \sim \mathcal{N}(0, 0.10^2)$ for $i$ in the ceiling mask; $y_i^{\text{smooth}} = y_i$ otherwise - Seeded for reproducibility (`set.seed(216)`)
+
+This adds at most \~0.10 SD of noise to a small fraction of observations and leaves the bulk of the distribution untouched. All Bayesian models below use `socagency.sd_smooth` as the outcome.
+
+**Reporting:** The ceiling spike is an IRT scoring artifact that violates the Gaussian likelihood assumption and would otherwise show up as spurious misspecification in posterior predictive checks. Light jitter on the ceiling values restores continuity in the latent construct that the IRT score is intended to measure.
+
+```r
+# 1. Inspect the spike
+max_val <- max(data$socagency.sd, na.rm = TRUE)
+eps     <- 0.05
+ceiling_mask <- data$socagency.sd >= (max_val - eps)
+n_ceiling    <- sum(ceiling_mask, na.rm = TRUE)
+cat("Max value:", round(max_val, 3),
+    "| Ceiling threshold (>=", round(max_val - eps, 3), "):",
+    n_ceiling, "students (",
+    round(100 * n_ceiling / nrow(data), 2), "% of sample )\n")
+
+# 2. Jitter only the ceiling values
+set.seed(216)
+data$socagency.sd_smooth <- data$socagency.sd
+data$socagency.sd_smooth[ceiling_mask] <-
+  data$socagency.sd[ceiling_mask] + rnorm(n_ceiling, mean = 0, sd = 0.10)
+
+# 3. Before / after comparison
+par(mfrow = c(1, 2))
+hist(data$socagency.sd,        breaks = 40,
+     main = "Original socagency.sd", xlab = "socagency.sd")
+hist(data$socagency.sd_smooth, breaks = 40,
+     main = "Smoothed (jitter on ceiling)", xlab = "socagency.sd_smooth")
+par(mfrow = c(1, 1))
+
+# Summary stats: confirm minimal global distortion
+summary(data$socagency.sd)
+summary(data$socagency.sd_smooth)
+```
+
+# Descriptive Analysis
+
+```r
+library(table1)
+descr <- table1(~ socagency.sd_smooth +
+                  # school IVs
+                  insttype + instcont + selectivity.sd + hbcu +
+                  # student background (gender now 3 levels: Men/Women/GNC)
+                  gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b, data = data)
+descr
+```
+
+# Bayesian Models — Default (Weakly Informative) Priors
+
+All four models below use `socagency.sd_smooth` as the outcome and `rstanarm` default priors (autoscaled, weakly informative Normal on coefficients; Exponential(1) on $\sigma$; `decov()` on the random-effect covariance in M3/M4).
+
+## M1 — Linear (stan_glm)
+
+```r
+hist(data$socagency.sd_smooth, breaks = 40)
+
+m1_linear <- stan_glm(
+  socagency.sd_smooth ~
+    # baseline social agency measures
+    tfssocagency.sd + 
+    # community service activity
+    comserv_freq + tfsvolunteer +
+    # school IVs
+    insttype + instcont + selectivity.sd + hbcu +
+    # student background (gender now 3 levels: Men/Women/GNC)
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    # pre-college STEM
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    # aspirations, values, abilities
+    degreeasp.sub +
+    tfshabits.sd + tfsacselfcon.sd + tfssocselfcon.sd,
+  data   = data,
+  family = gaussian(),
+  chains = 4, iter = 2000, seed = 216, refresh = 0
+)
+
+# Coefficient table
+summary(m1_linear, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m1_linear)
+```
+
+## M2 — Additive (stan_gamm4)
+
+```r 
+# M2 — Additive: selected continuous predictors enter as penalized splines
+# s(); the rest stay linear. stan_gamm4() fits GAMs in rstanarm (it wraps mgcv's smooth construction).
+m2_additive <- stan_gamm4(
+  socagency.sd_smooth ~
+    # baseline social agency measure
+    s(tfssocagency.sd) +
+    # community service activity
+    comserv_freq + tfsvolunteer +
+    # school IVs
+    insttype + instcont + s(selectivity.sd) + hbcu +
+    # student background
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    # pre-college STEM
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    # aspirations, values, abilities
+    degreeasp.sub + s(tfshabits.sd) + s(tfsacselfcon.sd) + s(tfssocselfcon.sd),
+  data = data, family = gaussian(),
+  chains = CHAINS, iter = ITER, seed = 216, refresh = 0,
+  adapt_delta = 0.99           # smooths sometimes need a higher target
+)
+
+# Coefficient table
+summary(m2_additive, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m2_additive)
+```
+
+## M3 — Mixed (stan_glmer)
+
+```r 
+# Calculate ICC first
+library(lme4)
+
+m0 <- lmer(socagency.sd_smooth ~ 1 + (1 | UNITID), data = data)
+vc     <- as.data.frame(VarCorr(m0))
+tau2   <- vc$vcov[vc$grp == "UNITID"]     # between-institution variance
+sigma2 <- vc$vcov[vc$grp == "Residual"]   # within-institution (residual) variance
+icc    <- tau2 / (tau2 + sigma2)
+icc   # ICC = 0.044
+
+# M3 — Mixed: same linear specification as M1 PLUS a random intercept by
+# institution. stan_glmer() is rstanarm's lme4-style multilevel function;
+# the group-variance prior is decov() by default.
+m3_mixed <- stan_glmer(
+  socagency.sd_smooth ~
+    # baseline social agency measure
+    tfssocagency.sd +
+    # community service activity 
+    comserv_freq + tfsvolunteer +
+    # school IVs
+    insttype + instcont + selectivity.sd + hbcu +
+    # student background
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    # pre-college STEM
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    # aspirations, values, abilities
+    degreeasp.sub + tfshabits.sd + tfsacselfcon.sd + tfssocselfcon.sd +
+    # institution random intercept
+    (1 | UNITID),
+  data = data, family = gaussian(),
+  chains = CHAINS, iter = ITER, seed = 216,
+  adapt_delta = 0.95
+)
+
+# Coefficient table
+summary(m3_mixed, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m3_mixed)
+```
+
+## M4 — Additive mixed (stan_gamm4 + RI)
+
+```r 
+# M4 — Additive mixed: the M2 smooths and a random intercept
+m4_addmixed <- stan_gamm4(
+  socagency.sd_smooth ~
+    # baseline social agency measure
+    s(tfssocagency.sd) +
+    # community service activity (comserv_freq = treatment)
+    comserv_freq + tfsvolunteer +
+    # school IVs
+    insttype + instcont + s(selectivity.sd) + hbcu +
+    # student background
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    # pre-college STEM
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    # aspirations, values, abilities
+    degreeasp.sub + s(tfshabits.sd) + s(tfsacselfcon.sd) + s(tfssocselfcon.sd),
+  random = ~(1 | UNITID),
+  data = data, family = gaussian(),
+  chains = CHAINS, iter = ITER, seed = 216,
+  adapt_delta = 0.99
+)
+
+# Coefficient table
+summary(m4_addmixed, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m4_addmixed)
+```
+
+# Bayesian Models — Sparsity (Regularized Horseshoe) Priors
+
+## Horseshoe Specification
+
+For the second set of models (M5–M7), we replace the default weakly informative Normal prior on each parametric coefficient with the **regularized horseshoe** (Piironen & Vehtari, 2017). The prior shrinks small effects toward zero while leaving large signals essentially unpenalized, which is well suited to a regression with \~30 covariates of mixed substantive relevance.
+
+For coefficient $\beta_p$, $$\beta_p \mid \lambda_p, \tau, c \;\sim\; \mathcal{N}\!\left(0,\ \tau^2\, \tilde\lambda_p^{\,2}\right), \quad
+\tilde\lambda_p^{\,2} = \frac{c^2 \lambda_p^{\,2}}{c^2 + \tau^2 \lambda_p^{\,2}},$$ with local scales $\lambda_p \sim \mathrm{Half\text{-}}t_{\nu}$, global scale $\tau \sim \mathrm{Half\text{-}}t_{\nu_g}(0, \tau_0)$, and slab scale $c^2 \sim \mathrm{Inv\text{-}Gamma}$. We set $\nu = \nu_g = 1$ (Cauchy local and global), slab df = 4, slab scale = 2.5, and the global scale $\tau_0$ following $\tau_0 \approx (p_0 / (p - p_0)) \cdot \sigma / \sqrt{n}$, with $p \approx 30$ parametric coefficients and an expected number of nonzero coefficients $p_0 \approx 5$. This gives $\tau_0 \approx 0.01$.
+
+**Important:** in `stan_gamm4`, the `prior` argument applies only to the parametric (linear) coefficients. Smooth-term basis coefficients keep their own penalized priors, so applying the horseshoe leaves the additive smooths unshrunk — matching our design requirement.
+
+```r
+# Global scale: tau0 = (p0 / (p - p0)) * sigma_y / sqrt(n)
+# Use p = 30, p0 = 5; sigma_y on standardized outcome ~ 1
+p_total   <- 30
+p_nonzero <- 5
+n_obs     <- nrow(data)
+tau0      <- (p_nonzero / (p_total - p_nonzero)) / sqrt(n_obs)
+tau0   # ~ 0.0026; round up to 0.01 for a slightly less aggressive global shrinkage
+
+hs_prior <- hs(df = 1, global_df = 1, global_scale = 0.01,
+               slab_df = 4, slab_scale = 2.5)
+```
+
+## M5 — Linear + horseshoe
+
+```r 
+m5_linear_hs <- stan_glm(
+  socagency.sd_smooth ~
+    # baseline social agency
+    tfssocagency.sd +
+    # community service activity
+    comserv_freq + tfsvolunteer +
+    # school IVs
+    insttype + instcont + selectivity.sd + hbcu +
+    # student background
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    # pre-college STEM
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    # aspirations, values, abilities
+    degreeasp.sub + tfshabits.sd + tfsacselfcon.sd + tfssocselfcon.sd,
+  data   = data,
+  family = gaussian(),
+  prior  = hs_prior,
+  chains = CHAINS, iter = ITER, seed = 216, refresh = 0,
+  adapt_delta = 0.99
+)
+
+summary(m5_linear_hs, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m5_linear_hs)
+```
+
+## M6 — Additive + horseshoe (linear coefs only)
+
+```r 
+m6_additive_hs <- stan_gamm4(
+  socagency.sd_smooth ~
+    s(tfssocagency.sd) +
+    comserv_freq + tfsvolunteer +
+    insttype + instcont + s(selectivity.sd) + hbcu +
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    degreeasp.sub + s(tfshabits.sd) + s(tfsacselfcon.sd) + s(tfssocselfcon.sd),
+  data = data, family = gaussian(),
+  prior  = hs_prior,           # applies to parametric coefs only; smooths unshrunk
+  chains = CHAINS, iter = ITER, seed = 216, refresh = 0,
+  adapt_delta = 0.99
+)
+
+summary(m6_additive_hs, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m6_additive_hs)
+```
+
+## M7 — Mixed + horseshoe
+
+```r 
+m7_mixed_hs <- stan_glmer(
+  socagency.sd_smooth ~
+    tfssocagency.sd +
+    comserv_freq + tfsvolunteer +
+    insttype + instcont + selectivity.sd + hbcu +
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    degreeasp.sub + tfshabits.sd + tfsacselfcon.sd + tfssocselfcon.sd +
+    (1 | UNITID),
+  data = data, family = gaussian(),
+  prior  = hs_prior,           # fixed-effect coefs; RI keeps decov()
+  QR     = TRUE,               # orthogonalize design matrix (faster sampling)
+  chains = CHAINS, iter = ITER, seed = 216, refresh = 0,
+  adapt_delta = 0.99
+)
+
+summary(m7_mixed_hs, probs = c(0.025, 0.5, 0.975), digits = 3)
+prior_summary(m7_mixed_hs)
+```
+
+# Bayesian Models — Interactions under Sparsity Prior
+
+## Rationale
+
+With the regularized horseshoe absorbing uninformative terms, we can safely introduce interaction blocks to probe heterogeneity in the community-service association without inflating posterior uncertainty for the main effects. Drawing on the dissertation finding that women, students of color, and first-generation STEM students show higher baseline social responsibility, we test whether the community-service association *differs* by these three demographic dimensions:
+
+- `comserv_freq × gender`
+- `comserv_freq × race`
+- `comserv_freq × firstgen.b`
+
+We do not include institutional interactions (HBCU, major) here, keeping the model focused on the demographic heterogeneity claims most aligned with the dissertation story.
+
+## M8 — Mixed + horseshoe + demographic interactions
+
+```r 
+m8_mixed_hs_int <- stan_glmer(
+  socagency.sd_smooth ~
+    tfssocagency.sd +
+    comserv_freq + tfsvolunteer +
+    insttype + instcont + selectivity.sd + hbcu +
+    gender + race + tfsmajor.stemsub + firstgen.b + hsgpa.sd + parentstem.b +
+    ymath.sd + yphys.sd + ybio.sd + ycs.sd +
+    degreeasp.sub + tfshabits.sd + tfsacselfcon.sd + tfssocselfcon.sd +
+    # demographic interactions with treatment
+    comserv_freq:gender + comserv_freq:race + comserv_freq:firstgen.b +
+    (1 | UNITID),
+  data = data, family = gaussian(),
+  prior  = hs_prior,
+  QR     = TRUE,               # orthogonalize design matrix (faster sampling)
+  chains = CHAINS, iter = ITER, seed = 216, refresh = 0,
+  adapt_delta = 0.99
+)
+
+summary(m8_mixed_hs_int, probs = c(0.025, 0.5, 0.975), digits = 3)
+
+# Pull out only the interaction coefficients for inspection
+int_pars <- grep("^comserv_freq.*:", rownames(summary(m8_mixed_hs_int)), value = TRUE)
+summary(m8_mixed_hs_int, pars = int_pars,
+        probs = c(0.025, 0.5, 0.975), digits = 3)
+```
+
+# Convergence and Model Checking
+
+```r 
+fits <- list(
+  `M1 Linear`           = m1_linear,
+  `M2 Additive`         = m2_additive,
+  `M3 Mixed`            = m3_mixed,
+  `M4 Additive mixed`   = m4_addmixed,
+  `M5 Linear + HS`      = m5_linear_hs,
+  `M6 Additive + HS`    = m6_additive_hs,
+  `M7 Mixed + HS`       = m7_mixed_hs,
+  `M8 Mixed + HS + Int` = m8_mixed_hs_int
+)
+
+# R-hat and bulk-ESS check for every model (want R-hat ~ 1.00, ESS in 1000s)
+# as.matrix() on a stanreg object returns the posterior draws matrix.
+purrr::imap_dfr(fits, function(m, nm) {
+  s <- posterior::summarise_draws(as.matrix(m), "rhat", "ess_bulk")
+  tibble(model = nm,
+         max_rhat = max(s$rhat, na.rm = TRUE),
+         min_ess  = min(s$ess_bulk, na.rm = TRUE))
+}) %>% kable(digits = 3, caption = "Convergence summary across models")
+```
+
+```r 
+# Posterior predictive checks — does each model reproduce the outcome dist
+pp_check(m1_linear,      ndraws = 100) + ggtitle("M1 Linear")
+pp_check(m2_additive,    ndraws = 100) + ggtitle("M2 Additive")
+pp_check(m3_mixed,       ndraws = 100) + ggtitle("M3 Mixed")
+pp_check(m4_addmixed,    ndraws = 100) + ggtitle("M4 Additive mixed")
+pp_check(m5_linear_hs,   ndraws = 100) + ggtitle("M5 Linear + HS")
+pp_check(m6_additive_hs, ndraws = 100) + ggtitle("M6 Additive + HS")
+pp_check(m7_mixed_hs,    ndraws = 100) + ggtitle("M7 Mixed + HS")
+pp_check(m8_mixed_hs_int,ndraws = 100) + ggtitle("M8 Mixed + HS + Int")
+```
+
+```r 
+# Visualize the estimated 
+# plot_nonlinear() is rstanarm's helper for stan_gamm4 smooth term
+plot_nonlinear(m2_additive)
+```
+
+# Model Comparison (Robustness)
+
+```r
+loo_m1 <- loo(m1_linear)
+loo_m2 <- loo(m2_additive)
+loo_m3 <- loo(m3_mixed)
+loo_m4 <- loo(m4_addmixed)        # overfitting under default priors
+loo_m5 <- loo(m5_linear_hs)
+loo_m6 <- loo(m6_additive_hs)
+loo_m7 <- loo(m7_mixed_hs)
+loo_m8 <- loo(m8_mixed_hs_int)
+
+# loo_compare orders models best-first
+loo_compare(loo_m1, loo_m2, loo_m3, loo_m4,
+            loo_m5, loo_m6, loo_m7, loo_m8)
+
+print(loo_m4)
+print(loo_m8)
+```
+
+# Treatment Effect Summary
+
+## Posterior of `comserv_freq` across all models
+
+```r 
+# Pull posterior draws for the main treatment coefficient from every fit
+tx_par <- "comserv_freqTreated"
+
+tx_draws <- purrr::imap_dfr(fits, function(m, nm) {
+  d <- as.data.frame(m, pars = tx_par)
+  tibble(model = nm, beta = d[[tx_par]])
+})
+
+# Posterior summary table
+tx_summary <- tx_draws %>%
+  group_by(model) %>%
+  summarise(
+    mean   = mean(beta),
+    sd     = sd(beta),
+    q025   = quantile(beta, 0.025),
+    q975   = quantile(beta, 0.975),
+    p_gt_0 = mean(beta > 0)
+  )
+tx_summary %>% kable(digits = 3,
+  caption = "Posterior of community-service association across models")
+
+# Posterior density overlay
+ggplot(tx_draws, aes(x = beta, colour = model)) +
+  geom_density(linewidth = 0.7) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(x = expression(beta[comserv_freq]),
+       y = "Posterior density",
+       title = "Posterior of community-service association across models") +
+  theme_minimal()
+```
+
+## M8 — demographic interaction posteriors
+
+```r 
+# Extract interaction-coefficient posteriors and plot 95% CrIs
+all_pars <- rownames(summary(m8_mixed_hs_int))
+int_pars <- grep("^comserv_freq.*:|^comserv_freqTreated:", all_pars, value = TRUE)
+int_pars
+
+int_draws <- as.data.frame(m8_mixed_hs_int, pars = int_pars) %>%
+  tidyr::pivot_longer(everything(), names_to = "term", values_to = "beta")
+
+int_draws %>%
+  group_by(term) %>%
+  summarise(
+    mean = mean(beta), sd = sd(beta),
+    q025 = quantile(beta, 0.025), q975 = quantile(beta, 0.975),
+    p_gt_0 = mean(beta > 0)
+  ) %>%
+  arrange(desc(abs(mean))) %>%
+  kable(digits = 3,
+        caption = "M8: posterior of comserv × demographic interaction terms")
+
+ggplot(int_draws, aes(x = beta, y = term)) +
+  tidybayes::stat_halfeye(.width = c(0.5, 0.95)) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(x = "Interaction coefficient (on standardized outcome)",
+       y = NULL,
+       title = "M8: heterogeneity of community-service association") +
+  theme_minimal()
+```
+
+
+
