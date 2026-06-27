@@ -6,6 +6,7 @@ categories: [Bayesian, R]
 format:
   html:
     toc: true
+    toc-title: Contents
     code-fold: false
     self-contained: true
 image: "cover.png"

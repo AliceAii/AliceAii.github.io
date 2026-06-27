@@ -1,0 +1,562 @@
+---
+title: "Bayesian Methods Part 5: Multilevel Models and Partial Pooling"
+author: Shuhan (Alice) Ai
+date: "2026-06-10"
+categories: [Bayesian, R, Multilevel Models]
+format:
+  html:
+    toc: true
+    toc-title: Contents
+    code-fold: false
+    self-contained: true
+image: "cover.png"
+execute:
+  warning: false
+  message: false
+---
+
+[Part 4](https://aliceaii.github.io/posts/bayesian4/) led us into Bayesian regression with MCMC. We used `rstanarm` to fit logistic, probit, and ordered models, and the main lesson was computational: once the posterior is no longer available in closed form, we sample from it.
+
+This post moves from single-level regression to **multilevel modeling**. The main idea is: when observations are nested within groups, we should recognize group differences without treating each group as entirely separate.
+
+Multilevel models give us a principled compromise called **partial pooling**. Multilevle or hierarchical models provide a principled approach to estimating group-specific effects through empirical Bayes, or shrinkage, estimation: each group’s estimate is informed by its own data while also being adjusted toward the value predicted by the higher-level model.
+
+We will use the 1992 American National Election Study (NES) to predict whether a voter supported George H. W. Bush. Voters are nested in states, so the question is:
+
+> How do we estimate state differences in Bush support without overreacting to noisy state-level samples?
+
+Along the way, we will compare:
+
+- **Complete pooling**: ignore state entirely.
+- **No pooling**: estimate a separate fixed effect for every state.
+- **Partial pooling**: estimate state effects as draws from a shared distribution.
+- **Bayesian partial pooling**: fit the same multilevel model with `stan_glmer()` and summarize posterior uncertainty directly.
+
+## Setup
+
+```{r setup}
+library(haven)      # read .dta files
+library(arm)        # sim()
+library(lme4)       # glmer()
+library(rstanarm)   # stan_glmer()
+library(bayesplot)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(knitr)
+library(skimr)
+
+options(mc.cores = min(4, parallel::detectCores()))
+theme_set(bayesplot::theme_default(base_size = 11))
+```
+
+## 1. The Pooling Problem
+
+Suppose voters are nested in states. Let $y_i = 1$ if voter $i$ voted for Bush and $0$ otherwise.
+
+A simple logistic regression ignores state:
+
+$$
+\Pr(y_i = 1) = \text{logit}^{-1}(X_i \beta).
+$$
+
+This is **complete pooling**. Every voter contributes to one national regression line. The model is stable, but it cannot show residual state-to-state differences.
+
+The opposite approach estimates a separate intercept for every state:
+
+$$
+\Pr(y_i = 1) = \text{logit}^{-1}(\alpha_{s[i]} + X_i \beta).
+$$
+
+This is **no pooling**. Each state gets its own intercept. The model is flexible, but small states can get noisy, extreme estimates.
+
+The multilevel model lands between those extremes:
+
+$$
+\Pr(y_i = 1) =
+\text{logit}^{-1}(\alpha + a_{s[i]} + X_i \beta),
+\qquad
+a_s \sim \mathcal{N}(0, \sigma_a^2).
+$$
+
+This is what we called **partial pooling**. State effects are estimated as coming from a shared distribution. States with little data are pulled toward the national average; states with more data are allowed to move farther away.
+
+::: {.callout-note}
+## Understaning partial pooling in education context
+
+Example: Suppose you want to estimate each school’s average achievement. A school with only 10 students should not be allowed to look extremely high or low based only on a tiny sample. Partial pooling says: “Use what we know from this school, but also borrow strength from all schools.” So the small school’s estimate is pulled more toward the overall pattern, while a large school’s estimate stays closer to its own observed average.
+
+In Raudenbush and Bryk’s (2002) terminology, this is closely related to *empirical Bayes shrinkage*: group-specific estimates are shrunk more when they are less reliable, especially when the group has a small sample size or more noise. 
+:::
+
+
+
+
+## 2. Why This Is Bayesian in Spirit
+
+The random-effect assumption
+
+$$
+a_s \sim \mathcal{N}(0, \sigma_a^2)
+$$
+
+resembles a prior distribution on state effects. In a fully Bayesian model, it would be interpreted in that way. In `glmer()`, this structure is estimated using maximum likelihood rather than full Bayesian inference, but it still carries a similar regularizing logic.
+
+In this sense, even before moving to Stan, multilevel modeling already has a Bayesian flavor:
+
+- Group effects are treated as uncertain quantities.
+- Extreme estimates are moderated toward a shared center.
+- Predictions combine individual-level information with group-level information.
+- Uncertainty can be explored by simulating from the fitted model.
+
+This is why multilevel modeling offers a natural bridge from classical regression to Bayesian data analysis.
+
+## 3. NES 1992 Data
+
+The NES is a long-running survey of U.S. voters. We use the 1992 presidential election, keep only two-party voters, and code:
+
+$$
+y_i =
+\begin{cases}
+1, & \text{voted for Bush} \\
+0, & \text{voted for Clinton.}
+\end{cases}
+$$
+
+```{r nes-data}
+nes_raw <- read_dta(
+  "https://faculty.stat.ucla.edu/handcock/216/examples/nes/nes5200_processed_voters_realideo.dta"
+)
+
+scale_2sd <- function(x) {
+  as.numeric((x - mean(x, na.rm = TRUE)) / (2 * sd(x, na.rm = TRUE)))
+}
+
+nes92 <- nes_raw %>%
+  filter(year == 1992, presvote < 3) %>%
+  mutate(vote_bush = ifelse(presvote == 2, 1, 0)) %>%
+  select(vote_bush, female, black, age, educ1, income,
+         partyid7, real_ideo, ideo_feel, state) %>%
+  na.omit() %>%
+  mutate(
+    age_c    = scale_2sd(age),
+    educ_c   = scale_2sd(educ1),
+    income_c = scale_2sd(income),
+    party_c  = scale_2sd(partyid7),
+    ideo_c   = scale_2sd(real_ideo),
+    state    = factor(state)
+  )
+
+dim(nes92)
+skim(nes92)
+```
+
+::: {.callout-note}
+## Why divide continuous predictors by 2 SD?
+Binary predictors, such as `female` or `black`, usually change from 0 to 1. This makes their coefficients easy to interpret: they describe the difference between the two groups.
+
+Continuous predictors, such as age or income, are different. A one-unit change may be very small, such as one year of age or one dollar of income. This can make their coefficients difficult to compare with binary predictors.
+
+Gelman (2008) recommends dividing continuous predictors by two standard deviations. This puts continuous predictors on a scale that is more comparable to a 0-to-1 change in a binary variable.
+
+For example, if we divide age by `2 * sd(age)`, the age coefficient no longer describes the effect of a one-year increase. Instead, it describes a larger and more meaningful difference, roughly comparing a relatively young voter with a relatively old voter.
+
+This scaling makes it easier to compare which predictors have larger or smaller associations with the outcome.
+:::
+
+## 4. Complete Pooling: Ignore State
+
+Start with an ordinary logistic regression. This model uses individual-level predictors but ignores state.
+
+```{r complete-pooling}
+fit_complete <- glm(
+  vote_bush ~ female + black + age_c + educ_c + income_c +
+    party_c + ideo_c + income_c:ideo_c + party_c:ideo_c,
+  family = binomial,
+  data = nes92
+)
+
+summary(fit_complete)
+```
+
+```{r complete-odds}
+exp(coef(fit_complete)[c("party_c", "ideo_c", "black")])
+```
+
+On the logit scale, positive coefficients indicate higher log-odds of voting for Bush. On the odds scale, `exp(beta)` represents the multiplicative change in the odds of voting for Bush.
+
+The main findings are straightforward:
+
+- Voters who identify as more Republican are much more likely to vote for Bush.
+- Voters who identify as more conservative are also more likely to vote for Bush.
+- Black respondents are much less likely to vote for Bush, after accounting for the other predictors.
+
+However, this model cannot tell us whether some states remain more or less pro-Bush after adjusting for individual-level characteristics.
+
+
+## 5. No Pooling: Fixed State Effects
+
+The no-pooling model includes `state` as a fixed effect. This gives every state its own intercept.
+
+```{r no-pooling}
+fit_no_pool <- glm(
+  vote_bush ~ female + black + age_c + educ_c + income_c +
+    party_c + ideo_c + income_c:ideo_c + party_c:ideo_c +
+    state,
+  family = binomial,
+  data = nes92
+)
+
+summary(fit_no_pool)
+```
+
+The problem is not that state fixed effects are wrong. They are often useful. The problem is that they treat every state's estimate as independent. A state with a small sample can get an extreme intercept even if the evidence is thin.
+
+Let's extract the state fixed effects and compare them to state sample sizes.
+
+```{r no-pooling-state-effects, fig.width=7, fig.height=4.5}
+state_counts <- nes92 %>%
+  count(state, name = "n")
+
+no_pool_effects <- coef(fit_no_pool) %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("term") %>%
+  rename(estimate = 2) %>%
+  filter(grepl("^state", term)) %>%
+  mutate(state = sub("^state", "", term)) %>%
+  select(state, estimate)
+
+ggplot(no_pool_effects %>% left_join(state_counts, by = "state"),
+       aes(x = n, y = estimate)) +
+  geom_point(alpha = 0.75) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  labs(
+    x = "State sample size",
+    y = "No-pooling state fixed effect",
+    title = "Small states can have noisy fixed-effect estimates"
+  ) +
+  theme_bw()
+```
+
+::: {.callout-warning}
+## A subtle issue with state fixed effects
+Fixed effects do not know that state estimates are related to one another. If a state has little data, the model does not automatically borrow strength from other states. That is exactly what multilevel modeling fixes.
+:::
+
+## 6. Partial Pooling: Varying Intercepts by State
+
+Now fit the multilevel model. The formula `(1 | state)` means each state gets its own intercept, and those intercepts are modeled as coming from a shared normal distribution.
+
+```{r partial-pooling}
+fit_partial <- glmer(
+  vote_bush ~ female + black + age_c + educ_c + income_c +
+    party_c + ideo_c + income_c:ideo_c + party_c:ideo_c +
+    (1 | state),
+  family = binomial,
+  data = nes92
+)
+
+summary(fit_partial)
+```
+
+The state-level standard deviation tells us how much residual state-to-state variation remains after accounting for individual predictors.
+
+```{r state-sd}
+as.data.frame(VarCorr(fit_partial)) %>%
+  select(grp, var1, sdcor)
+```
+
+If this standard deviation is small, then most of the state differences are already explained by individual-level covariates. If it is large, similar voters still differ meaningfully across states.
+
+## 7. Seeing Shrinkage
+
+Partial pooling shrinks state effects toward zero. The amount of shrinkage is not arbitrary: it depends on state sample size and estimated state-level variance.
+
+```{r shrinkage-plot, fig.width=7, fig.height=4.8}
+partial_effects <- ranef(fit_partial)$state[, 1] %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("state") %>%
+  rename(partial_pooling = 2)
+
+shrink_df <- no_pool_effects %>%
+  rename(no_pooling = estimate) %>%
+  inner_join(partial_effects, by = "state") %>%
+  left_join(state_counts, by = "state")
+
+ggplot(shrink_df, aes(x = no_pooling, y = partial_pooling, size = n)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray60") +
+  geom_point(alpha = 0.75, color = "#5B8DB8") +
+  scale_size_continuous(range = c(2, 7)) +
+  labs(
+    x = "No-pooling state effect",
+    y = "Partial-pooling state effect",
+    size = "State n",
+    title = "Partial pooling pulls state effects toward the national average"
+  ) +
+  theme_bw()
+```
+
+Points below the diagonal in absolute value have been pulled toward zero. Smaller states usually shrink more because the model has less state-specific information for them.
+
+The gray dash line is the “no change” reference line, where partial-pooling state effect = no-pooling state effect. So:
+
+- Points on the dashed line: partial pooling gives the same estimate as no pooling.
+- Points below the dashed line: partial pooling gives a smaller estimate than no pooling.
+- Points above the dashed line: partial pooling gives a larger estimate than no pooling.
+
+## 8. Bayesian Partial Pooling with `stan_glmer`
+
+Now we can fit a Bayesian version of the same multilevel logistic regression model. The model structure is very similar to the `glmer()` model: we still predict whether a respondent voted for Bush, include individual-level predictors, and allow the intercept to vary by state.
+
+The key difference is that `stan_glmer()` estimates a **posterior distribution** for each parameter rather than only producing one point estimate and a standard error. This means we can describe not only the most likely value of each coefficient, but also the uncertainty around it.
+
+```{r stan-partial, cache=TRUE}
+fit_stan <- stan_glmer(
+  vote_bush ~ female + black + age_c + educ_c + income_c +
+    party_c + ideo_c + income_c:ideo_c + party_c:ideo_c +
+    (1 | state),
+  family = binomial(link = "logit"),
+  data = nes92,
+  prior = normal(0, 2.5),
+  prior_intercept = normal(0, 5),
+  iter = 2000,
+  chains = 4,
+  seed = 216,
+  refresh = 0
+)
+
+summary(fit_stan, probs = c(0.025, 0.5, 0.975), digits = 2)
+```
+
+The term `(1 | state)` means that each state is allowed to have its own baseline tendency to vote for Bush. These state-specific intercepts are not estimated completely separately. Instead, the model assumes that they come from a common state-level distribution. This is what creates **partial pooling**: each state estimate uses information from that state, but it is also stabilized by information from the overall distribution of states.
+
+In practical terms, states with less information are pulled more strongly toward the national average, while states with more information are allowed to remain closer to their own observed pattern. This helps avoid overinterpreting noisy state-level estimates, especially when some states have small sample sizes.
+
+The weakly informative prior `normal(0, 2.5)` is fairly wide on the log-odds scale. A coefficient of 2.5 corresponds to multiplying the odds by about 12, since `exp(2.5)` is approximately 12. This prior does not force coefficients to be small, but it discourages extremely large and implausible effects. In this way, the prior provides gentle regularization while still allowing the data to drive the results.
+
+The prior on the intercept, `normal(0, 5)`, is even wider. This gives the model flexibility in estimating the overall baseline log-odds of voting for Bush.
+
+
+::: {.callout-note}
+## Confidence interval vs credible interval
+A 95% frequentist confidence interval describes the long-run behavior of an estimation procedure. If we repeatedly sampled data and built intervals in the same way, about 95% of those intervals would contain the true parameter.
+
+A 95% Bayesian credible interval has a more direct interpretation. Given the model, prior, and data, 95% of the posterior distribution lies inside that interval.
+
+These intervals may look similar when priors are weak and samples are large, but they come from different statistical frameworks and should not be interpreted in the same way.
+:::
+
+## 9. Comparing `glmer` and `stan_glmer`
+
+With weakly informative priors and enough data, the classical and Bayesian multilevel estimates are often very similar. This is what we see here. The `glmer` estimates and the `stan_glmer` posterior medians are close for most coefficients.
+
+The main difference is in how we interpret the results. The `glmer` model gives a point estimate and standard error based on maximum likelihood estimation. The `stan_glmer` model gives a posterior distribution for each parameter. In the table below, `stan_median` is the middle of the posterior distribution, while `stan_low` and `stan_high` give the lower and upper bounds of the 95% credible interval.
+
+```{r compare-glmer-stan}
+glmer_coef <- fixef(fit_partial)
+stan_draws <- as.matrix(fit_stan)
+stan_fixed <- stan_draws[, names(glmer_coef), drop = FALSE]
+
+compare_tbl <- tibble(
+  term = names(glmer_coef),
+  glmer_estimate = as.numeric(glmer_coef),
+  stan_median = apply(stan_fixed, 2, median),
+  stan_low = apply(stan_fixed, 2, quantile, probs = 0.025),
+  stan_high = apply(stan_fixed, 2, quantile, probs = 0.975)
+)
+
+kable(compare_tbl, digits = 2)
+```
+
+All coefficients are on the logit scale. Positive values mean higher log-odds of voting for Bush, while negative values mean lower log-odds of voting for Bush.
+
+The comparison shows that the two models tell a very similar story. Party identification has the largest positive coefficient in both models. The `glmer` estimate is 4.71, and the Bayesian posterior median is 4.72. This means that voters who identify as more Republican are much more likely to vote for Bush. Ideology is also strongly positive: more conservative voters are more likely to vote for Bush.
+
+The coefficient for Black respondents is strongly negative in both models. The `glmer` estimate is -2.60, and the Bayesian posterior median is -2.53. The Bayesian credible interval is also entirely below zero, from -3.88 to -1.41. This indicates that, after adjusting for the other predictors in the model, Black respondents were much less likely to vote for Bush.
+
+For several other predictors, the Bayesian credible intervals include zero. For example, the intervals for `female`, `age_c`, `educ_c`, `income_c`, and `income_c:ideo_c` all cross zero. This means the data do not provide strong evidence that these predictors have clearly positive or clearly negative associations with voting for Bush, after accounting for the other variables in the model.
+
+The interaction between party identification and ideology, `party_c:ideo_c`, is negative in both models. However, its Bayesian credible interval ranges from -2.82 to 0.21, which includes zero. This suggests that the interaction may be negative, but there is still considerable uncertainty about its size and direction.
+
+Overall, the comparison is reassuring. The Bayesian model does not produce very different estimates from the classical multilevel model. Instead, it gives a similar set of results while adding a posterior interpretation. This allows us to describe uncertainty more directly and to use posterior simulations for predicted probabilities, state effects, and other quantities of interest.
+
+## 10. Visualizing State-Level Uncertainty
+
+So far, we have compared coefficients and state-level intercepts numerically. Another useful way to understand the multilevel model is to **visualize how the predicted probability of voting for Bush changes across states**.
+
+Gelman and Hill's (2007) Figure 14.2 in *Analysis Using Regression and Multilevel/Hierarchical Models* shows fitted logistic curves for several states. The idea is simple: we first summarize each respondent’s individual-level predictors into the fixed part of the linear predictor, and then we allow each state’s random intercept to shift the curve up or down.
+
+In this plot, the x-axis represents the fixed part of the linear predictor:
+
+$$
+\eta_i = X_i\beta
+$$
+
+This combines the individual-level information, such as gender, race, age, education, income, party identification, ideology, and the interaction terms.
+
+Then the state-specific model adds a state random intercept:
+
+$$
+\eta_{ij} = X_{ij}\beta + a_j
+$$
+
+where (a_j) is the estimated state effect for state (j). After applying the inverse-logit transformation, we get the predicted probability of voting for Bush:
+
+$$
+P(Y_{ij} = 1) = \frac{1}{1 + \exp[-(X_{ij}\beta + a_j)]}
+$$
+
+The key point is that the state random intercept shifts the logistic curve. A state with a positive random intercept has a higher predicted probability of voting for Bush, holding individual characteristics constant. A state with a negative random intercept has a lower predicted probability.
+
+First, we choose eight states with the largest sample sizes. Using states with larger samples makes the plots easier to read because there are more observed data points in each panel.
+
+```{r choose-states}
+states_plot <- nes92 %>%
+  count(state) %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 8) %>%
+  pull(state) %>%
+  as.character()
+
+states_plot
+```
+
+### 10.1 Approximate posterior simulation with `arm::sim()`
+
+The first version uses `arm::sim()` to simulate uncertainty from the fitted `glmer()` model. This is not full Bayesian MCMC, but it is useful for teaching because it gives a posterior-like simulation. The basic idea is:
+
+1. Fit the multilevel model using `glmer()`.
+2. Simulate plausible values of the model parameters.
+3. Use those simulated values to draw many possible prediction curves.
+4. Compare the curves across states.
+
+The thin colored lines represent simulated curves. Each line is one plausible version of the state-specific relationship between the fixed linear predictor and the probability of voting for Bush. The black line shows the fitted curve using the estimated state random intercept. The jittered points show the observed vote outcomes, where 1 means voting for Bush and 0 means not voting for Bush.
+
+```{r arm-sim-plot, fig.width=8, fig.height=4.8}
+beta <- fixef(fit_partial)
+X <- model.matrix(fit_partial)
+eta_fixed <- as.numeric(X %*% beta)
+
+invlogit <- function(x) 1 / (1 + exp(-x))
+x_grid <- seq(min(eta_fixed), max(eta_fixed), length.out = 200)
+
+set.seed(216)
+sims <- arm::sim(fit_partial, n.sims = 20)
+
+state_names <- rownames(ranef(fit_partial)$state)
+state_draw_mat <- sims@ranef$state[, , 1]
+colnames(state_draw_mat) <- state_names
+
+draw_curves_arm <- map_dfr(states_plot, function(s) {
+  re_draws <- state_draw_mat[, s]
+  expand.grid(x = x_grid, draw = seq_along(re_draws)) %>%
+    mutate(
+      state = s,
+      y = invlogit(x + re_draws[draw])
+    )
+})
+
+re_state <- ranef(fit_partial)$state[, 1]
+names(re_state) <- state_names
+
+median_curves <- expand.grid(x = x_grid, state = states_plot) %>%
+  mutate(y = invlogit(x + re_state[as.character(state)]))
+
+plot_df <- nes92 %>%
+  mutate(eta_fixed = eta_fixed) %>%
+  filter(state %in% states_plot)
+
+ggplot() +
+  geom_jitter(
+    data = plot_df,
+    aes(x = eta_fixed, y = vote_bush),
+    height = 0.03, alpha = 0.3, size = 0.6
+  ) +
+  geom_line(
+    data = draw_curves_arm,
+    aes(x = x, y = y, group = draw),
+    color = "#5B8DB8", alpha = 0.25, linewidth = 0.3
+  ) +
+  geom_line(
+    data = median_curves,
+    aes(x = x, y = y),
+    color = "black", linewidth = 0.9
+  ) +
+  facet_wrap(~ state, nrow = 2) +
+  labs(
+    x = expression(eta[i] ~ "(fixed part of linear predictor)"),
+    y = "P(vote Bush)",
+    title = "State-specific curves from a varying-intercept logit model"
+  ) +
+  theme_bw()
+```
+
+The plot should be read as follows. Moving from left to right on the x-axis means that the respondent’s individual characteristics make them more likely to vote for Bush. Moving upward on the y-axis means a higher predicted probability of voting for Bush.
+
+The panels differ by state. If one state’s curve is generally higher than another state’s curve, this means that voters in that state are estimated to be more likely to vote for Bush, after holding individual-level characteristics constant. If the curve is lower, that state is estimated to be less pro-Bush, conditional on the same individual-level predictors.
+
+The spread of the thin colored lines shows uncertainty. When the lines are close together, the model is relatively certain about that state’s curve. When the lines are more spread out, the model is less certain. States with less information usually have more uncertainty, and their estimated state effects are also more strongly pulled toward the overall average.
+
+### 10.2 Full posterior curves from `stan_glmer`
+
+Now we repeat the same idea using the Bayesian model from `stan_glmer()`. This time, the curves come from actual posterior draws. Each draw represents one plausible set of parameter values after combining the prior, the model, and the observed data.
+
+This version has a more direct Bayesian interpretation. The thin curves show plausible state-specific prediction curves from the posterior distribution. The variation among these curves represents posterior uncertainty about the state-level effect.
+
+```{r bayes-state-curves, cache=TRUE, fig.width=8, fig.height=4.8}
+post_mat <- as.matrix(fit_stan)
+set.seed(216)
+draw_idx <- sample(seq_len(nrow(post_mat)), 20)
+
+find_state_col <- function(s) {
+  hits <- grep(paste0("state:", s, "\\]"), colnames(post_mat), value = TRUE)
+  if (length(hits) == 0) {
+    stop("Could not find posterior column for state ", s)
+  }
+  hits[1]
+}
+
+draw_curves_bayes <- map_dfr(states_plot, function(s) {
+  col <- find_state_col(s)
+  re_draws <- post_mat[draw_idx, col]
+  expand.grid(x = x_grid, draw = seq_along(re_draws)) %>%
+    mutate(
+      state = s,
+      y = invlogit(x + re_draws[draw])
+    )
+})
+
+ggplot() +
+  geom_jitter(
+    data = plot_df,
+    aes(x = eta_fixed, y = vote_bush),
+    height = 0.03, alpha = 0.3, size = 0.6
+  ) +
+  geom_line(
+    data = draw_curves_bayes,
+    aes(x = x, y = y, group = draw),
+    color = "#8B3A8B", alpha = 0.25, linewidth = 0.3
+  ) +
+  geom_line(
+    data = median_curves,
+    aes(x = x, y = y),
+    color = "black", linewidth = 0.9
+  ) +
+  facet_wrap(~ state, nrow = 2) +
+  labs(
+    x = expression(eta[i] ~ "(fixed part of linear predictor)"),
+    y = "P(vote Bush)",
+    title = "State-specific curves from posterior draws"
+  ) +
+  theme_bw()
+```
+
+The two plots should tell almost the same story. Both show how state-level intercepts shift the logistic curve upward or downward. Both also show that the model does not produce a single certain curve; instead, there is uncertainty around each state-specific prediction.
+
+The difference is interpretive. The `arm::sim()` plot is based on a normal approximation to the fitted `glmer()` model. It is useful and often works well, but it is still an approximation. The `stan_glmer()` plot is based on draws from the posterior distribution, so it has a clearer Bayesian interpretation.
+
+
+*This tutorial is based on UCLA [STATS C216: Applied Bayesian Social Statistics](https://handcock.github.io/teaching/c216/) taught by Prof [Mark Handcock](https://handcock.github.io/).*
+
+
