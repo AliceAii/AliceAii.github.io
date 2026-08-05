@@ -37,4 +37,11 @@ This is my little baby, **Star**. She also has a beautiful Chinese name, 星晨,
   <img src="star.jpg" alt="Star the corgi" style="width: 250px; border-radius: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </div>
 
+
+</div>
+
+<p style="text-align: center; font-size: 14px; color: #555; margin: 20px 0 5px 0;">
+  &copy; 2026 Shuhan “Alice” Ai.
+</p>
+
 </div>
