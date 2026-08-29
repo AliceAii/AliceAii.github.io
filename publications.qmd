@@ -16,13 +16,13 @@ format:
 
 <div class="hanging">
 
-**Ai, S.** (in press). Engaging Future Scientists: The Effect of Science Museum Visits on High School Students’ Science Identity Development. *International Journal of STEM Education*.
-
-Jiang, T., **Ai, S.**, Jiao, C., Li, K (in press). Revealing Hidden Contributions on Research Data: The Potential of Data Paper. *Scientometrics.*
-
 **Ai, S.** & Eagan, K., (2026). From Club to College: The Impact of Science Clubs/Groups on High School Students’ STEM Major Choice. *Research in Higher Education*, 67, 32. [[Paper]](https://doi.org/10.1007/s11162-026-09892-8) [[Code]](https://github.com/AliceAii/From-Club-to-College)
 
+**Ai, S.** (2026). Engaging Future Scientists: The Effect of Science Museum Visits on High School Students’ Science Identity Development. *International Journal of STEM Education*. [[Paper]](https://doi.org/10.1186/s40594-026-00644-9)[[Code]](https://github.com/AliceAii/Engaging-Future-Scientists)
+
 **Ai, S.**, Eagan, K., Wu, J. (2026). Fueling Ambition: Graduate Degree Aspirations Among Women of Color in STEM. *CBE – Life Science Education.* [[Paper]](https://www.lifescied.org/doi/10.1187/cbe.25-10-0229) [[Code]](https://github.com/AliceAii/Fueling-Ambition-WOC-STEM)
+
+Jiang, T., **Ai, S.**, Jiao, C., Li, K (2026). Revealing Hidden Contributions on Research Data: The Potential of Data Paper. *Scientometrics.* [[Paper]](https://doi.org/10.1007/s11192-026-05768-x)
 
 **Ai, S.** (2024). Empowering Online Teaching: A System Review of Online Instructors’ Professional Development in Higher Education. *InterActions: UCLA Journal of Education and Information Studies, 19*(1). 
 [[Paper]](https://doi.org/10.5070/D41.6661)
@@ -55,6 +55,8 @@ Omeyr, F. & **Ai, S.** (2023). State of the Cities. *National League of Cities.*
 
 **Ai, S.** & Wu, J. (under review). Shortcut or Stepping-Stone? AI-Assisted Coursework and STEM Graduate Aspirations among U.S. STEM Undergraduates. *International Journal of STEM Education.*
 
+**Ai, S.** (under review). Early Signals, Future Pathways: A Systematic Review of the Middle School Indicators for College and Career Success, 2007–2026. *Review of Educational Research.*
+
 **Ai, S.** (under review). Building Professional Ties Online: How Discussion Networks Form and Evolve in a MOOC for K-12 Educators. *Social Networks.*
 
 Wu, J., Li, L., & **Ai, S.** (under review). Finding the Way In: Longitudinal Predictors of Female STEM Joiner Pathways. *AERA Open.* 
@@ -69,6 +71,6 @@ Eagan, M. K., Ramos, H., **Ai, S.**, Romero, A. L., & Cobian, K. (under review).
 
 **Ai, S.** & Rickles, J. (in preparation). Decomposing Disparities in High School Computer Science Course-Taking for Women of Color: The Intersection of Race, Sex, Access, and Participation. *Educational Researcher.*
 
-**Ai, S.** (in preparation). Early Signals, Future Pathways: A Systematic Review of the Middle School Indicators for College and Career Success, 2007–2026. *Review of Educational Research.*
+
 
 </div>
